@@ -3,11 +3,40 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { BrowserRouter } from 'react-router-dom';
+import { compose, combineReducers, createStore, applyMiddleware} from 'redux';
+import { Provider } from 'react-redux';
+import thunk from 'redux-thunk';
+
+import noteReducer from './store/reducers/notes';
+import authReducer from './store/reducers/auth';
+import msgReducer from './store/reducers/message';
+import notesList from './store/reducers/allNotes';
+
+const composeEnhancers = process.env.NODE_ENV === 'development' ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ : null || compose;
+// const composeEnhancers = compose;
+
+const rootReducer = combineReducers({
+  note: noteReducer,
+  auth: authReducer,
+  msg: msgReducer,
+  notelist: notesList
+});
+
+const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk)))
+
+const app = (
+  <Provider store={store}>
+    <BrowserRouter basename="/">
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    </BrowserRouter>
+  </Provider>
+);
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  app,
   document.getElementById('root')
 );
 

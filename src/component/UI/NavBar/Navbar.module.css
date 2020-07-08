@@ -1,0 +1,16 @@
+.BrandName {
+    color: whitesmoke;
+    font-size: large;
+    font-weight: bolder;
+}
+
+.NavbarItem {
+    margin-left: 20px;
+}
+
+@media (max-width: 767px) {
+    .NavbarItem {
+        margin-left: 0px;
+        margin-top: 10px;
+    }
+}

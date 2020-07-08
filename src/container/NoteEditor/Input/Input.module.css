@@ -1,0 +1,11 @@
+.Textarea {
+    height: 50vh !important;
+    font-size: 20px !important;
+    background-color: antiquewhite !important;
+    color: black !important;
+    font-family: 'Roboto', sans-serif !important;
+}
+
+.Textfield {
+    font-size: 20px;
+}

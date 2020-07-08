@@ -1,26 +1,64 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
+import Navbar from './component/UI/NavBar/Navbar';
+import { Route, Switch } from 'react-router-dom';
+import NoteEditor from './container/NoteEditor/NoteEditor';
+import Auth from './container/Auth/Auth';
+import Test from './Test/Test';
+import Logout from './container/Auth/Logout/Logout';
+import MainPage from './container/MainPage/MainPage';
+import { connect } from 'react-redux';
+import * as actions from './store/actions/index';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+let routes = null;
+
+class App extends Component {
+
+  componentDidMount () {
+    this.props.onTryAutoLogin();
+  }
+
+  render () {
+    if (this.props.isAuthenticated) {
+      routes = (
+          <Switch>
+            <Route path="/note" component={NoteEditor} />
+            <Route path="/logout" component={Logout} exact />
+            <Route path="/test" component={Test} exact />
+            <Route path="/login" component={Auth} exact />
+            <Route path="/" component={MainPage} />
+          </Switch>
+      );
+    } else {
+      routes = (
+          <Switch>
+            <Route path="/note" component={NoteEditor} />
+            <Route path="/login" component={Auth} exact />
+            <Route path="/test" component={Test} exact />
+            <Route path="/" component={MainPage} />
+          </Switch>
+      );
+    }
+
+    return (
+      <React.Fragment>
+        <Navbar />
+        {routes}
+      </React.Fragment>
+    );
+  }
 }
 
-export default App;
+export const mapStateToProps = state => {
+  return {
+    isAuthenticated: state.auth.idToken !== null
+  };
+}
+
+export const mapDispatchToProps = dispatch => {
+  return {
+    onTryAutoLogin: () => dispatch(actions.tryAutoLogin())
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

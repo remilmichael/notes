@@ -1,0 +1,38 @@
+.SaveBtn {
+    border: 2px solid #563D7C;
+    padding: 5px;
+    transition: ease-in-out 0.2s;
+}
+
+.SaveBtn:hover {
+    color: whitesmoke;
+    background-color: #363B59;
+}
+
+.DeleteBtn {
+    padding: 5px;
+    border: 2px solid salmon;
+    transition: ease-in-out 0.2s;
+}
+
+.DeleteBtn:disabled {
+    cursor: not-allowed;
+    padding: 5px;
+    border: 2px solid salmon;
+}
+
+.DeleteBtn:hover {
+    color: whitesmoke;
+    background-color: #ED5E68;
+}
+
+.CancelBtn {
+    padding: 5px;
+    border: 2px solid gray;
+    transition: ease-in-out 0.2s;
+}
+
+.CancelBtn:hover {
+    color: whitesmoke;
+    background-color: gray;
+}

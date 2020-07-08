@@ -1,0 +1,15 @@
+.Navlink {
+    font-weight: bold;
+    font-size: larger;
+    color: grey !important;
+}
+
+.NavlinkActive {
+    color: bisque !important;
+}
+
+.Navlink.hover,
+.Navlink:hover {
+    color: bisque !important;
+    text-decoration: none;
+}
