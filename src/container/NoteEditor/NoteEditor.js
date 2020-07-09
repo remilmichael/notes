@@ -19,15 +19,20 @@ class NoteEditor extends Component {
         error: null,
         errorAck: false, // Set to true, when error has been acknowledged properly, since errors are faded after few seconds, to avoid re-rendering due to that.
         noteId: null,
-        fetchNote: true
+        fetchNote: true,
+        fetchingNow: false
     };
 
     componentDidMount () {
         if (this.state.noteId === null) {
             const urlparams = new URLSearchParams(this.props.location.search);
-            this.setState({
-                noteId: urlparams.get("id")
-            })
+            const noteId = urlparams.get("id");
+            if (noteId !== null) {
+                this.setState({
+                    noteId: urlparams.get("id"),
+                    fetchingNow: true
+                });
+            }
         }
 
         this._mounted = true;
@@ -47,7 +52,9 @@ class NoteEditor extends Component {
         if (this.props.error && !this.state.error && !this.state.errorAck) {
             this.setState({error: this.props.error, errorAck: true});
         }
-        this.fetchNoteHandler();
+        if (this.state.fetchingNow === true) {
+            this.fetchNoteHandler();
+        }
     }
 
     formInputHandler = (event) => {
@@ -58,7 +65,7 @@ class NoteEditor extends Component {
     }
 
     fetchNoteHandler = () => {
-        if (this.state.noteId !== null && this.props.idToken !== null && this.state.fetchNote === true) {
+        if (this.state.noteId !== null && this.props.idToken !== null && this.state.note.length === 0 && this.state.error === null) {
             const headers = {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + this.props.idToken
@@ -72,15 +79,16 @@ class NoteEditor extends Component {
                     heading: response.data["noteHeading"],
                     note: response.data["noteBody"],
                     lastUpdated: response.data["lastUpdated"],
-                    fetchNote: false
+                    fetchingNow: false
                 });
             })
-            .catch(error => {
+            .catch(() => {
                 this.setState({
-                    error: error.response
+                    fetchingNow: false,
+                    error: "Failed to fetch note"
                 });
             })
-    }
+        }
     }
 
     checkNoteValidity = () => {
@@ -131,6 +139,8 @@ class NoteEditor extends Component {
 
     render () {
         
+        console.log("Inside rendering function => [NoteEditor.js]");
+
         let dispComponent = null;
 
         if (this.props.dbActionSuccessful) {
@@ -139,7 +149,7 @@ class NoteEditor extends Component {
         else if (this.props.idToken == null) {
             dispComponent = <Redirect to="/login?redirect=note" />;
         } 
-        else if (this.props.isStoringNow) {
+        else if (this.props.isStoringNow || this.state.fetchingNow === true) {
             dispComponent = <Spinner />;
         } else {
             dispComponent = (
