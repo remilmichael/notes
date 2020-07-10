@@ -1,9 +1,12 @@
 import * as actionTypes from '../actions/actionTypes';
-// import { updateObject } from '../../utility';
+import { updateObject } from '../../utility';
 
 const initialState = {
     notes: [],
-    fetchStarted: false,
+    currentPage: 1,
+    hasMoreNotes: true,
+    loading: false,
+    PAGE_SIZE: 10 //FIXED
 }
 
 export const reducer = (state = initialState, action) => {
@@ -18,6 +21,10 @@ export const reducer = (state = initialState, action) => {
             return deleteNote(state, action.payload);
         case actionTypes.CLEAR_NOTE_REDUX:
             return clearNotes(state);
+        case actionTypes.FETCH_MORE_NOTES_START:
+            return updateObject(state, {loading: true});
+        case actionTypes.FETCH_NOTES_TITLES_FAILED:
+            return updateObject(state, {loading: false});
         default:
             return state;
     }
@@ -62,9 +69,25 @@ const addNote = (state, newNote) => {
 }
 
 const pushNote = (state, titles) => {
+
+    if (titles.length === 0 ) {
+        return {
+            ...state,
+            hasMoreNotes: false,
+            loading: false
+        };
+    }
+
+    const notes = [...state.notes];
+    notes.push(...titles);
+    const currentPage = state.currentPage + 1;
+    const hasMoreNote = titles.length < state.PAGE_SIZE ? false : true;
     return {
         ...state,
-        notes: titles
+        notes: notes,
+        loading: false,
+        currentPage: currentPage,
+        hasMoreNotes: hasMoreNote
     };
 };
 

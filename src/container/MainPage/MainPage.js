@@ -3,6 +3,7 @@ import { Container, Row, Col, Card} from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import * as actions from '../../store/actions/index';
+import SpinnerOrButton from './Actions/SpinnerOrButton';
 
 class MainPage extends Component {
 
@@ -13,7 +14,7 @@ class MainPage extends Component {
     componentDidMount() {
         if (this.props.notelist.length === 0 && this.state.checkNotes === true) {
             if (this.props.idToken !== null) {
-                this.props.onFetchNotes(this.props.idToken);
+                this.props.onFetchNotes(this.props.idToken, this.props.pageNumber);
             }
         } else if (this.props.notelist.length !== 0 && this.props.idToken === null) {
             this.props.onClearNotes();
@@ -24,7 +25,7 @@ class MainPage extends Component {
         if (this.props.notelist.length === 0 && this.state.checkNotes === true) {
             console.log("componentDidUpdate -> MainPage");
             if (this.props.idToken !== null) {
-                this.props.onFetchNotes(this.props.idToken);
+                this.props.onFetchNotes(this.props.idToken, this.props.pageNumber);
             }
             this.setState({
                 checkNotes: false
@@ -34,9 +35,15 @@ class MainPage extends Component {
         }
     }
 
+    loadMoreNotesHandler = () => {
+        this.props.onFetchNotes(this.props.idToken, this.props.pageNumber);
+    }
+
     render () {
         console.log('Inside rendering function => [MainPage.js]');
+
         let noteList = null;
+        let moreButton = null;
         if (this.props.notelist.length > 0) {
             noteList = this.props.notelist.map((note) => {
                     return (<Col className="col-12 col-md-4 mt-3" key={note.noteId}>
@@ -50,7 +57,15 @@ class MainPage extends Component {
                                 </NavLink>
                             </Card>
                         </Col>);
-            });
+            }); 
+        }
+
+        if (this.props.hasMoreNotes === true)  {
+            if (this.props.loading === false) {
+                moreButton = <SpinnerOrButton disabled={false} message="Load more" clickedMoreNotes={this.loadMoreNotesHandler} />;
+            } else {
+                moreButton = <SpinnerOrButton disabled={true} message=" Loading..." />;
+            }
         }
 
         let addNewComponent = (
@@ -70,6 +85,13 @@ class MainPage extends Component {
                 <Row>
                     {noteList}
                 </Row>
+                <Row className="mt-5 justify-content-center">
+                    <Col></Col>
+                    <Col>
+                        {moreButton}
+                    </Col>
+                    <Col></Col>
+                </Row>
             </Container>  
         );
     }
@@ -80,13 +102,15 @@ export const mapStateToProps = state => {
         userId: state.auth.userId,
         idToken: state.auth.idToken,
         notelist: state.notelist.notes,
-        pageRefresh: state.notelist.refresh
+        pageNumber: state.notelist.currentPage,
+        hasMoreNotes: state.notelist.hasMoreNotes,
+        loading: state.notelist.loading
     };
 }
 
 export const mapDispatchToProps = dispatch => {
     return {
-        onFetchNotes: (idToken) => dispatch(actions.fetchAllNotes(idToken)),
+        onFetchNotes: (idToken, pageNumber) => dispatch(actions.fetchAllNotes(idToken, pageNumber)),
         onClearNotes: () => dispatch(actions.clearTitles())
     };
 }
