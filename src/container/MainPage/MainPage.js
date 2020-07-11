@@ -4,12 +4,12 @@ import { connect } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import * as actions from '../../store/actions/index';
 import SpinnerOrButton from './Actions/SpinnerOrButton';
+import classes from './MainPage.module.css';
 
 class MainPage extends Component {
 
     componentDidMount() {
         console.log('ComponentDidMount -> MainPage.js');
-        console.log(this.props.loading);
         if (this.props.notelist.length === 0 && this.props.loading === false) {
             if (this.props.idToken !== null) {
                 this.props.onFetchNotes(this.props.idToken, this.props.pageNumber);
@@ -42,7 +42,7 @@ class MainPage extends Component {
             noteList = this.props.notelist.map((note) => {
                     return (<Col className="col-12 col-md-4 mt-3" key={note.noteId}>
                             <Card bg="light" text="dark">
-                                <NavLink to={'/note?id='.concat(note.noteId)}>
+                                <NavLink to={'/note?id='.concat(note.noteId)} className={classes.link}>
                                     <Card.Body>
                                         <Card.Text>
                                             {note.noteHeading}
