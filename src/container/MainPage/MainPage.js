@@ -7,12 +7,10 @@ import SpinnerOrButton from './Actions/SpinnerOrButton';
 
 class MainPage extends Component {
 
-    state = {
-        checkNotes: true,
-    }
-
     componentDidMount() {
-        if (this.props.notelist.length === 0 && this.state.checkNotes === true) {
+        console.log('ComponentDidMount -> MainPage.js');
+        console.log(this.props.loading);
+        if (this.props.notelist.length === 0 && this.props.loading === false) {
             if (this.props.idToken !== null) {
                 this.props.onFetchNotes(this.props.idToken, this.props.pageNumber);
             }
@@ -22,14 +20,11 @@ class MainPage extends Component {
     }
 
     componentDidUpdate() {
-        if (this.props.notelist.length === 0 && this.state.checkNotes === true) {
-            console.log("componentDidUpdate -> MainPage");
+        console.log("componentDidUpdate -> MainPage");
+        if (this.props.notelist.length === 0 && this.props.loading === false) {
             if (this.props.idToken !== null) {
                 this.props.onFetchNotes(this.props.idToken, this.props.pageNumber);
             }
-            this.setState({
-                checkNotes: false
-            });
         } else if (this.props.notelist.length !== 0 && this.props.idToken === null) {
             this.props.onClearNotes();
         }
@@ -41,7 +36,6 @@ class MainPage extends Component {
 
     render () {
         console.log('Inside rendering function => [MainPage.js]');
-
         let noteList = null;
         let moreButton = null;
         if (this.props.notelist.length > 0) {
@@ -60,7 +54,7 @@ class MainPage extends Component {
             }); 
         }
 
-        if (this.props.hasMoreNotes === true)  {
+        if (this.props.hasMoreNotes === true && this.props.idToken !== null)  {
             if (this.props.loading === false) {
                 moreButton = <SpinnerOrButton disabled={false} message="Load more" clickedMoreNotes={this.loadMoreNotesHandler} />;
             } else {

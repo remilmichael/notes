@@ -33,7 +33,10 @@ export const reducer = (state = initialState, action) => {
 const clearNotes = (state) => {
     return {
         ...state,
-        notes: []
+        notes: [],
+        currentPage: 1,
+        hasMoreNotes: true,
+        loading: false,
     };
 }
 
