@@ -11,7 +11,7 @@ class MainPage extends Component {
     componentDidMount() {
         console.log('ComponentDidMount -> MainPage.js');
         if (this.props.notelist.length === 0 && this.props.loading === false) {
-            if (this.props.idToken !== null) {
+            if (this.props.idToken !== null && this.props.fetchFailed === false) {
                 this.props.onFetchNotes(this.props.idToken, this.props.pageNumber);
             }
         } else if (this.props.notelist.length !== 0 && this.props.idToken === null) {
@@ -22,7 +22,7 @@ class MainPage extends Component {
     componentDidUpdate() {
         console.log("componentDidUpdate -> MainPage");
         if (this.props.notelist.length === 0 && this.props.loading === false) {
-            if (this.props.idToken !== null) {
+            if (this.props.idToken !== null && this.props.fetchFailed === false) {
                 this.props.onFetchNotes(this.props.idToken, this.props.pageNumber);
             }
         } else if (this.props.notelist.length !== 0 && this.props.idToken === null) {
@@ -55,10 +55,23 @@ class MainPage extends Component {
         }
 
         if (this.props.hasMoreNotes === true && this.props.idToken !== null)  {
-            if (this.props.loading === false) {
-                moreButton = <SpinnerOrButton disabled={false} message="Load more" clickedMoreNotes={this.loadMoreNotesHandler} />;
+            if (this.props.fetchFailed === true) {
+                moreButton = <SpinnerOrButton 
+                    disabled={true}
+                    variant="secondary"
+                    message="Unable to connect" 
+                    clickedMoreNotes={this.loadMoreNotesHandler} />;
+            } else if (this.props.loading === false) {
+                moreButton = <SpinnerOrButton 
+                    disabled={false} 
+                    variant="primary"
+                    message="Load more" 
+                    clickedMoreNotes={this.loadMoreNotesHandler} />;
             } else {
-                moreButton = <SpinnerOrButton disabled={true} message=" Loading..." />;
+                moreButton = <SpinnerOrButton 
+                    disabled={true} 
+                    variant="primary"
+                    message=" Loading..." />;
             }
         }
 
@@ -98,7 +111,8 @@ export const mapStateToProps = state => {
         notelist: state.notelist.notes,
         pageNumber: state.notelist.currentPage,
         hasMoreNotes: state.notelist.hasMoreNotes,
-        loading: state.notelist.loading
+        loading: state.notelist.loading,
+        fetchFailed: state.notelist.fetchFailed
     };
 }
 

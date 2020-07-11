@@ -3,11 +3,11 @@ import { Button } from 'react-bootstrap';
 
 const spinner = (props) => {
     let spinner = null;
-    if (props.disabled === true) {
+    if (props.disabled === true && props.variant !== "secondary") {
         spinner = <span className="spinner-grow spinner-grow-sm" role="status" aria-hidden="true" />;
     }
     return (
-        <Button variant="primary" size="md" disabled={props.disabled} onClick={props.clickedMoreNotes}>
+        <Button variant={props.variant} size="md" disabled={props.disabled} onClick={props.clickedMoreNotes}>
             {spinner}{props.message}
         </Button>
     )

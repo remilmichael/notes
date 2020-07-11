@@ -6,6 +6,7 @@ const initialState = {
     currentPage: 1,
     hasMoreNotes: true,
     loading: false,
+    fetchFailed: false,
     PAGE_SIZE: 10 //FIXED
 }
 
@@ -24,7 +25,7 @@ export const reducer = (state = initialState, action) => {
         case actionTypes.FETCH_MORE_NOTES_START:
             return updateObject(state, {loading: true});
         case actionTypes.FETCH_NOTES_TITLES_FAILED:
-            return updateObject(state, {loading: false});
+            return updateObject(state, {loading: false, fetchFailed: true});
         default:
             return state;
     }
@@ -37,6 +38,7 @@ const clearNotes = (state) => {
         currentPage: 1,
         hasMoreNotes: true,
         loading: false,
+        fetchFailed: false
     };
 }
 
@@ -44,7 +46,8 @@ const deleteNote = (state, noteId) => {
     const notes = state.notes.filter(note => note.noteId !== noteId);
     return {
         ...state,
-        notes: notes
+        notes: notes,
+        fetchFailed: false
     };
 }
 
@@ -67,7 +70,8 @@ const addNote = (state, newNote) => {
     notes.push(...state.notes);
     return {
         ...state,
-        notes: notes
+        notes: notes,
+        fetchFailed: false
     };
 }
 
@@ -77,7 +81,8 @@ const pushNote = (state, titles) => {
         return {
             ...state,
             hasMoreNotes: false,
-            loading: false
+            loading: false,
+            fetchFailed: false
         };
     }
 
@@ -90,7 +95,8 @@ const pushNote = (state, titles) => {
         notes: notes,
         loading: false,
         currentPage: currentPage,
-        hasMoreNotes: hasMoreNote
+        hasMoreNotes: hasMoreNote,
+        fetchFailed: false
     };
 };
 
