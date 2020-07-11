@@ -3,7 +3,7 @@ import { updateObject } from '../../utility';
 
 const initialState = {
     notes: [],
-    currentPage: 1,
+    nextRecordNumber: 0,
     hasMoreNotes: true,
     loading: false,
     fetchFailed: false,
@@ -35,7 +35,7 @@ const clearNotes = (state) => {
     return {
         ...state,
         notes: [],
-        currentPage: 1,
+        nextRecordNumber: 0,
         hasMoreNotes: true,
         loading: false,
         fetchFailed: false
@@ -44,10 +44,12 @@ const clearNotes = (state) => {
 
 const deleteNote = (state, noteId) => {
     const notes = state.notes.filter(note => note.noteId !== noteId);
+    const nextRecordNumber = state.nextRecordNumber - 1;
     return {
         ...state,
         notes: notes,
-        fetchFailed: false
+        fetchFailed: false,
+        nextRecordNumber: nextRecordNumber
     };
 }
 
@@ -62,6 +64,7 @@ const updateNote = (state, updatedNote) => {
 
 const addNote = (state, newNote) => {
     let notes = [];
+    const nextRecordNumber = state.nextRecordNumber + 1;
     const note = {
         noteId: newNote.noteId,
         noteHeading: newNote.noteHeading
@@ -71,7 +74,8 @@ const addNote = (state, newNote) => {
     return {
         ...state,
         notes: notes,
-        fetchFailed: false
+        fetchFailed: false,
+        nextRecordNumber: nextRecordNumber
     };
 }
 
@@ -85,16 +89,15 @@ const pushNote = (state, titles) => {
             fetchFailed: false
         };
     }
-
+    const nextRecordNumber = state.nextRecordNumber + titles.length;
     const notes = [...state.notes];
     notes.push(...titles);
-    const currentPage = state.currentPage + 1;
     const hasMoreNote = titles.length < state.PAGE_SIZE ? false : true;
     return {
         ...state,
         notes: notes,
         loading: false,
-        currentPage: currentPage,
+        nextRecordNumber: nextRecordNumber,
         hasMoreNotes: hasMoreNote,
         fetchFailed: false
     };

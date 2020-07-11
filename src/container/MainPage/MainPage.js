@@ -12,7 +12,7 @@ class MainPage extends Component {
         console.log('ComponentDidMount -> MainPage.js');
         if (this.props.notelist.length === 0 && this.props.loading === false) {
             if (this.props.idToken !== null && this.props.fetchFailed === false) {
-                this.props.onFetchNotes(this.props.idToken, this.props.pageNumber);
+                this.props.onFetchNotes(this.props.idToken, this.props.nextRecordNumber);
             }
         } else if (this.props.notelist.length !== 0 && this.props.idToken === null) {
             this.props.onClearNotes();
@@ -23,7 +23,7 @@ class MainPage extends Component {
         console.log("componentDidUpdate -> MainPage");
         if (this.props.notelist.length === 0 && this.props.loading === false) {
             if (this.props.idToken !== null && this.props.fetchFailed === false) {
-                this.props.onFetchNotes(this.props.idToken, this.props.pageNumber);
+                this.props.onFetchNotes(this.props.idToken, this.props.nextRecordNumber);
             }
         } else if (this.props.notelist.length !== 0 && this.props.idToken === null) {
             this.props.onClearNotes();
@@ -31,7 +31,7 @@ class MainPage extends Component {
     }
 
     loadMoreNotesHandler = () => {
-        this.props.onFetchNotes(this.props.idToken, this.props.pageNumber);
+        this.props.onFetchNotes(this.props.idToken, this.props.nextRecordNumber);
     }
 
     render () {
@@ -109,7 +109,7 @@ export const mapStateToProps = state => {
         userId: state.auth.userId,
         idToken: state.auth.idToken,
         notelist: state.notelist.notes,
-        pageNumber: state.notelist.currentPage,
+        nextRecordNumber: state.notelist.nextRecordNumber,
         hasMoreNotes: state.notelist.hasMoreNotes,
         loading: state.notelist.loading,
         fetchFailed: state.notelist.fetchFailed
@@ -118,7 +118,7 @@ export const mapStateToProps = state => {
 
 export const mapDispatchToProps = dispatch => {
     return {
-        onFetchNotes: (idToken, pageNumber) => dispatch(actions.fetchAllNotes(idToken, pageNumber)),
+        onFetchNotes: (idToken, nextRecordNumber) => dispatch(actions.fetchAllNotes(idToken, nextRecordNumber)),
         onClearNotes: () => dispatch(actions.clearTitles())
     };
 }
