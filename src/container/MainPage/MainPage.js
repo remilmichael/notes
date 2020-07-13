@@ -10,17 +10,15 @@ class MainPage extends Component {
 
     componentDidMount() {
         console.log('ComponentDidMount -> MainPage.js');
-        if (this.props.notelist.length === 0 && this.props.loading === false) {
-            if (this.props.idToken !== null && this.props.fetchFailed === false) {
-                this.props.onFetchNotes(this.props.idToken, this.props.nextRecordNumber);
-            }
-        } else if (this.props.notelist.length !== 0 && this.props.idToken === null) {
-            this.props.onClearNotes();
-        }
+        this.fetchOrClearNotes();
     }
 
     componentDidUpdate() {
         console.log("componentDidUpdate -> MainPage");
+        this.fetchOrClearNotes();
+    }
+
+    fetchOrClearNotes() {
         if (this.props.notelist.length === 0 && this.props.loading === false) {
             if (this.props.idToken !== null && this.props.fetchFailed === false) {
                 this.props.onFetchNotes(this.props.idToken, this.props.nextRecordNumber);

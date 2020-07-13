@@ -8,9 +8,18 @@ import { v4 as uuidv4 } from 'uuid';
 import * as actions from '../../store/actions/index';
 import Spinner from '../../component/UI/Spinner/Spinner';
 import Alert from '../../component/UI/Alert/Alert';
-import axios from '../../axios-notes';
+import axios from 'axios';
+import { ROOT_URL } from '../../axios-notes';
 
 class NoteEditor extends Component {
+
+    source = axios.CancelToken.source();
+
+    constructor(props) {
+        super(props);
+        this.errorTimeout = null;
+    }
+
 
     state = {
         heading: '',
@@ -35,14 +44,15 @@ class NoteEditor extends Component {
             }
         }
 
-        this._mounted = true;
         if (!this.props.idToken) {
             this.props.onRaiseWarning("Login to continue!", "warning");
         }
     }
 
+
     componentWillUnmount () {
-        this._mounted = false;
+        clearTimeout(this.errorTimeout);
+        this.source.cancel();
     }
 
     componentDidUpdate () {
@@ -69,9 +79,10 @@ class NoteEditor extends Component {
             const headers = {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + this.props.idToken
-            };
-            axios.get('/notes/' + this.state.noteId, {
-                headers: headers
+            }
+            axios.get(`${ROOT_URL}/notes/${this.state.noteId}`, {
+                headers: headers,
+                cancelToken: this.source.token
             })
             .then(response => {
                 this.setState({
@@ -82,11 +93,13 @@ class NoteEditor extends Component {
                     fetchingNow: false
                 });
             })
-            .catch(() => {
-                this.setState({
-                    fetchingNow: false,
-                    error: "Failed to fetch note"
-                });
+            .catch((error) => {
+                if (!axios.isCancel(error)) {
+                    this.setState({
+                        fetchingNow: false,
+                        error: "Failed to fetch note"
+                    });
+                }
             })
         }
     }
@@ -104,7 +117,7 @@ class NoteEditor extends Component {
                 heading = this.state.note.slice(0, 10);
             }
             this.setState({heading: heading}, () => {
-                this.saveNoteHandler(); //only call this function, when the state gets updated.
+                this.saveNoteHandler(); //call this function only when the state gets updated.
             });
         } else {
             this.saveNoteHandler();
@@ -175,13 +188,10 @@ class NoteEditor extends Component {
         }
 
         if (this.state.error) {
-            if (this._mounted === true) {
-                setTimeout(()=> {
-                    if (this._mounted === true) {
+                clearTimeout(this.errorTimeout);
+                this.errorTimeout = setTimeout(()=> {
                         this.setState({error: null})
-                    }
                 }, 5000);
-            }
         }
 
         return (
