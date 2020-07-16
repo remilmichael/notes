@@ -3,7 +3,6 @@ import Navbar from './component/UI/NavBar/Navbar';
 import { Route, Switch } from 'react-router-dom';
 import NoteEditor from './container/NoteEditor/NoteEditor';
 import Auth from './container/Auth/Auth';
-import Test from './Test/Test';
 import Logout from './container/Auth/Logout/Logout';
 import MainPage from './container/MainPage/MainPage';
 import { connect } from 'react-redux';
