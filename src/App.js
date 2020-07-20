@@ -23,7 +23,6 @@ class App extends Component {
           <Switch>
             <Route path="/note" component={NoteEditor} />
             <Route path="/logout" component={Logout} exact />
-            <Route path="/test" component={Test} exact />
             <Route path="/login" component={Auth} exact />
             <Route path="/" component={MainPage} />
           </Switch>
@@ -33,7 +32,6 @@ class App extends Component {
           <Switch>
             <Route path="/note" component={NoteEditor} />
             <Route path="/login" component={Auth} exact />
-            <Route path="/test" component={Test} exact />
             <Route path="/" component={MainPage} />
           </Switch>
       );
