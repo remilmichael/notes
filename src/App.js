@@ -5,6 +5,7 @@ import NoteEditor from './container/NoteEditor/NoteEditor';
 import Auth from './container/Auth/Auth';
 import Logout from './container/Auth/Logout/Logout';
 import MainPage from './container/MainPage/MainPage';
+import TodoEditor from './container/Todo/Editor/TodoEditor';
 import { connect } from 'react-redux';
 import * as actions from './store/actions/index';
 import './App.css';
@@ -24,6 +25,7 @@ class App extends Component {
             <Route path="/note" component={NoteEditor} />
             <Route path="/logout" component={Logout} exact />
             <Route path="/login" component={Auth} exact />
+            <Route path="/todo" component={TodoEditor} />
             <Route path="/" component={MainPage} />
           </Switch>
       );
@@ -31,6 +33,7 @@ class App extends Component {
       routes = (
           <Switch>
             <Route path="/note" component={NoteEditor} />
+            <Route path="/todo" component={TodoEditor} />
             <Route path="/login" component={Auth} exact />
             <Route path="/" component={MainPage} />
           </Switch>

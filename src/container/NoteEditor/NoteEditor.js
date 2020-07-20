@@ -154,8 +154,6 @@ class NoteEditor extends Component {
 
     render () {
 
-        
-
         console.log("Inside rendering function => [NoteEditor.js]");
 
         let dispComponent = null;
@@ -163,8 +161,13 @@ class NoteEditor extends Component {
         if (this.props.dbActionSuccessful) {
             dispComponent = <Redirect to="/" />;
         }
-        else if (!this.props.idToken && !this.urlParam_Id) {
-            dispComponent = <Redirect to="/login?redirect=note" />;
+        else if (!this.props.idToken) {
+            if (this.urlParam_Id) {
+                dispComponent = <Redirect to={`/login?redirect=note?id=${this.urlParam_Id}`} />;
+            } else {
+                dispComponent = <Redirect to="/login?redirect=note" />;
+            }
+            
         } 
         else if (this.props.isStoringNow || this.state.fetchingNow === true) {
             dispComponent = <Spinner />;
