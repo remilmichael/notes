@@ -18,6 +18,8 @@ class NoteEditor extends Component {
     constructor(props) {
         super(props);
         this.errorTimeout = null;
+        this.urlParams = new URLSearchParams(this.props.location.search);
+        this.urlParam_Id = this.urlParams.get("id");
     }
 
 
@@ -151,7 +153,9 @@ class NoteEditor extends Component {
     }
 
     render () {
+
         
+
         console.log("Inside rendering function => [NoteEditor.js]");
 
         let dispComponent = null;
@@ -159,7 +163,7 @@ class NoteEditor extends Component {
         if (this.props.dbActionSuccessful) {
             dispComponent = <Redirect to="/" />;
         }
-        else if (this.props.idToken == null) {
+        else if (!this.props.idToken && !this.urlParam_Id) {
             dispComponent = <Redirect to="/login?redirect=note" />;
         } 
         else if (this.props.isStoringNow || this.state.fetchingNow === true) {
