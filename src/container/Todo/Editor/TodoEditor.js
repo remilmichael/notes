@@ -1,38 +1,39 @@
-import React, { useState, useReducer, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { Container } from 'react-bootstrap';
 import InputComponent from '../Input/Input';
 import * as actions from './actions';
-import reducer from './reducer';
-
-const initialState = {
-    todos: [],
-    nextIndex: 0
-}
+import { useApiCallReducer } from './reducer';
+import Table from '../Table/Table';
+import { ReactComponent as TrashIcon} from '../../../assets/trashicon.svg'
+import classes from './TodoEditor.module.css';
 
 function TodoEditor() {
 
-    console.log("Todo Editor")
+    console.log('TodoEditor');
 
-    const [item, setItem] = useState('');
-    const [state, dispatch] = useReducer(reducer, initialState);
+    const [state, dispatch] = useApiCallReducer();
 
-    console.log(state);
-
+    const inputRef = useRef(null);
     const addItem = () => {
+
+        const item = inputRef.current.value;
+
         if (item.trim().length === 0) {
+            inputRef.current.focus();
             // Raise error
         } else {
             const nextIndex = state.nextIndex;
-            const newItem = {
-                item: item,
+            const newTodo = {
+                item: item.trim(),
+                strike: false,
                 index: nextIndex
             }
-            console.log("add item")
             dispatch({
                 type: actions.APPEND_ITEM,
-                payload: newItem
+                payload: newTodo
             });
-            setItem('');
+            inputRef.current.value = '';
+            inputRef.current.focus();
         }
     }
 
@@ -42,15 +43,40 @@ function TodoEditor() {
         }
     }
 
+    let tableBody;
+    if (state.todos.length !== 0) {
+        tableBody = state.todos.map(item => {
+            const content = item.strike === true ? <del>{item.item}</del> : item.item;
+            return (
+                <tr key={item.index}>
+                    <td><input type="checkbox" name={item.index} /></td>
+                    <td className="w-75">
+                        <span 
+                            className={classes.Item}
+                            onClick={() => dispatch({type: actions.CHANGE_STRIKE_STATE, payload: item.index})}>
+                            {content}
+                        </span>
+                    </td>
+                    <td>
+                        <TrashIcon 
+                            className={classes.TrashIcon} 
+                            onClick={() => dispatch({type: actions.DELETE_ITEM, payload: item.index})}  />
+                    </td>
+                </tr>
+            );
+        })
+    }
+
 
     return (
         <Container fluid>
             <InputComponent 
-                changeItem={(e) => setItem(e.target.value)} 
+                inputRef={inputRef}
                 addItem={addItem} 
                 keyPressed={checkKeyEvent} 
                 clicked={addItem}
             />
+            <Table body={tableBody} />
         </Container>
     );
 }

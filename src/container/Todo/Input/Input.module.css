@@ -2,3 +2,7 @@
     color: #FFFFFF;
     background-color: #282C34;
 }
+
+.AddButton:hover {
+    color: #23A8CC;
+}
