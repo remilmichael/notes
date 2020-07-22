@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { Container } from 'react-bootstrap';
+import React, { useRef, useState } from 'react';
+import { Container, Row, Col } from 'react-bootstrap';
 import InputComponent from '../Input/Input';
 import * as actions from './actions';
 import { useApiCallReducer } from './reducer';
@@ -11,15 +11,16 @@ function TodoEditor() {
 
     console.log('TodoEditor');
 
-    const [state, dispatch] = useApiCallReducer();
+    const [state, dispatch] = useApiCallReducer(); // state contains => todos: Array, nextIndex: number
+    const [selectedCbSet, setSelectedCbSet] = useState(new Set());
 
     const inputRef = useRef(null);
+    
     const addItem = () => {
 
         const item = inputRef.current.value;
 
         if (item.trim().length === 0) {
-            inputRef.current.focus();
             // Raise error
         } else {
             const nextIndex = state.nextIndex;
@@ -33,8 +34,8 @@ function TodoEditor() {
                 payload: newTodo
             });
             inputRef.current.value = '';
-            inputRef.current.focus();
         }
+        inputRef.current.focus();
     }
 
     const checkKeyEvent = (event) => {
@@ -43,13 +44,61 @@ function TodoEditor() {
         }
     }
 
+    const handleCheckBoxEvent = (event) => {
+
+        const isChecked = event.target.checked;
+        const checkBoxName = event.target.name;
+        const newSet = new Set(selectedCbSet);
+
+        if (isChecked) {
+
+            newSet.add(checkBoxName);
+            setSelectedCbSet(newSet)
+
+        } else {
+            // if it was already selected, and now has de-selected
+
+            newSet.delete(checkBoxName);
+            setSelectedCbSet(newSet);
+        }
+    }
+
+    const multipleDeleteHandler = () => {
+
+        dispatch({
+            type: actions.DELETE_MULTIPLE_ITEMS,
+            payload: selectedCbSet
+        });
+
+        setSelectedCbSet(new Set());
+    }
+
+    const singleItemDeleteHandler = (index) => {
+        dispatch({type: actions.DELETE_ITEM, payload: index});
+        setSelectedCbSet(new Set());
+    }
+
+    let deleteButton = null;
+    if (selectedCbSet.size !== 0) {
+        deleteButton = <button type="button" 
+                            className="btn btn-danger"
+                            onClick={multipleDeleteHandler}>Delete selected</button>
+    }
+
     let tableBody;
     if (state.todos.length !== 0) {
         tableBody = state.todos.map(item => {
             const content = item.strike === true ? <del>{item.item}</del> : item.item;
             return (
                 <tr key={item.index}>
-                    <td><input type="checkbox" name={item.index} /></td>
+                    <td>
+                        <input 
+                            type="checkbox" 
+                            name={item.index} 
+                            onChange={(e) => handleCheckBoxEvent(e)} 
+                            checked={selectedCbSet.has(item.index.toString())}
+                            />
+                    </td>
                     <td className="w-75">
                         <span 
                             className={classes.Item}
@@ -60,13 +109,14 @@ function TodoEditor() {
                     <td>
                         <TrashIcon 
                             className={classes.TrashIcon} 
-                            onClick={() => dispatch({type: actions.DELETE_ITEM, payload: item.index})}  />
+                            onClick={() => singleItemDeleteHandler(item.index)}  />
                     </td>
                 </tr>
             );
         })
     }
 
+    console.log(state.todos);
 
     return (
         <Container fluid>
@@ -76,6 +126,11 @@ function TodoEditor() {
                 keyPressed={checkKeyEvent} 
                 clicked={addItem}
             />
+            <Row className="mt-3 mt-lg-5">
+                <Col className="col-12 col-lg-5 offset-6 pl-4 offset-lg-6">
+                    {deleteButton}
+                </Col>
+            </Row>
             <Table body={tableBody} />
         </Container>
     );

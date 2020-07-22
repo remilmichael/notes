@@ -14,6 +14,8 @@ const reducer = (state, action) => {
             return deleteItem(state, action.payload);
         case actions.CHANGE_STRIKE_STATE:
             return changeStrikeState(state, action.payload);
+        case actions.DELETE_MULTIPLE_ITEMS:
+            return deleteMultipleItems(state, action.payload);
         default:
             return state;
     }
@@ -37,15 +39,52 @@ const addItem = (state, payload) => {
 
 const deleteItem = (state, index) => {
     
+    let indexCounter = 0;
+
     const newTodos = state.todos.filter(item => {
         return item.index !== index;
     });
 
+    console.log(newTodos);
+    
+    newTodos.forEach(item => {
+        item.index = indexCounter++;
+    });
+    
+        
+    
     return {
         ...state,
         todos: newTodos,
+        nextIndex: indexCounter
     };
     
+}
+
+const deleteMultipleItems = (state, set) => {
+    
+    // copied 'set' since mutating the original 'set' causes the
+    // TodoEditor.js to re-render.
+    const tempSet = new Set(set); 
+
+    let indexCounter = 0;
+    const tempArray = [...state.todos];
+
+    const newTodos = tempArray.filter((item) => {
+        if (tempSet.has(item.index.toString())) {
+            tempSet.delete(item.index.toString());
+            return false;
+        }
+        item.index = indexCounter++;
+        return true;
+    });
+    
+    return {
+        ...state,
+        todos: newTodos,
+        nextIndex: indexCounter
+    };
+
 }
 
 const changeStrikeState = (state, index) => {
