@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import InputComponent from '../Input/Input';
 import * as actions from './actions';
@@ -11,10 +11,15 @@ function TodoEditor() {
 
     console.log('TodoEditor');
 
-    const [state, dispatch] = useApiCallReducer(); // state contains => todos: Array, nextIndex: number
+    // state contains => todos: Array, nextIndex: number
+    const [state, dispatch] = useApiCallReducer();
     const [selectedCbSet, setSelectedCbSet] = useState(new Set());
 
     const inputRef = useRef(null);
+
+    useEffect(() => {
+        document.title = 'ToDo';
+    }, [])
     
     const addItem = () => {
 
@@ -73,6 +78,7 @@ function TodoEditor() {
         setSelectedCbSet(new Set());
     }
 
+    // Handler which deletes the item when clicked on Trash icon.
     const singleItemDeleteHandler = (index) => {
         dispatch({type: actions.DELETE_ITEM, payload: index});
         setSelectedCbSet(new Set());
@@ -108,15 +114,13 @@ function TodoEditor() {
                     </td>
                     <td>
                         <TrashIcon 
-                            className={classes.TrashIcon} 
+                            className={classes.TrashIcon}
                             onClick={() => singleItemDeleteHandler(item.index)}  />
                     </td>
                 </tr>
             );
         })
     }
-
-    console.log(state.todos);
 
     return (
         <Container fluid>
