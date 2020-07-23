@@ -4,7 +4,11 @@ import InputComponent from '../Input/Input';
 import * as actions from './actions';
 import { useApiCallReducer } from './reducer';
 import Table from '../Table/Table';
-import { ReactComponent as TrashIcon} from '../../../assets/trashicon.svg'
+import TextField from './TextField';
+import { ReactComponent as CheckMarkIcon } from '../../../assets/checkmark.svg';
+import { ReactComponent as ReturnIcon } from '../../../assets/returnicon.svg';
+import { ReactComponent as TrashIcon } from '../../../assets/trashicon.svg';
+import { ReactComponent as EditIcon } from '../../../assets/editicon.svg';
 import classes from './TodoEditor.module.css';
 
 function TodoEditor() {
@@ -14,8 +18,10 @@ function TodoEditor() {
     // state contains => todos: Array, nextIndex: number
     const [state, dispatch] = useApiCallReducer();
     const [selectedCbSet, setSelectedCbSet] = useState(new Set());
+    const [editItemIndex, setEditItemIndex] = useState(-1);
 
     const inputRef = useRef(null);
+    const editInputRef = useRef(null);
 
     useEffect(() => {
         document.title = 'ToDo';
@@ -74,7 +80,9 @@ function TodoEditor() {
             type: actions.DELETE_MULTIPLE_ITEMS,
             payload: selectedCbSet
         });
-
+        if (selectedCbSet.has(editItemIndex.toString())) {
+            setEditItemIndex(-1);
+        }
         setSelectedCbSet(new Set());
     }
 
@@ -84,6 +92,28 @@ function TodoEditor() {
         setSelectedCbSet(new Set());
     }
 
+    const itemEditHandler = (index) => {
+        setEditItemIndex(index);
+    }
+
+    const saveChangesHandler = () => {
+
+        if (editInputRef.current) {
+            const payload = {
+                index: editItemIndex,
+                value: editInputRef.current.value
+            };
+            dispatch({type: actions.SAVE_CHANGES, payload: payload});
+            setEditItemIndex(-1);
+        } else {
+            // something went wrong
+        }
+    }
+
+    const clearEditablesHandler = () => {
+        setEditItemIndex(-1);
+    }
+
     let deleteButton = null;
     if (selectedCbSet.size !== 0) {
         deleteButton = <button type="button" 
@@ -91,6 +121,7 @@ function TodoEditor() {
                             onClick={multipleDeleteHandler}>Delete selected</button>
     }
 
+    
     let tableBody;
     if (state.todos.length !== 0) {
         tableBody = state.todos.map(item => {
@@ -105,17 +136,44 @@ function TodoEditor() {
                             checked={selectedCbSet.has(item.index.toString())}
                             />
                     </td>
-                    <td className="w-75">
-                        <span 
-                            className={classes.Item}
-                            onClick={() => dispatch({type: actions.CHANGE_STRIKE_STATE, payload: item.index})}>
-                            {content}
-                        </span>
+                    <td className={classes.TdContent}>
+                        {
+                            item.index === editItemIndex ? <TextField content={content} name={item.index} inputRef={editInputRef} /> :
+                            <span 
+                                className={classes.Item}
+                                onClick={() => dispatch({type: actions.CHANGE_STRIKE_STATE, payload: item.index})}>
+                                {content}
+                            </span>
+                        }
                     </td>
                     <td>
-                        <TrashIcon 
-                            className={classes.TrashIcon}
-                            onClick={() => singleItemDeleteHandler(item.index)}  />
+                        {
+                            item.index === editItemIndex ? 
+                                        <CheckMarkIcon 
+                                            className={classes.CheckMarkIcon} 
+                                            onClick={saveChangesHandler}
+                                        /> 
+                                        :
+                                        <EditIcon 
+                                            className={classes.EditIcon}
+                                            onClick={() => itemEditHandler(item.index)}
+                                        />
+                        }
+                        
+                    </td>
+                    <td>
+                        {
+                            item.index === editItemIndex ? 
+                                        <ReturnIcon 
+                                            className={classes.ReturnIcon}
+                                            onClick={clearEditablesHandler}
+                                        /> 
+                                        : 
+                                        <TrashIcon 
+                                            className={classes.TrashIcon}
+                                            onClick={() => singleItemDeleteHandler(item.index)}
+                                        />
+                        }
                     </td>
                 </tr>
             );

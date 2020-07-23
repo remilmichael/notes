@@ -16,6 +16,8 @@ const reducer = (state = initialState, action) => {
             return changeStrikeState(state, action.payload);
         case actions.DELETE_MULTIPLE_ITEMS:
             return deleteMultipleItems(state, action.payload);
+        case actions.SAVE_CHANGES:
+            return saveChangesMade(state, action.payload);
         default:
             return state;
     }
@@ -34,6 +36,23 @@ const addItem = (state, payload) => {
         ...state,
         todos: todos,
         nextIndex: nextIndex
+    };
+}
+
+const saveChangesMade = (state, payload) => {
+    
+    // payload = { index: number, value: string }
+
+    const updatedTodos = state.todos.map(item => {
+        if (item.index === payload.index) {
+            return { ...item, item: payload.value}
+        }
+        return item;
+    });
+
+    return {
+        ...state,
+        todos: updatedTodos
     };
 }
 

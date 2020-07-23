@@ -1,4 +1,24 @@
+.TdContent {
+    width: 75%;
+}
+
+.TrashIcon {
+    margin: 0px;
+}
+
 .TrashIcon:hover {
+    cursor: pointer;
+}
+
+.CheckMarkIcon:hover {
+    cursor: pointer;
+}
+
+.ReturnIcon:hover {
+    cursor: pointer;
+}
+
+.EditIcon:hover {
     cursor: pointer;
 }
 
