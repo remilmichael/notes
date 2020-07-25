@@ -4,7 +4,7 @@ import InputComponent from '../Input/Input';
 import * as actions from './actions';
 import { useApiCallReducer } from './reducer';
 import Table from '../Table/Table';
-import TextField from './TextField';
+import TextField from '../../../component/UI/TextField/TextField';
 import { ReactComponent as CheckMarkIcon } from '../../../assets/checkmark.svg';
 import { ReactComponent as ReturnIcon } from '../../../assets/returnicon.svg';
 import { ReactComponent as TrashIcon } from '../../../assets/trashicon.svg';
@@ -99,12 +99,16 @@ function TodoEditor() {
     const saveChangesHandler = () => {
 
         if (editInputRef.current) {
-            const payload = {
-                index: editItemIndex,
-                value: editInputRef.current.value
-            };
-            dispatch({type: actions.SAVE_CHANGES, payload: payload});
-            setEditItemIndex(-1);
+            if (editInputRef.current.value.trim().length !== 0) {
+                const payload = {
+                    index: editItemIndex,
+                    value: editInputRef.current.value
+                };
+                dispatch({type: actions.SAVE_CHANGES, payload: payload});
+                setEditItemIndex(-1);
+            } else {
+                // raise error
+            }
         } else {
             // something went wrong
         }
