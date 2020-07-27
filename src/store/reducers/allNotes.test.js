@@ -1,5 +1,6 @@
 import * as actionTypes from '../actions/actionTypes';
 import { reducer } from './allNotes';
+import { node } from 'prop-types';
 
 const initialState = {
     notes: [], // [{ noteId - String, noteHeading - String }]
@@ -109,7 +110,7 @@ describe('allNotes Reducer', () => {
                     notes: [...sampleNotes, ...newReceivedNotes],
                     hasMoreNotes: false
                 }
-                expect(newState).toEqual(expectedState)
+                expect(newState).toEqual(expectedState);
             });
         });
         
@@ -117,6 +118,56 @@ describe('allNotes Reducer', () => {
 
     describe('action type `SAVE_NOTE_REDUX`', () => {
         
+        describe('When no titles exists', () => {
+            
+            test('should return the updated state when a new title is added', () => {
+                const payload = { noteId: 'id234', noteHeading: 'Sample note heading' };
+                const newState = reducer(initialState, { type: actionTypes.SAVE_NOTE_REDUX, payload: payload});
+                const expectedState = {
+                    ...initialState,
+                    notes: [payload],
+                    nextRecordNumber: initialState.nextRecordNumber + 1
+                }
+                expect(newState).toEqual(expectedState);
+            });
+
+        });
+
+        describe('When some titles exists - Should add new title to beginning of the array', () => {
+            test('should return the updated state when a new title is added', () => {
+                const updatedState = { ...initialState, notes: [...sampleNotes], nextRecordNumber: sampleNotes.length };
+                const payload = { noteId: 'id234', noteHeading: 'Sample note heading' };
+                const newState = reducer(updatedState, { type: actionTypes.SAVE_NOTE_REDUX, payload: payload});
+                const expectedState = {
+                    ...initialState,
+                    notes: [payload, ...sampleNotes],
+                    nextRecordNumber: sampleNotes.length + 1
+                }
+                expect(newState).toEqual(expectedState);
+            });
+        });
+
     });
+
+    describe('action type `DELETE_NOTE_REDUX`', () => {
+        test('should return the updated state after a note is deleted from redux store', () => {
+            const updatedState = { ...initialState, notes: [...sampleNotes], nextRecordNumber: sampleNotes.length };
+            const noteIdToDelete = 'abcd';
+            const newState = reducer(updatedState, { type: actionTypes.DELETE_NOTE_REDUX, payload: noteIdToDelete });
+            const updatedNotes = sampleNotes.filter(note => {
+                return note.noteId !== noteIdToDelete;
+            })
+            const expectedState = {
+                ...initialState,
+                notes: [...updatedNotes],
+                nextRecordNumber: sampleNotes.length - 1
+            }
+            expect(newState).toEqual(expectedState);
+        });
+    });
+
+    /* Leaving below two action types since they simple actions */
+    // FETCH_MORE_NOTES_START
+    // FETCH_NOTES_TITLES_FAILED
 
 });
