@@ -119,8 +119,8 @@ export const mapStateToProps = state => {
         isLoggingNow: state.auth.logging,
         isAuthenticated: state.auth.idToken !== null,
         authError: state.auth.error,
-        message: state.msg.message,
-        msgType: state.msg.type
+        message: state.message.message,
+        msgType: state.message.type
     };
 }
 

@@ -19,7 +19,7 @@ const composeEnhancers = compose;
 const rootReducer = combineReducers({
   note: noteReducer,
   auth: authReducer,
-  msg: msgReducer,
+  message: msgReducer,
   notelist: notesList
 });
 
