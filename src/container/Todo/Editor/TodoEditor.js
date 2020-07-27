@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
+
 import InputComponent from '../Input/Input';
 import * as actions from './actions';
 import { useApiCallReducer } from './reducer';

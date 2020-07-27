@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Container, Row, Col } from 'react-bootstrap';
+import { Redirect } from 'react-router-dom';
+
 import AuthPresentationalComponents from './AuthComponents';
 import Spinner from '../../component/UI/Spinner/Spinner';
 import * as actions from '../../store/actions/index';
 import Alert from '../../component/UI/Alert/Alert';
-import { Redirect } from 'react-router-dom';
+
 
 class Auth extends Component {
 

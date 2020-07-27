@@ -1,7 +1,8 @@
 import React from 'react';
 import { InputGroup, Row, Col } from 'react-bootstrap';
-import classes from './Input.module.css';
 import PropTypes from 'prop-types';
+
+import classes from './Input.module.css';
 
 const NoteInput = (props) => {
     return (

@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import Actions from './Action/Action';
-import Input from './Input/Input';
+import axios from 'axios';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router';
 import { v4 as uuidv4 } from 'uuid';
+
 import * as actions from '../../store/actions/index';
 import Spinner from '../../component/UI/Spinner/Spinner';
 import Alert from '../../component/UI/Alert/Alert';
-import axios from 'axios';
+import Actions from './Action/Action';
+import Input from './Input/Input';
 import { ROOT_URL } from '../../axios-notes';
 
 class NoteEditor extends Component {

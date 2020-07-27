@@ -12,9 +12,11 @@ export const authStart = () => {
 export const authSuccess = (idToken, expiresOn, userId) => {
     return {
         type: actions.AUTH_USER_SUCCESS,
-        idToken: idToken,
-        expiresOn: expiresOn,
-        userId: userId
+        payload: {
+            idToken: idToken,
+            expiresOn: expiresOn,
+            userId: userId
+        }
     };
 }
 
@@ -50,8 +52,6 @@ export const tryAutoLogin = () => {
                     if (!userId) dispatch(logout());
                     else {
                         dispatch(authSuccess(idToken, expiresOn, userId));
-                        /* Used with firebase */
-                        // const timeInSeconds = ((expiresOn.getTime() - new Date().getTime()) / 1000);
                         const timeInSeconds = (expiresOn.getTime() - new Date().getTime());
                         dispatch(checkAuthTimeOut(timeInSeconds));
                     }
@@ -63,10 +63,10 @@ export const tryAutoLogin = () => {
     }
 }
 
-export const authFailed = (err) => {
+export const authFailed = (error) => {
     return {
         type: actions.AUTH_USER_FAILED,
-        error: err
+        payload: error
     };
 }
 
@@ -76,6 +76,12 @@ export const clearError = () => {
     };
 }
 
+/**
+ * Function will validate the credential given.
+ * @function authUser
+ * @param {Object} credential - Contains username and password
+ * @returns {function}
+ */
 export const authUser = (credential) => {
     return dispatch => {
         const url = loginUrl;
@@ -86,9 +92,6 @@ export const authUser = (credential) => {
         axios.post(url, requestObj)
             .then(response => {
                 const idToken = response.data.token;
-                /* Used with firebase */
-                // const expiresOn = new Date(new Date().getTime() + response.data.expiresOn);
-
                 const expiresOn = new Date(response.data.expiresOn * 1000);
                 const userId = response.data.userId;
 

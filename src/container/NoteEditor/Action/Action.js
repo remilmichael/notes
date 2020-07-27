@@ -1,5 +1,6 @@
 import React from 'react';
 import { Col, Row } from 'react-bootstrap';
+
 import classes from './Action.module.css'
 const noteActions = (props) => {
     return (

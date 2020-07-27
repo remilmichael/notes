@@ -1,6 +1,9 @@
 import * as actionTypes from '../actions/actionTypes';
 import { updateObject } from '../../utility';
 
+/**
+ * Initial state given to the `reducer` function.
+ */
 const initialState = {
     userId: null, // User Id generated from firebase (server)
     logging: false, // For spinner
@@ -10,16 +13,22 @@ const initialState = {
     error: null // Is set if any failure occurs during authentication
 }
 
-const reducer = (state = initialState, action) => {
+/**
+ * @function authReducer
+ * @param {Object} state - State object of Auth reducer
+ * @param {Object} action - Action type to reduce the state of the Auth reducer
+ * @returns {Object} - Reduced state
+ */
+export const reducer = (state = initialState, action) => {
     switch(action.type) {
         case actionTypes.AUTH_USER_START:
             return updateObject(state, authStartReducer());
         case actionTypes.AUTH_USER_SUCCESS:
-            return updateObject(state, authSuccessReducer(action));
+            return updateObject(state, authSuccessReducer(action.payload));
         case actionTypes.AUTH_USER_FAILED:
-            return updateObject(state, authFailedReducer(action.error))
+            return updateObject(state, authFailedReducer(action.payload))
         case actionTypes.AUTH_USER_LOGOUT:
-            return updateObject(state, logoutReducer());
+            return {...initialState};
         case actionTypes.AUTH_ERROR_RESET:
             return updateObject(state, authErrorResetReducer());
         default:
@@ -27,6 +36,11 @@ const reducer = (state = initialState, action) => {
     }
 }
 
+/**
+ * Function to start sign-in process, which sets the spinner on
+ * @function authStartReducer
+ * @returns {Object} - Reduced state
+ */
 const authStartReducer = () => {
     return {
         logging: true,
@@ -34,17 +48,29 @@ const authStartReducer = () => {
     };
 }
 
-const authSuccessReducer = (action) => {
+/**
+ * Function to reduce the state to a `successful` logged-in state.
+ * @function authSuccessReducer
+ * @param {Object} payload - payload consists of idToken, expiresOn, userId
+ * @return {Object} - Reduced state
+ */
+const authSuccessReducer = (payload) => {
     return {
         logging: false,
-        idToken: action.idToken,
-        expiresOn: action.expiresOn,
-        userId: action.userId,
+        idToken: payload.idToken,
+        expiresOn: payload.expiresOn,
+        userId: payload.userId,
         error: null,
         authCheckComplete: true
     };
 }
 
+/**
+ * Function to reduce the state to `failed` logged-in state. 
+ * @function authFailedReducer
+ * @param {string} error - Error produced while trying to log-in
+ * @returns {Object} - Reduced state.
+ */
 const authFailedReducer = (error) => {
     return {
         logging: false,
@@ -53,21 +79,16 @@ const authFailedReducer = (error) => {
     };
 }
 
+/**
+ * Function to reset the error set in the reducer state.
+ * @function authErrorResetReducer
+ * @returns {Object} - Reduced state.
+ */
 const authErrorResetReducer = () => {
     return {
         error: null
     };
 }
 
-const logoutReducer = () => {
-    return {
-        userId: null,
-        logging: false,
-        idToken: null,
-        expiresOn: null,
-        error: null,
-        authCheckComplete: false
-    };
-}
 
 export default reducer;
