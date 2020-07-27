@@ -10,7 +10,7 @@ const initialState = {
     PAGE_SIZE: 10 //FIXED
 }
 /**
- * @function reducer - allNotes reducer function
+ * @function reducer - `allNotes` reducer function
  * @param {Object} state - State given to reducer
  * @param {Object} action - Consists of type and payload
  */

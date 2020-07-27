@@ -8,7 +8,12 @@ const initialState = {
     saveSuccessful: false,
 };
 
-const reducer = (state = initialState, action) => {
+/**
+ * @function reducer - `notes` reducer fucntion
+ * @param {Object} state
+ * @param {Object} action 
+ */
+export const reducer = (state = initialState, action) => {
     switch(action.type) {
         case actionTypes.RESET_NOTE_STATE_DEFAULT:
             return updateObject(state, resetState());

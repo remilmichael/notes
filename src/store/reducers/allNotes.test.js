@@ -1,6 +1,5 @@
 import * as actionTypes from '../actions/actionTypes';
 import { reducer } from './allNotes';
-import { node } from 'prop-types';
 
 const initialState = {
     notes: [], // [{ noteId - String, noteHeading - String }]
@@ -19,7 +18,7 @@ const sampleNotes = [
     { noteId: 'abcd', noteHeading: 'Heading 5' },
 ]
 
-describe('allNotes Reducer', () => {
+describe('`allNotes` Reducer', () => {
     
     test('should return initialState when no action and state is passed', () => {
         const newState = reducer(undefined, {});
