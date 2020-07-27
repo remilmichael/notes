@@ -8,8 +8,9 @@ import Spinner from '../../component/UI/Spinner/Spinner';
 import * as actions from '../../store/actions/index';
 import Alert from '../../component/UI/Alert/Alert';
 
-
 class Auth extends Component {
+
+    errorTimeout = null;
 
     state = {
         username: null,
@@ -21,7 +22,6 @@ class Auth extends Component {
     }
 
     componentDidMount () {
-        this._mounted = true;
         if (this.props.message) {
             this.props.onClearMessage();
             this.setState({error: this.props.message, errorType: this.props.msgType})
@@ -36,7 +36,7 @@ class Auth extends Component {
     }
 
     componentWillUnmount() {
-        this._mounted = false;
+        clearTimeout(this.errorTimeout);
     }
 
     usernameChangeHandler = (event) => {
@@ -88,10 +88,9 @@ class Auth extends Component {
         }
 
         if (this.state.error) {
-            setTimeout(() => {
-                if (this._mounted) {
-                    this.setState({error: null, errorType: null});
-                }
+            clearTimeout(this.errorTimeout);
+            this.errorTimeout = setTimeout(() => {
+                this.setState({error: null, errorType: null});
             }, 3000);
         }
 
