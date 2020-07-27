@@ -2,14 +2,18 @@ import * as actionTypes from '../actions/actionTypes';
 import { updateObject } from '../../utility';
 
 const initialState = {
-    notes: [],
+    notes: [], // [{ noteId - String, noteHeading - String }]
     nextRecordNumber: 0,
     hasMoreNotes: true,
     loading: false,
     fetchFailed: false,
     PAGE_SIZE: 10 //FIXED
 }
-
+/**
+ * @function reducer - allNotes reducer function
+ * @param {Object} state - State given to reducer
+ * @param {Object} action - Consists of type and payload
+ */
 export const reducer = (state = initialState, action) => {
     switch(action.type) {
         case actionTypes.SAVE_NOTES_LIST:
@@ -29,6 +33,59 @@ export const reducer = (state = initialState, action) => {
         default:
             return state;
     }
+}
+
+/**
+ * Function to store all fetched note titles from the server
+ * @function pushNote
+ * @param {Object} state 
+ * @param {Array} titles 
+ * @returns {Object}
+ */
+const pushNote = (state, titles) => {
+    if (titles.length === 0 ) {
+        return {
+            ...state,
+            hasMoreNotes: false,
+            loading: false,
+            fetchFailed: false
+        };
+    }
+    const nextRecordNumber = state.nextRecordNumber + titles.length;
+    const notes = [...state.notes];
+    notes.push(...titles);
+    const hasMoreNote = titles.length < state.PAGE_SIZE ? false : true;
+    return {
+        ...state,
+        notes: notes,
+        loading: false,
+        nextRecordNumber: nextRecordNumber,
+        hasMoreNotes: hasMoreNote,
+        fetchFailed: false
+    };
+};
+
+/**
+ * Function to add a new note (noteHeading and noteId) to the redux
+ * @param {Object} state
+ * @param {Object} newNote - Contains noteId and noteHeading
+ * @returns {Object} - Updated state with newly added note heading
+ */
+const addNote = (state, newNote) => {
+    let notes = [];
+    const nextRecordNumber = state.nextRecordNumber + 1;
+    const note = {
+        noteId: newNote.noteId,
+        noteHeading: newNote.noteHeading
+    };
+    notes.push(note);
+    notes.push(...state.notes);
+    return {
+        ...state,
+        notes: notes,
+        fetchFailed: false,
+        nextRecordNumber: nextRecordNumber
+    };
 }
 
 const clearNotes = (state) => {
@@ -62,45 +119,6 @@ const updateNote = (state, updatedNote) => {
     return state;
 }
 
-const addNote = (state, newNote) => {
-    let notes = [];
-    const nextRecordNumber = state.nextRecordNumber + 1;
-    const note = {
-        noteId: newNote.noteId,
-        noteHeading: newNote.noteHeading
-    };
-    notes.push(note);
-    notes.push(...state.notes);
-    return {
-        ...state,
-        notes: notes,
-        fetchFailed: false,
-        nextRecordNumber: nextRecordNumber
-    };
-}
 
-const pushNote = (state, titles) => {
-
-    if (titles.length === 0 ) {
-        return {
-            ...state,
-            hasMoreNotes: false,
-            loading: false,
-            fetchFailed: false
-        };
-    }
-    const nextRecordNumber = state.nextRecordNumber + titles.length;
-    const notes = [...state.notes];
-    notes.push(...titles);
-    const hasMoreNote = titles.length < state.PAGE_SIZE ? false : true;
-    return {
-        ...state,
-        notes: notes,
-        loading: false,
-        nextRecordNumber: nextRecordNumber,
-        hasMoreNotes: hasMoreNote,
-        fetchFailed: false
-    };
-};
 
 export default reducer;
