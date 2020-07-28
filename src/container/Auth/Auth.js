@@ -68,17 +68,18 @@ class Auth extends Component {
     render () {
         let currentLoginComponent = null;
         if (this.props.isAuthenticated) {
-            let redirectPath;
-            let query = new URLSearchParams(this.props.location.search);
-            redirectPath = query.get('redirect');
-            if (redirectPath === null) redirectPath = '/';
-            currentLoginComponent = <Redirect to={redirectPath} />;
-            // this.props.history.goBack();
+            let redirectPath = '/';
+            if (this.props.location && this.props.location.search) {
+                let query = new URLSearchParams(this.props.location.search);
+                redirectPath = query.get('redirect');
+            }
+            currentLoginComponent = <Redirect data-test="component-redirect" to={redirectPath} />;
         } else if (this.props.isLoggingNow) {
-            currentLoginComponent = <Spinner />;
+            currentLoginComponent = <Spinner data-test="component-spinner" />;
         } else {
             currentLoginComponent = (
                 <AuthPresentationalComponents 
+                    data-test="component-loginform"
                     userNameChanged={this.usernameChangeHandler} 
                     passwordChanged={this.passwordChangeHandler} 
                     loginClicked={this.loginHandler}
@@ -95,8 +96,8 @@ class Auth extends Component {
         }
 
         return (
-            <React.Fragment>
-                <Container className="mt-5 pt-2">
+            <>
+                <Container className="mt-5 pt-2" data-test="component-container">
                     <Row>
                         <Col className={'col-12 offset-0 col-md-5 offset-md-4'}>
                             {currentLoginComponent}
@@ -104,11 +105,20 @@ class Auth extends Component {
                     </Row>
                     <Row className="mt-4">
                         <Col className="col-md-5 offset-md-4 text-center">
-                            {this.state.error ? <Alert type={this.state.errorType} message={this.state.error}/> : null}
+                            {
+                                this.state.error
+                                ?
+                                <Alert 
+                                    data-test="component-alert"
+                                    type={this.state.errorType} 
+                                    message={this.state.error}/>
+                                :
+                                null
+                            }
                         </Col>
                     </Row>
                 </Container>
-            </React.Fragment>
+            </>
         );  
     }
 }

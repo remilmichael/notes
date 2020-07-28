@@ -3,7 +3,7 @@ import { Col, Row, InputGroup, Button } from 'react-bootstrap';
 
 const authComponents = (props) => {
     return (
-        <React.Fragment>
+        <>
             <Row>
                 <Col className="col-12">
                     <InputGroup>
@@ -46,7 +46,7 @@ const authComponents = (props) => {
                     </Button>
                 </Col>
             </Row>
-        </React.Fragment>
+        </>
     );
 }
 

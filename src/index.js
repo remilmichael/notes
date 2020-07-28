@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-import { compose, combineReducers, createStore, applyMiddleware} from 'redux';
+import { compose, combineReducers, createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 
@@ -15,7 +15,7 @@ import notesList from './store/reducers/allNotes/allNotes';
 // const composeEnhancers = process.env.NODE_ENV === 'development' ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ : null || compose;
 const composeEnhancers = compose;
 
-const rootReducer = combineReducers({
+export const rootReducer = combineReducers({
   note: noteReducer,
   auth: authReducer,
   message: msgReducer,
