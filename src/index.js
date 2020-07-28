@@ -1,17 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
 import { BrowserRouter } from 'react-router-dom';
 import { compose, combineReducers, createStore, applyMiddleware} from 'redux';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 
-import noteReducer from './store/reducers/notes';
-import authReducer from './store/reducers/auth';
-import msgReducer from './store/reducers/message';
-import notesList from './store/reducers/allNotes';
+import App from './App';
+import * as serviceWorker from './serviceWorker';
+import noteReducer from './store/reducers/notes/notes';
+import authReducer from './store/reducers/auth/auth';
+import msgReducer from './store/reducers/message/message';
+import notesList from './store/reducers/allNotes/allNotes';
 
 // const composeEnhancers = process.env.NODE_ENV === 'development' ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ : null || compose;
 const composeEnhancers = compose;
