@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 import AuthPresentationalComponents from './AuthComponents';
 import Spinner from '../../component/UI/Spinner/Spinner';
@@ -16,7 +17,7 @@ class Auth extends Component {
         username: null,
         password: null,
         error: null,
-        errorType: null, // For setting the error message color
+        errorType: null, // For setting the error message type
         errorAck: false // Set to true, when error has been acknowledged properly, since errors are faded after few seconds,
                         // to avoid re-rendering due to that.
     }
@@ -47,11 +48,15 @@ class Auth extends Component {
         this.setState({password: event.target.value});
     }
 
+    /**
+     * Function to start sign-in process 
+     * @function loginHandler
+     */
     loginHandler = () => {
         if (this.state.username === null || this.state.username.trim() === '') {
-            this.setState({error: "Username can't be empty", errorType: "warning"});
+            this.setState({ error: "Username can't be empty", errorType: "warning" });
         } else if (this.state.password === null || this.state.password.trim() === '') {
-            this.setState({error: "Password can't be empty", errorType: "warning"});
+            this.setState({ error: "Password can't be empty", errorType: "warning" });
         } else {
             const credential = {
                 username: this.state.username,
@@ -61,6 +66,10 @@ class Auth extends Component {
         }
     }
 
+    /**
+     * Function to navigate to home page
+     * @function goBackHandler
+     */
     goBackHandler = () => {
         this.props.history.push('/');
     }

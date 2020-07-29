@@ -2,7 +2,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 
 import Auth from './Auth';
-import { storeFactory, findByTestAttr } from '../../testUtils';
+import { storeFactory, findByTestAttr, checkProps } from '../../testUtils';
 
 
 /**
@@ -32,11 +32,10 @@ const messageInitialState = {
  * @param {Object} initialState - Initial state for the setup
  * @returns {ShallowWrapper}
  */
-const setup = (initialState={}) => {
+const setup = (initialState={}, props={}) => {
     const store = storeFactory(initialState);
-    return shallow(<Auth store={store} />).dive().dive();
+    return shallow(<Auth store={store} { ...props } />).dive().dive();
 }
-
 
 
 describe('When user is `NOT` logged in', () => {
@@ -67,6 +66,7 @@ describe('When user is `NOT` logged in', () => {
     });
 });
 
+
 describe('When user is logged in', () => {
 
     const auth = {
@@ -78,7 +78,7 @@ describe('When user is logged in', () => {
 
     let wrapper;
     beforeEach(() => {
-        wrapper = setup({auth: auth})
+        wrapper = setup({ auth: auth })
     });
 
     test('Should NOT render the `login form`', () => {
@@ -93,9 +93,12 @@ describe('When user is logged in', () => {
         const component = findByTestAttr(wrapper, 'component-spinner');
         expect(component.length).toBe(0);
     });
+
 });
 
-describe('When `message` is set', () => {
+
+
+describe('When alert `message` is set', () => {
     const message = {
         ...messageInitialState,
         message: 'Sample message',
@@ -103,9 +106,13 @@ describe('When `message` is set', () => {
     };
     let wrapper;
     beforeEach(() => {
-        wrapper = setup({message: message});
+        wrapper = setup({ message: message });
     });
 
+    test('should render `login form`', () => {
+        const component = findByTestAttr(wrapper, 'component-loginform');
+        expect(component.length).toBe(1);
+    });
     test('should render `Alert` component', () => {
         const component = findByTestAttr(wrapper, 'component-alert');
         expect(component.length).toBe(1);
@@ -114,4 +121,78 @@ describe('When `message` is set', () => {
         const component = findByTestAttr(wrapper, 'component-spinner');
         expect(component.length).toBe(0);
     });
+});
+
+describe('When user is logging in - `loading`', () => {
+    
+    const auth = {
+        ...authInitialState,
+        logging: true
+    };
+
+    let wrapper;
+    beforeEach(() => {
+        wrapper = setup({ auth: auth });
+    })
+
+    test('should render `Spinner` component', () => {
+        const component = findByTestAttr(wrapper, 'component-spinner');
+        expect(component.length).toBe(1);
+    });
+    test('should NOT render `login component`', () => {
+        const component = findByTestAttr(wrapper, 'component-loginform');
+        expect(component.length).toBe(0);
+    });
+    test('should NOT render `Alert` component', () => {
+        const component = findByTestAttr(wrapper, 'component-alert');
+        expect(component.length).toBe(0);
+    });
+
+});
+
+describe('Simulating events', () => {
+    let wrapper, loginComponent;
+    const username = 'user123';
+    const password = 'pass123';
+    const historyMock = { push: jest.fn() };
+    beforeEach(() => {
+        wrapper = setup({}, { history: historyMock });
+        loginComponent = findByTestAttr(wrapper, 'component-loginform').dive();
+    });
+
+    describe('Change textfield value', () => {
+    
+        it('should update the state without error', () => {
+            const usernameTF = loginComponent.find('#username');
+            const passwordTF = loginComponent.find('#password');
+
+            usernameTF.simulate('change', { target: { value: username }});
+            passwordTF.simulate('change', { target: { value: password }});
+            expect(wrapper.state('username')).toEqual(username);
+            expect(wrapper.state('password')).toEqual(password);
+        });
+    });
+
+    describe('Clicking the `login` button', () => {
+        it('should update the `logging` value in `auth` reducer to `true`', () => {
+            const usernameTF = loginComponent.find('#username');
+            const passwordTF = loginComponent.find('#password');
+            const loginBtn = loginComponent.find("#loginBtn");
+            
+            usernameTF.simulate('change', { target: { value: username }});
+            passwordTF.simulate('change', { target: { value: password }});
+            loginBtn.simulate('click');
+            const isLoading = wrapper.instance().props.store.getState().auth.logging;
+            expect(isLoading).toBe(true);
+        })
+    });
+
+    describe('Clicking the `cancel` button', () => {
+        it('should push `/` into the history prop to redirect to homepage', () => {
+            const cancelBtn = loginComponent.find("#cancelBtn");
+            cancelBtn.simulate('click');
+            expect(historyMock.push.mock.calls[0]).toEqual(['/'])
+        })
+    });
+    
 });

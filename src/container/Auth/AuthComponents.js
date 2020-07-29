@@ -36,12 +36,13 @@ const authComponents = (props) => {
                 <Col>
                     <button 
                         type="button"
+                        id="loginBtn"
                         className="btn btn-primary"
                         onClick={props.loginClicked}
                     >Login</button>
                 </Col>
                 <Col>
-                    <Button variant="secondary" onClick={props.cancelClicked}>
+                    <Button variant="secondary" onClick={props.cancelClicked} id="cancelBtn">
                         Cancel
                     </Button>
                 </Col>
