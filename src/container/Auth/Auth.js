@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
-import PropTypes from 'prop-types';
 
 import AuthPresentationalComponents from './AuthComponents';
 import Spinner from '../../component/UI/Spinner/Spinner';

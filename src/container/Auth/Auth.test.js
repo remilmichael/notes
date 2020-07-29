@@ -2,7 +2,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 
 import Auth from './Auth';
-import { storeFactory, findByTestAttr, checkProps } from '../../testUtils';
+import { storeFactory, findByTestAttr } from '../../testUtils';
 
 
 /**
