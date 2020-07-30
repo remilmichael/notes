@@ -214,7 +214,6 @@ class NoteEditor extends Component {
 
 const mapStateToProps = state => {
     return {
-        isEditingExisting: state.note.isEditingExisting,
         isStoringNow: state.note.loadingNow,
         error: state.note.error,
         dbActionSuccessful: state.note.saveSuccessful,
