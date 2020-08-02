@@ -19,8 +19,11 @@ class NoteEditor extends Component {
     constructor(props) {
         super(props);
         this.errorTimeout = null;
-        this.urlParams = new URLSearchParams(this.props.location.search);
-        this.urlParam_Id = this.urlParams.get("id");
+        this.urlParam_Id = null;
+        if (this.props.location && this.props.location.search) {
+            this.urlParams = new URLSearchParams(this.props.location.search);
+            this.urlParam_Id = this.urlParams.get("id");
+        }
     }
 
 
@@ -31,27 +34,19 @@ class NoteEditor extends Component {
         error: null,
         errorAck: false, // Set to true, when error has been acknowledged properly, since errors are faded after few seconds, to avoid re-rendering due to that.
         noteId: null,
-        fetchNote: true,
         fetchingNow: false
     };
 
     componentDidMount () {
-        if (this.state.noteId === null) {
-            const urlparams = new URLSearchParams(this.props.location.search);
-            const noteId = urlparams.get("id");
-            if (noteId !== null) {
-                this.setState({
-                    noteId: urlparams.get("id"),
-                    fetchingNow: true
-                });
-            }
-        }
-
         if (!this.props.idToken) {
             this.props.onRaiseWarning("Login to continue!", "warning");
         }
-    }
 
+        
+        if (!this.state.noteId && this.urlParam_Id) {
+            this.setState({ noteId: this.urlParam_Id, fetchingNow: true });
+        }
+    }
 
     componentWillUnmount () {
         clearTimeout(this.errorTimeout);
@@ -65,8 +60,8 @@ class NoteEditor extends Component {
         if (this.props.error && !this.state.error && !this.state.errorAck) {
             this.setState({error: this.props.error, errorAck: true});
         }
-        if (this.state.fetchingNow === true) {
-            this.fetchNoteHandler();
+        if (this.state.fetchingNow) {
+            this.fetchNoteFromDb();
         }
     }
 
@@ -77,34 +72,42 @@ class NoteEditor extends Component {
         }
     }
 
-    fetchNoteHandler = () => {
-        if (this.state.noteId !== null && this.props.idToken !== null && this.state.note.length === 0 && this.state.error === null) {
-            const headers = {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + this.props.idToken
-            }
-            axios.get(`${ROOT_URL}/notes/${this.state.noteId}`, {
-                headers: headers,
-                cancelToken: this.source.token
-            })
-            .then(response => {
-                this.setState({
-                    noteId: response.data["noteId"],
-                    heading: response.data["noteHeading"],
-                    note: response.data["noteBody"],
-                    lastUpdated: response.data["lastUpdated"],
-                    fetchingNow: false
-                });
-            })
-            .catch((error) => {
-                if (!axios.isCancel(error)) {
-                    this.setState({
-                        fetchingNow: false,
-                        error: "Failed to fetch note"
-                    });
-                }
-            })
+    fetchNoteFromDb = async () => {
+        if (this.props.idToken && this.state.note.length === 0 && !this.state.error) {
+            this.fetchNoteHandler();
         }
+    }
+
+    /**
+     * Function to fetch the note with the given `noteId` from the server
+     * @function fetchNoteHandler
+     */
+    fetchNoteHandler = () => {    
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + this.props.idToken
+        }
+        return axios.get(`${ROOT_URL}/notes/${this.state.noteId}`, {
+            headers: headers,
+            cancelToken: this.source.token
+        })
+        .then(response => {
+            this.setState({
+                noteId: response.data["noteId"],
+                heading: response.data["noteHeading"],
+                note: response.data["noteBody"],
+                lastUpdated: response.data["lastUpdated"],
+                fetchingNow: false
+            });
+        })
+        .catch((error) => {
+            if (!axios.isCancel(error)) {
+                this.setState({
+                    fetchingNow: false,
+                    error: "Failed to fetch note"
+                });
+            }
+        });
     }
 
     checkNoteValidity = () => {
@@ -155,28 +158,28 @@ class NoteEditor extends Component {
 
     render () {
 
-        console.log("Inside rendering function => [NoteEditor.js]");
+        // console.log("Inside rendering function => [NoteEditor.js]");
 
         let dispComponent = null;
 
         if (this.props.dbActionSuccessful) {
-            dispComponent = <Redirect to="/" />;
+            dispComponent = <Redirect data-test="component-redirect-plain" to="/" />;
         }
         else if (!this.props.idToken) {
             if (this.urlParam_Id) {
-                dispComponent = <Redirect to={`/login?redirect=note?id=${this.urlParam_Id}`} />;
+                dispComponent = <Redirect data-test="component-redirect-param" to={`/login?redirect=note?id=${this.urlParam_Id}`} />;
             } else {
-                dispComponent = <Redirect to="/login?redirect=note" />;
+                dispComponent = <Redirect data-test="component-redirect-plain" to="/login?redirect=note" />;
             }
             
         } 
         else if (this.props.isStoringNow || this.state.fetchingNow === true) {
-            dispComponent = <Spinner />;
+            dispComponent = <Spinner data-test="component-spinner" />;
         } else {
             dispComponent = (
                 <Row>
                     <Col className="col-12 offset-0 col-lg-6 offset-lg-3  text-center justify-content-center">
-                        <Input formChanged={this.formInputHandler} heading={this.state.heading} body={this.state.note} />
+                        <Input data-test="component-inputform" formChanged={this.formInputHandler} heading={this.state.heading} body={this.state.note} />
                         <Row>
                             <Col>
                                 {this.state.error ? <Alert type="danger" message={this.state.error} /> : null}
@@ -185,10 +188,11 @@ class NoteEditor extends Component {
                     </Col>
                     <Col className="col-lg-3 mt-3 mt-lg-0">
                         <Actions 
+                            data-test="component-action"
                             clickedSave={this.checkNoteValidity} 
                             clickedCancel={this.cancelNoteHandler}
                             clickedDelete={this.deleteNoteHandler}
-                            delDisabled={this.props.currentNoteId === null} 
+                            delDisabled={this.state.noteId === null}
                         />
                     </Col>
                 </Row>
@@ -196,10 +200,10 @@ class NoteEditor extends Component {
         }
 
         if (this.state.error) {
-                clearTimeout(this.errorTimeout);
-                this.errorTimeout = setTimeout(()=> {
-                        this.setState({error: null})
-                }, 5000);
+            clearTimeout(this.errorTimeout);
+            this.errorTimeout = setTimeout(()=> {
+                    this.setState({error: null})
+            }, 5000);
         }
 
         return (

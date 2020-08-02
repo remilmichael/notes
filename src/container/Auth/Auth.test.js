@@ -30,6 +30,7 @@ const messageInitialState = {
  * Factory function to create a ShallowWrapper for the GuessedWords component.
  * @function setup
  * @param {Object} initialState - Initial state for the setup
+ * @param {Object} props - Component props specific to this setup.
  * @returns {ShallowWrapper}
  */
 const setup = (initialState={}, props={}) => {
@@ -191,7 +192,7 @@ describe('Simulating events', () => {
         it('should push `/` into the history prop to redirect to homepage', () => {
             const cancelBtn = loginComponent.find("#cancelBtn");
             cancelBtn.simulate('click');
-            expect(historyMock.push.mock.calls[0]).toEqual(['/'])
+            expect(historyMock.push.mock.calls[0]).toEqual(['/']);
         })
     });
     

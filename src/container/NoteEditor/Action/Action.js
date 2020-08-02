@@ -4,7 +4,7 @@ import { Col, Row } from 'react-bootstrap';
 import classes from './Action.module.css'
 const noteActions = (props) => {
     return (
-        <React.Fragment>
+        <>
             <Row className="mb-3 mb-md-0 text-center">
                 <Col className="col-4 pl-0" data-test="component-button">
                     <button 
@@ -29,7 +29,7 @@ const noteActions = (props) => {
                     className={`${classes.CancelBtn} btn btn-lg`}>Cancel</button>
                 </Col>
             </Row>
-        </React.Fragment>
+        </>
     );
 };
 
