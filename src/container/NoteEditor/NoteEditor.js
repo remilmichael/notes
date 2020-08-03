@@ -65,6 +65,12 @@ class NoteEditor extends Component {
         }
     }
 
+    /**
+     * Function which is called whenever the value in input components change.
+     * 
+     * @function formInputHandler
+     * @param {Object} event - Event object to get the current content in input components
+     */
     formInputHandler = (event) => {
         if (event.target.id === 'notearea') this.setState({note: event.target.value});
         else if (event.target.id === 'noteheading') {
@@ -72,26 +78,46 @@ class NoteEditor extends Component {
         }
     }
 
+    /**
+     * Function to check if note to be fetched from server, if required
+     *      calls fetchNoteHandler() function
+     * 
+     * @function fetchNoteFromDb
+     */
     fetchNoteFromDb = async () => {
         if (this.props.idToken && this.state.note.length === 0 && !this.state.error) {
             this.fetchNoteHandler();
         }
     }
 
+
     /**
      * Function to fetch the note with the given `noteId` from the server
+     * 
      * @function fetchNoteHandler
      */
-    fetchNoteHandler = () => {    
+    fetchNoteHandler = async() => {      
+        let response;
+        let data;
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + this.props.idToken
         }
-        return axios.get(`${ROOT_URL}/notes/${this.state.noteId}`, {
-            headers: headers,
-            cancelToken: this.source.token
-        })
-        .then(response => {
+        
+        try {
+            response = await axios.get(`${ROOT_URL}/notes/${this.state.noteId}`,
+                 { headers: headers, cancelToken: this.source.token });
+            data = await response.data;
+        } catch(error) {
+            if (!axios.isCancel(error)) {
+                this.setState({
+                    fetchingNow: false,
+                    error: "Failed to fetch note"
+                });
+            }
+        }
+
+        if (data) {
             this.setState({
                 noteId: response.data["noteId"],
                 heading: response.data["noteHeading"],
@@ -99,17 +125,15 @@ class NoteEditor extends Component {
                 lastUpdated: response.data["lastUpdated"],
                 fetchingNow: false
             });
-        })
-        .catch((error) => {
-            if (!axios.isCancel(error)) {
-                this.setState({
-                    fetchingNow: false,
-                    error: "Failed to fetch note"
-                });
-            }
-        });
+        }
     }
 
+    /**
+     * Function to perform validation on `click` event of `Save` button
+     *      and calls saveNoteHandler() to push it to the server.
+     * 
+     * @function checkNoteValidity
+     */
     checkNoteValidity = () => {
         if (this.state.note === null || this.state.note.trim() === '') {
             this.setState({
@@ -123,13 +147,20 @@ class NoteEditor extends Component {
                 heading = this.state.note.slice(0, 10);
             }
             this.setState({heading: heading}, () => {
-                this.saveNoteHandler(); //call this function only when the state gets updated.
+                // call this function only after the state gets updated.
+                this.saveNoteHandler(); 
             });
         } else {
             this.saveNoteHandler();
         }
     }
 
+    /**
+     * Function which creates a note object and calls the redux
+     *      action creator to store it to the server.
+     * 
+     * @function saveNoteHandler
+     */
     saveNoteHandler = () => {
         let note = {
             noteId: this.state.noteId,
@@ -146,10 +177,20 @@ class NoteEditor extends Component {
         }
     }
 
+    /**
+     * Function to redirect to base url
+     * 
+     * @function cancelNoteHandler
+     */
     cancelNoteHandler = () => {
         this.props.history.push('/');
     }
 
+    /**
+     * Function to delete the note when `delete` button is clicked.
+     * 
+     * @function deleteNoteHandler
+     */
     deleteNoteHandler = () => {
         if (this.state.noteId !== null && this.props.idToken !== null) {
             this.props.onDeleteNote(this.state.noteId, this.props.idToken);
@@ -157,9 +198,7 @@ class NoteEditor extends Component {
     }
 
     render () {
-
         // console.log("Inside rendering function => [NoteEditor.js]");
-
         let dispComponent = null;
 
         if (this.props.dbActionSuccessful) {
@@ -182,7 +221,16 @@ class NoteEditor extends Component {
                         <Input data-test="component-inputform" formChanged={this.formInputHandler} heading={this.state.heading} body={this.state.note} />
                         <Row>
                             <Col>
-                                {this.state.error ? <Alert type="danger" message={this.state.error} /> : null}
+                                {
+                                    this.state.error 
+                                    ? 
+                                    <Alert 
+                                        data-test="component-alert"
+                                        type="danger"
+                                        message={this.state.error} />
+                                    :
+                                    null
+                                }
                             </Col>
                         </Row>
                     </Col>

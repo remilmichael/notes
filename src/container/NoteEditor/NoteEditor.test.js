@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import { storeFactory, findByTestAttr } from '../../testUtils';
+import { storeFactory, findByTestAttr, findByIdSelector } from '../../testUtils';
 import NoteEditor from './NoteEditor';
 import moxios from 'moxios';
 
@@ -17,6 +17,28 @@ const authInitialState = {
     error: null
 }
 
+const randomNoteId = 'randomId757';
+
+const sampleResponse = {
+    noteId: randomNoteId,
+    noteHeading: 'This is a sample note heading',
+    noteBody: 'I\'m the note body',
+    lastUpdated: new Date(),
+};
+
+/**
+ * Initial state of the `NoteEditor` component
+ */
+const noteEditorInitialState = {
+    heading: '',
+    note: '',
+    lastUpdated: null,
+    error: null,
+    errorAck: false,
+    noteId: null,
+    fetchingNow: false
+}
+
 /**
  * Factory function to create a ShallowWrapper for the GuessedWords component.
  * @function setup
@@ -27,8 +49,7 @@ const authInitialState = {
 const setup = (initialState={}, props={}) => {
     const store = storeFactory(initialState);
     return shallow(<NoteEditor store={store} { ...props } />).dive().dive();
-}
-
+};
 
 describe('Accessing `NoteEditor` without signing in', () => {
 
@@ -65,7 +86,6 @@ describe('Accessing `NoteEditor` without signing in', () => {
             expect(component.length).toBe(1);
         });
     });
-
 });
 
 
@@ -96,17 +116,17 @@ describe('Accessing `NoteEditor` with valid login credentials', () => {
             expect(deleteBtn.length).toBe(1);
             expect(deleteBtn.prop('disabled')).toBe(true);
         });
+
+        it('should display an error message on click event of `save` button when both heading and body are empty', () => {
+            const actionComponent = findByTestAttr(wrapper, 'component-action').dive();
+            const saveBtn = findByIdSelector(actionComponent, 'saveBtn');
+            saveBtn.simulate('click');
+            const errorAlert = findByTestAttr(wrapper, 'component-alert');
+            expect(errorAlert.length).toBe(1);
+        });
     });
 
-
-    describe('`NoteEditor` with url params', () => {
-        const randomNoteId = 'randomId757';
-        const sampleResponse = {
-            noteId: randomNoteId,
-            noteHeading: 'This is a sample note heading',
-            noteBody: 'I\'m the note body',
-            lastUpdated: new Date(),
-        };
+    describe('Sending note to server', () => {
 
         beforeEach(() => {
             moxios.install();
@@ -115,9 +135,69 @@ describe('Accessing `NoteEditor` with valid login credentials', () => {
         afterEach(() => {
             moxios.uninstall();
         })
-        
-        it('should set the state with fetched (mocked) data from server', (done) => {
 
+        it('should ', (done) => {
+            moxios.wait(() => {
+                let request = moxios.requests.mostRecent()
+                request.respondWith({
+                    status: 204
+                }).then(() => {
+                    console.log(request.data)
+                    
+                })
+                moxios.wait(() => {
+                    let request = moxios.requests.mostRecent()
+                    request.respondWith({
+                        status: 204
+                    }).then(() => {
+                        console.log(request.data)
+                        done()
+                    })
+                })
+            })
+
+            
+
+            const wrapper = setup({ auth: authUpdatedState });
+            wrapper.setState({
+                noteId: randomNoteId,
+                heading: 'This is a sample note heading',
+                note: 'I\'m the note body',
+                lastUpdated: new Date(),
+            })
+            const actionComponent = findByTestAttr(wrapper, 'component-action').dive();
+            const saveBtn = findByIdSelector(actionComponent, 'saveBtn');
+            saveBtn.simulate('click');
+        });
+    });
+
+
+    describe('`NoteEditor` with url params', () => {
+        
+        const expectedState = {
+            ...noteEditorInitialState,
+            noteId: sampleResponse.noteId,
+            heading: sampleResponse.noteHeading,
+            note: sampleResponse.noteBody,
+            lastUpdated: sampleResponse.lastUpdated,
+            fetchingNow: false
+        };
+
+        beforeEach(() => {
+            moxios.install();
+        });
+
+        afterEach(() => {
+            moxios.uninstall();
+        });
+
+        it('should render the spinner component', () => {
+            const wrapper = setup({ auth: authUpdatedState }, { location: { search: { id: randomNoteId }}});
+            const spinner = findByTestAttr(wrapper, 'component-spinner');
+            expect(spinner.length).toBe(1);
+        })
+        
+        it('should updated the state with mocked data from server', (done) => {
             moxios.wait(() => {
                 const request = moxios.requests.mostRecent();
                 request.respondWith({
@@ -125,24 +205,34 @@ describe('Accessing `NoteEditor` with valid login credentials', () => {
                     response: sampleResponse
                 }).then(() => {
                     const updatedState =  wrapper.instance().state;
-                    expect(updatedState.noteId).toEqual(sampleResponse.noteId);
-                    expect(updatedState.heading).toEqual(sampleResponse.noteHeading);
-                    expect(updatedState.lastUpdated).toEqual(sampleResponse.lastUpdated);
-                    expect(updatedState.fetchingNow).toEqual(false);
-
-                    const spinner = findByTestAttr(wrapper, 'component-spinner');
-                    expect(spinner.length).toBe(0);
+                    expect(expectedState).toStrictEqual(updatedState);
                     done();
-                })
+                });
             })
-
             const wrapper = setup({ auth: authUpdatedState }, { location: { search: { id: randomNoteId }}});
-            const spinner = findByTestAttr(wrapper, 'component-spinner');
-            expect(spinner.length).toBe(1);
         });
-        
+
+        it('should display an error message on click event of `save` button when both heading and body are empty', (done) => {
+            moxios.wait(() => {
+                const request = moxios.requests.mostRecent();
+                request.respondWith({
+                    status: 200,
+                    response: sampleResponse
+                }).then(() => {
+                    wrapper.setState({
+                        heading: '',
+                        note: '',
+                        lastUpdated: null,
+                    });
+                    const actionComponent = findByTestAttr(wrapper, 'component-action').dive();
+                    const saveBtn = findByIdSelector(actionComponent, 'saveBtn');
+                    saveBtn.simulate('click');
+                    const errorAlert = findByTestAttr(wrapper, 'component-alert');
+                    expect(errorAlert.length).toBe(1);
+                    done();
+                });
+            });
+            const wrapper = setup({ auth: authUpdatedState }, { location: { search: { id: randomNoteId }}}); 
+        });
     });
-
-
-
 });
