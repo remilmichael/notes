@@ -2,7 +2,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 
 import Auth from './Auth';
-import { storeFactory, findByTestAttr } from '../../testUtils';
+import { storeFactory, findByTestAttr, findByIdSelector } from '../../testUtils';
 
 
 /**
@@ -98,7 +98,6 @@ describe('When user is logged in', () => {
 });
 
 
-
 describe('When alert `message` is set', () => {
     const message = {
         ...messageInitialState,
@@ -164,8 +163,8 @@ describe('Simulating events', () => {
     describe('Change textfield value', () => {
     
         it('should update the state without error', () => {
-            const usernameTF = loginComponent.find('#username');
-            const passwordTF = loginComponent.find('#password');
+            const usernameTF = findByIdSelector(loginComponent, 'username');
+            const passwordTF = findByIdSelector(loginComponent, 'password');
 
             usernameTF.simulate('change', { target: { value: username }});
             passwordTF.simulate('change', { target: { value: password }});
@@ -176,9 +175,9 @@ describe('Simulating events', () => {
 
     describe('Clicking the `login` button', () => {
         it('should update the `logging` value in `auth` reducer to `true`', () => {
-            const usernameTF = loginComponent.find('#username');
-            const passwordTF = loginComponent.find('#password');
-            const loginBtn = loginComponent.find("#loginBtn");
+            const usernameTF = findByIdSelector(loginComponent, 'username');
+            const passwordTF = findByIdSelector(loginComponent, 'password');
+            const loginBtn = findByIdSelector(loginComponent, 'loginBtn');
             
             usernameTF.simulate('change', { target: { value: username }});
             passwordTF.simulate('change', { target: { value: password }});
@@ -190,7 +189,7 @@ describe('Simulating events', () => {
 
     describe('Clicking the `cancel` button', () => {
         it('should push `/` into the history prop to redirect to homepage', () => {
-            const cancelBtn = loginComponent.find("#cancelBtn");
+            const cancelBtn = findByIdSelector(loginComponent, 'cancelBtn');
             cancelBtn.simulate('click');
             expect(historyMock.push.mock.calls[0]).toEqual(['/']);
         })

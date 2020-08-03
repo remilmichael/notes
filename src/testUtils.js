@@ -17,6 +17,7 @@ const rootReducer = combineReducers({
 
 /**
  * Return node(s) with specified `data-test` attribute
+ * 
  * @param {ShallowWrapper} wrapper - Enzyme shallow wrapper
  * @param {String} val - Value of the data-test attribute
  * @returns {ShallowWrapper}
@@ -26,7 +27,20 @@ export const findByTestAttr = (wrapper, val) => {
 }
 
 /**
+ * Return node(s) with specified `CSS id` selector
+ * 
+ * @param {ShallowWrapper} wrapper - Enzyme shallow wrapper
+ * @param {String} val - Value of the CSS id selector
+ * @returns {ShallowWrapper}
+ */
+export const findByIdSelector = (wrapper, val) => {
+    return wrapper.find(`#${val}`);
+}
+
+
+/**
  * Function to check the `prop types` of the component given
+ * 
  * @param {JSX} component 
  * @param {Object} props 
  */
@@ -37,6 +51,7 @@ export const checkProps = (component, props) => {
 
 /**
  * Create a testing store with imported reducers, middleware and initialState state.
+ * 
  * @param {object} initialState - Initial state for store
  * @function storeFactory
  * @returns {Store} - Redux store.
