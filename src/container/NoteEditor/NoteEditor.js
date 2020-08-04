@@ -26,14 +26,16 @@ class NoteEditor extends Component {
         }
     }
 
-
+    /**
+     * State variable of `NoteEditor` component
+     */
     state = {
+        noteId: null,
         heading: '',
         note: '',
         lastUpdated: null,
         error: null,
         errorAck: false, // Set to true, when error has been acknowledged properly, since errors are faded after few seconds, to avoid re-rendering due to that.
-        noteId: null,
         fetchingNow: false
     };
 

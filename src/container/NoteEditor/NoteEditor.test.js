@@ -1,24 +1,15 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import { storeFactory, findByTestAttr, findByIdSelector } from '../../testUtils';
+import { storeFactory, findByTestAttr, findByIdSelector, authInitialState } from '../../testUtils';
 import NoteEditor from './NoteEditor';
 import moxios from 'moxios';
 
-/**
- * Initial state of `auth` reducer
- */
-const authInitialState = {
-    userId: null,
-    logging: false,
-    idToken: null,
-    expiresOn: null,
-    authCheckComplete: false,
-    error: null
-}
-
 const randomNoteId = 'randomId757';
 
+/**
+ * A sample server response while fetching a note
+ */
 const sampleResponse = {
     noteId: randomNoteId,
     noteHeading: 'This is a sample note heading',
@@ -125,52 +116,6 @@ describe('Accessing `NoteEditor` with valid login credentials', () => {
             expect(errorAlert.length).toBe(1);
         });
     });
-
-    describe('Sending note to server', () => {
-
-        beforeEach(() => {
-            moxios.install();
-        });
-
-        afterEach(() => {
-            moxios.uninstall();
-        })
-
-        it('should ', (done) => {
-            moxios.wait(() => {
-                let request = moxios.requests.mostRecent()
-                request.respondWith({
-                    status: 204
-                }).then(() => {
-                    console.log(request.data)
-                    
-                })
-                moxios.wait(() => {
-                    let request = moxios.requests.mostRecent()
-                    request.respondWith({
-                        status: 204
-                    }).then(() => {
-                        console.log(request.data)
-                        done()
-                    })
-                })
-            })
-
-            
-
-            const wrapper = setup({ auth: authUpdatedState });
-            wrapper.setState({
-                noteId: randomNoteId,
-                heading: 'This is a sample note heading',
-                note: 'I\'m the note body',
-                lastUpdated: new Date(),
-            })
-            const actionComponent = findByTestAttr(wrapper, 'component-action').dive();
-            const saveBtn = findByIdSelector(actionComponent, 'saveBtn');
-            saveBtn.simulate('click');
-        });
-    });
-
 
     describe('`NoteEditor` with url params', () => {
         

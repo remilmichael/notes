@@ -16,7 +16,7 @@ const sampleNotes = [
     { noteId: '789', noteHeading: 'Heading 2' },
     { noteId: '467', noteHeading: 'Heading 4' },
     { noteId: 'abcd', noteHeading: 'Heading 5' },
-]
+];
 
 describe('`allNotes` Reducer', () => {
     
@@ -165,7 +165,7 @@ describe('`allNotes` Reducer', () => {
         });
     });
 
-    /* Leaving below two action types since they simple actions */
+    /* Leaving two action types since they simple actions */
     // FETCH_MORE_NOTES_START
     // FETCH_NOTES_TITLES_FAILED
 

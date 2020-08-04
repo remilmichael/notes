@@ -62,3 +62,13 @@ export const storeFactory = (initialState) => {
     const storeWithMiddleware = applyMiddleware(thunk)(createStore);
     return storeWithMiddleware(rootReducer, initialState);
 }
+
+
+export const authInitialState = {
+    userId: null,
+    logging: false,
+    idToken: null,
+    expiresOn: null,
+    authCheckComplete: false,
+    error: null
+}

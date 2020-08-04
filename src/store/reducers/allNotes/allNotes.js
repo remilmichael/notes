@@ -1,7 +1,7 @@
 import * as actionTypes from '../../actions/actionTypes';
 import { updateObject } from '../../../utility';
 
-const initialState = {
+export const initialState = {
     notes: [], // [{ noteId - String, noteHeading - String }]
     nextRecordNumber: 0,
     hasMoreNotes: true,
@@ -71,7 +71,7 @@ const pushNote = (state, titles) => {
  * @returns {Object} - Updated state with newly added note heading
  */
 const addNote = (state, newNote) => {
-    let notes = [];
+    const notes = [];
     const nextRecordNumber = state.nextRecordNumber + 1;
     const note = {
         noteId: newNote.noteId,
