@@ -1,14 +1,34 @@
 import * as actions from './actionTypes';
 import axios from 'axios';
 
+/**
+ * Authentication end point
+ */
 const loginUrl = "http://localhost:8080/api/authenticate";
 
+/**
+ * Action creator to start the spinner up
+ *      while authenticating
+ * 
+ * @function authStart
+ * @returns {Object} - Redux action type
+ */
 export const authStart = () => {
     return {
         type: actions.AUTH_USER_START
     };
 }
 
+/**
+ * Action creator to update the authentication status
+ *      as successful
+ * 
+ * @function authSuccess
+ * @param {String} idToken - JWT authentication token 
+ * @param {Number} expiresOn - Time when token expires (in milliseconds)
+ * @param {String} userId - User Id
+ * @returns {Object} - Redux action type and payload
+ */
 export const authSuccess = (idToken, expiresOn, userId) => {
     return {
         type: actions.AUTH_USER_SUCCESS,
@@ -20,6 +40,13 @@ export const authSuccess = (idToken, expiresOn, userId) => {
     };
 }
 
+/**
+ * Function to clear authentication token and
+ *      user related data from `local storage`
+ * 
+ * @function logout
+ * @returns {Object} - Redux action type.
+ */
 export const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('expiresOn');
@@ -29,6 +56,14 @@ export const logout = () => {
     };
 }
 
+/**
+ * Action creator to trigger auto logout whenever the 
+ *      authentication token expires
+ * 
+ * @function checkAuthTimeOut
+ * @param {Number} expiresIn
+ * @returns {Function}
+ */
 export const checkAuthTimeOut = (expiresIn) => {
     return dispatch => {
         setTimeout(() => {
@@ -37,6 +72,41 @@ export const checkAuthTimeOut = (expiresIn) => {
     };
 }
 
+/**
+ * Action creator to set the error message
+ *      generated during authentication
+ * 
+ * @function authFailed
+ * @param {String} error - Error message
+ * @returns {Object} - Redux action type and payload
+ */
+export const authFailed = (error) => {
+    return {
+        type: actions.AUTH_USER_FAILED,
+        payload: error
+    };
+}
+
+/**
+ * Action creator to clear the error message
+ *      if there is any.
+ */
+export const clearError = () => {
+    return {
+        type: actions.AUTH_ERROR_RESET
+    };
+}
+
+
+
+
+/**
+ * Function to check if authentication is valid
+ *      by checking on `local storage`
+ * 
+ * @function tryAutoLogin
+ * @returns {Function}
+ */
 export const tryAutoLogin = () => {
     return dispatch => {
         const idToken  = localStorage.getItem('token');
@@ -63,21 +133,9 @@ export const tryAutoLogin = () => {
     }
 }
 
-export const authFailed = (error) => {
-    return {
-        type: actions.AUTH_USER_FAILED,
-        payload: error
-    };
-}
-
-export const clearError = () => {
-    return {
-        type: actions.AUTH_ERROR_RESET
-    };
-}
-
 /**
- * Function will validate the credential given.
+ * Function will validate the credential given
+ * 
  * @function authUser
  * @param {Object} credential - Contains username and password
  * @returns {function}
@@ -107,7 +165,7 @@ export const authUser = (credential) => {
                 }
             })
             .catch(error => {
-                if (error.response) {
+                if (error.response && error.response.data && error.response.data.message) {
                     dispatch(authFailed(error.response.data.message));
                 } else {
                     const errorResponse = "Failed to connect to Server. Check network connectivity";
