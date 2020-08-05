@@ -30,7 +30,12 @@ export const reducer = (state = initialState, action) => {
     };
 }
 
-
+/**
+ * Function to reset state of the reducer
+ * 
+ * @function resetState
+ * @returns {Object} - Updated state
+ */
 const resetState = () => {
     return {
         loadingNow: false,
@@ -39,6 +44,13 @@ const resetState = () => {
     }
 }
 
+/**
+ * Function to update the state when the save
+ *      action is successful
+ * 
+ * @function saveSuccessReducer
+ * @returns {Object} - Updated state
+ */
 const saveSuccessReducer = () => {
     return {
         error: null,

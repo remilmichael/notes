@@ -5,7 +5,7 @@ import moxios from 'moxios';
 import AxiosInstance from '../axios-notes';
 import NoteEditor from '../container/NoteEditor/NoteEditor';
 import { storeFactory, authInitialState, findByTestAttr, findByIdSelector } from '../testUtils';
-import { reducer, initialState as allNotesInitialState } from '../store/reducers/allNotes/allNotes';
+import { initialState as allNotesInitialState } from '../store/reducers/allNotes/allNotes';
 
 
 /**
@@ -93,7 +93,7 @@ describe('Saving note', () => {
         saveBtn.simulate('click');
     });
 
-    it('should update ', (done) => {
+    it('should update the note in redux and position it first on array', (done) => {
         const sampleNotes = [
             { noteId: '123', noteHeading: 'Heading 1' },
             { noteId: '456', noteHeading: 'Heading 2' },
@@ -106,12 +106,11 @@ describe('Saving note', () => {
             noteId: 'abcd'
         }
         moxios.wait(() => {
-            
             const request = moxios.requests.mostRecent();
             request.respondWith({
                 status: 200
             }).then(() => {
-                console.log(wrapper.instance().props.store.getState().notelist);
+                expect(wrapper.instance().props.store.getState().notelist.notes[0]).toEqual({...sampleNotes[4], noteHeading: sampleNote.heading});
                 done();
             })
         })
@@ -119,7 +118,6 @@ describe('Saving note', () => {
         wrapper.setState(newNote);
         const saveBtn = findByIdSelector(findByTestAttr(wrapper, 'component-action').dive(), 'saveBtn');
         saveBtn.simulate('click');
-        console.log(wrapper.instance().props.store.getState().notelist);
     });
 
 });
