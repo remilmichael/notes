@@ -29,6 +29,14 @@ describe('User authenticates', () => {
     beforeEach(() => {
         moxios.install();
         wrapper = setup({});
+        wrapper.setState({ username: 'user', password: 'pass' });
+        const component = findByTestAttr(wrapper, 'component-loginform').dive();
+        const loginBtn = findByIdSelector(component, 'loginBtn');
+        loginBtn.simulate('click');
+    })
+
+    afterEach(() => {
+        moxios.uninstall();
     })
 
     it('should update the auth reducer state with the login credentials without errors', (done) => {
@@ -52,9 +60,26 @@ describe('User authenticates', () => {
             })
         })
 
-        wrapper.setState({ username: 'user', password: 'pass' });
-        const component = findByTestAttr(wrapper, 'component-loginform').dive();
-        const loginBtn = findByIdSelector(component, 'loginBtn');
-        loginBtn.simulate('click');
     });
+
+    it('should raise an error on invalid credentials', (done) => {
+        moxios.wait(() => {
+            const request = moxios.requests.mostRecent();
+            request.respondWith({
+                status: 401,
+                response: { message: 'Invalid credentials' }
+            }).then(() => {
+                const expectedState = {
+                    userId: null,
+                    expiresOn: null,
+                    idToken: null,
+                    logging: false,
+                    authCheckComplete: true,
+                    error: 'Invalid credentials'
+                }
+                expect(wrapper.instance().props.store.getState().auth).toEqual(expectedState)
+                done();
+            })
+        });
+    })
 });
