@@ -63,6 +63,20 @@ export const storeFactory = (initialState) => {
     return storeWithMiddleware(rootReducer, initialState);
 }
 
+/**
+ * Function to add days to the date
+ * 
+ * @function addDays
+ * @param {Date} - Date to add to
+ * @param {Number} - Number of days to add
+ * @returns {Date}
+ */
+export const addDays = (date, days) => {
+    const copyDate = new Date(Number(date));
+    copyDate.setDate(date.getDate() + days);
+    return copyDate;
+}
+
 
 export const authInitialState = {
     userId: null,
@@ -72,3 +86,4 @@ export const authInitialState = {
     authCheckComplete: false,
     error: null
 }
+
