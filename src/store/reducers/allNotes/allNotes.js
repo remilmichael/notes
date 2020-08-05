@@ -1,7 +1,10 @@
 import * as actionTypes from '../../actions/actionTypes';
 import { updateObject } from '../../../utility';
 
-export const initialState = {
+/**
+ * Initial State of `allNotes` reducer
+ */
+const initialState = {
     notes: [], // [{ noteId - String, noteHeading - String }]
     nextRecordNumber: 0,
     hasMoreNotes: true,
@@ -20,10 +23,12 @@ export const reducer = (state = initialState, action) => {
             return pushNote(state, action.payload);
         case actionTypes.SAVE_NOTE_REDUX:
             return addNote(state, action.payload)
+        case actionTypes.UPDATE_NOTE_REDUX:
+            return updateNote(state, action.payload);
         case actionTypes.DELETE_NOTE_REDUX:
             return deleteNote(state, action.payload);
         case actionTypes.CLEAR_NOTE_REDUX:
-            return clearNotes(state);
+            return clearNotes();
         case actionTypes.FETCH_MORE_NOTES_START:
             return updateObject(state, { loading: true });
         case actionTypes.FETCH_NOTES_TITLES_FAILED:
@@ -35,6 +40,7 @@ export const reducer = (state = initialState, action) => {
 
 /**
  * Function to store all fetched note titles from the server
+ * 
  * @function pushNote
  * @param {Object} state 
  * @param {Array} titles 
@@ -66,6 +72,8 @@ const pushNote = (state, titles) => {
 /**
  * Function to add a new note (noteHeading and noteId) to the redux
  * Will be added to the beginning of the array
+ * 
+ * @function addNote
  * @param {Object} state
  * @param {Object} newNote - Contains noteId and noteHeading
  * @returns {Object} - Updated state with newly added note heading
@@ -88,7 +96,32 @@ const addNote = (state, newNote) => {
 }
 
 /**
+ * Function to update the reducer with updated note
+ * 
+ * @function updateNote
+ * @param {Object} state 
+ * @param {Object} note 
+ */
+const updateNote = (state, note) => {
+
+    const notes = [];
+    notes.push({ noteId: note.noteId, noteHeading: note.noteHeading });
+    const otherNotes = state.notes.filter((item) => {
+        return item.noteId !== note.noteId;
+    });
+
+    notes.push(...otherNotes);
+    return {
+        ...state,
+        notes: notes
+    };
+}
+
+
+/**
  * Function to delete the note with the specified note id
+ * 
+ * @function deleteNote
  * @param {Object} state 
  * @param {String} noteId - Note id 
  * @returns {Object} - Updated state after removing the specified note.
@@ -104,18 +137,16 @@ const deleteNote = (state, noteId) => {
     };
 }
 
-const clearNotes = (state) => {
-    return {
-        ...state,
-        notes: [],
-        nextRecordNumber: 0,
-        hasMoreNotes: true,
-        loading: false,
-        fetchFailed: false
-    };
+/**
+ * Function to reset to initial state
+ * 
+ * @function clearNotes
+ * @param {Object} state 
+ * @returns {Object} - Initial state
+ */
+const clearNotes = () => {
+    return initialState;
 }
-
-
 
 
 export default reducer;
