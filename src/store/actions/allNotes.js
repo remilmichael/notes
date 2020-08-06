@@ -77,9 +77,8 @@ export const fetchAllNotes = (idToken, page) => {
         .then((response) => {
             dispatch(fetchTitlesSuccess(response.data))
         })
-        .catch(error => {
+        .catch(() => {
             dispatch(fetchTitlesFailed());
-            console.log(error);
         });
     }
 }

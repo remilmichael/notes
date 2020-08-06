@@ -4,7 +4,7 @@ import { updateObject } from '../../../utility';
 /**
  * Initial State of `allNotes` reducer
  */
-const initialState = {
+export const initialState = {
     notes: [], // [{ noteId - String, noteHeading - String }]
     nextRecordNumber: 0,
     hasMoreNotes: true,

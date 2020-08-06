@@ -9,12 +9,12 @@ import classes from './MainPage.module.css';
 class MainPage extends Component {
 
     componentDidMount() {
-        console.log('ComponentDidMount -> MainPage.js');
+        // console.log('ComponentDidMount -> MainPage.js');
         this.fetchOrClearNotes();
     }
 
     componentDidUpdate() {
-        console.log("componentDidUpdate -> MainPage");
+        // console.log("componentDidUpdate -> MainPage");
         this.fetchOrClearNotes();
     }
 
@@ -28,18 +28,19 @@ class MainPage extends Component {
         }
     }
 
+
     loadMoreNotesHandler = () => {
         this.props.onFetchNotes(this.props.idToken, this.props.nextRecordNumber);
     }
 
     render () {
-        console.log('Inside rendering function => [MainPage.js]');
+        // console.log('Inside rendering function => [MainPage.js]');
         let noteList = null;
         let moreButton = null;
         if (this.props.notelist.length > 0) {
             noteList = this.props.notelist.map((note) => {
                     return (<Col className="col-12 col-md-4 mt-3" key={note.noteId}>
-                            <Card bg="light" text="dark">
+                            <Card bg="light" text="dark" data-test="component-note-item">
                                 <NavLink to={'/note?id='.concat(note.noteId)} className={classes.link}>
                                     <Card.Body>
                                         <Card.Text>
@@ -52,15 +53,17 @@ class MainPage extends Component {
             }); 
         }
 
-        if (this.props.hasMoreNotes === true && this.props.idToken !== null)  {
-            if (this.props.fetchFailed === true) {
+        if (this.props.hasMoreNotes && this.props.idToken)  {
+            if (this.props.fetchFailed) {
                 moreButton = <SpinnerOrButton 
+                    data-test="component-button-failed"
                     disabled={true}
                     variant="secondary"
                     message="Unable to connect" 
                     clickedMoreNotes={this.loadMoreNotesHandler} />;
-            } else if (this.props.loading === false) {
+            } else if (!this.props.loading) {
                 moreButton = <SpinnerOrButton 
+                    data-test="component-loadmore"
                     disabled={false} 
                     variant="primary"
                     message="Load more" 
@@ -78,7 +81,10 @@ class MainPage extends Component {
                 <Row className="mt-3">
                     <Col>
                         <NavLink to="/note">
-                            <button type="button" className="btn btn-dark">New note</button>
+                            <button 
+                                data-test="component-addbutton"
+                                type="button" 
+                                className="btn btn-dark">New note</button>
                         </NavLink>
                     </Col>
                 </Row>

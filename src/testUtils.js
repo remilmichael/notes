@@ -77,7 +77,9 @@ export const addDays = (date, days) => {
     return copyDate;
 }
 
-
+/**
+ * Initial state of `auth` reducer
+ */
 export const authInitialState = {
     userId: null,
     logging: false,
