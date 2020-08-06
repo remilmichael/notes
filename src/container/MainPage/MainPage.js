@@ -70,6 +70,7 @@ class MainPage extends Component {
                     clickedMoreNotes={this.loadMoreNotesHandler} />;
             } else {
                 moreButton = <SpinnerOrButton 
+                    data-test="component-loading"
                     disabled={true} 
                     variant="primary"
                     message=" Loading..." />;
