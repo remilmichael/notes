@@ -2,7 +2,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 
 import MainPage from './MainPage';
-import { storeFactory, findByTestAttr, authInitialState } from '../../testUtils';
+import { storeFactory, findByTestAttr, authInitialState, sampleNotes } from '../../testUtils';
 import { initialState as notelistInitialState } from '../../store/reducers/allNotes/allNotes';
 
 /**
@@ -17,12 +17,6 @@ const setup = (initialState={}, props={}) => {
     return shallow(<MainPage store={store} { ...props } />).dive().dive();
 };
 
-const sampleNotes = [
-    { noteId: '123', noteHeading: 'Heading 1' },
-    { noteId: '456', noteHeading: 'Heading 2' },
-    { noteId: '789', noteHeading: 'Heading 2' },
-    { noteId: '467', noteHeading: 'Heading 4' },
-]
 
 describe('Accessing `MainPage` without signing in', () => {
     
@@ -87,7 +81,7 @@ describe('Accessing `MainPage` with credentials', () => {
 
 
     describe('Rendering note titles', () => {
-        
+
         it('should render all note titles with `load more` button', () => {
             const noteListUpdatedState = {
                 ...notelistInitialState,
@@ -108,7 +102,7 @@ describe('Accessing `MainPage` with credentials', () => {
                 ...notelistInitialState,
                 notes: sampleNotes,
                 hasMoreNotes: false,
-                nextRecordNumber: 4,
+                nextRecordNumber: sampleNotes.length,
             };
     
             const wrapper = setup({ auth: authWithCredentials, notelist: noteListUpdatedState });

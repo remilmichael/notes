@@ -7,7 +7,12 @@ const spinner = (props) => {
         spinner = <span className="spinner-grow spinner-grow-sm" role="status" aria-hidden="true" />;
     }
     return (
-        <Button variant={props.variant} size="md" disabled={props.disabled} onClick={props.clickedMoreNotes}>
+        <Button 
+            id="loadMoreBtn"
+            variant={props.variant} 
+            size="md" 
+            disabled={props.disabled} 
+            onClick={props.clickedMoreNotes}>
             {spinner}{props.message}
         </Button>
     )

@@ -70,8 +70,8 @@ const pushNote = (state, titles) => {
 };
 
 /**
- * Function to add a new note (noteHeading and noteId) to the redux
- * Will be added to the beginning of the array
+ * Function to add a new note title (noteHeading and noteId) to the redux.
+ * Since it's last modified note, it'll be appearing in the beginning.
  * 
  * @function addNote
  * @param {Object} state

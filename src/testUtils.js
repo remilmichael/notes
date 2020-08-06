@@ -89,3 +89,10 @@ export const authInitialState = {
     error: null
 }
 
+export const sampleNotes = [
+    { noteId: '123', noteHeading: 'Heading 1' },
+    { noteId: '456', noteHeading: 'Heading 2' },
+    { noteId: '789', noteHeading: 'Heading 2' },
+    { noteId: '467', noteHeading: 'Heading 4' },
+]
+

@@ -41,7 +41,7 @@ class MainPage extends Component {
             noteList = this.props.notelist.map((note) => {
                     return (<Col className="col-12 col-md-4 mt-3" key={note.noteId}>
                             <Card bg="light" text="dark" data-test="component-note-item">
-                                <NavLink to={'/note?id='.concat(note.noteId)} className={classes.link}>
+                                <NavLink to={`/note?id=${note.noteId}`} className={classes.link}>
                                     <Card.Body>
                                         <Card.Text>
                                             {note.noteHeading}
