@@ -29,7 +29,7 @@ class Auth extends Component {
     }
     
     componentDidUpdate () {
-        if (!this.state.error && this.props.authError) {
+        if (this.props.authError) {
             this.setState({ error: this.props.authError, errorType: "danger"});
             this.props.onClearError();
         }
