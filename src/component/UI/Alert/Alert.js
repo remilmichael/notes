@@ -1,6 +1,8 @@
 import React from 'react';
 import { Alert } from 'react-bootstrap';
 
+import PropTypes from 'prop-types'
+
 const alert = (props) => {
     return (
         <Alert variant={props.type}>
@@ -11,3 +13,7 @@ const alert = (props) => {
 
 export default alert;
 
+alert.propTypes = {
+    type: PropTypes.string.isRequired,
+    message: PropTypes.string.isRequired,
+};

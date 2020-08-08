@@ -1,6 +1,7 @@
 import React from 'react';
-import './Spinner.css';
 import { Row, Col } from 'react-bootstrap';
+
+import './Spinner.css';
 
 const spinner = () => (
     <Row className="text-center" style={{height: '100vh'}}>

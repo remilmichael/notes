@@ -1,14 +1,21 @@
 import React, { Component } from 'react';
 import { Navbar, Nav } from 'react-bootstrap';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+
 import logo from '../../../assets/note.png';
 import classes from './Navbar.module.css';
 import NavItem from './NavItem/NavItem';
-import { connect } from 'react-redux';
 
 class Toolbar extends Component{
     render () {
         return (
-            <Navbar collapseOnSelect expand="md" bg="dark" variant="dark">
+            <Navbar 
+                data-test="component-navbar"
+                collapseOnSelect
+                expand="md" 
+                bg="dark"
+                variant="dark">
                     <Navbar.Brand>
                         <img
                             src={logo}
@@ -28,7 +35,17 @@ class Toolbar extends Component{
                             {this.props.isAuthenticated ? <NavItem link="/note">Add Note</NavItem> : null}
                         </Nav>*/}
                         <Nav className={classes.NavbarItem + ' ml-auto'}>
-                            {this.props.isAuthenticated ? <NavItem link="/logout">Logout</NavItem> : <NavItem link="/login">Login</NavItem>}
+                            {
+                                this.props.isAuthenticated
+                                 ? 
+                                <NavItem 
+                                    data-test="link-logout"
+                                    link="/logout">Logout</NavItem>
+                                :
+                                <NavItem 
+                                    data-test="link-login"
+                                    link="/login">Login</NavItem>
+                            }
                         </Nav>
                     </Navbar.Collapse>
             </Navbar>
@@ -43,3 +60,7 @@ export const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps)(Toolbar);
+
+Toolbar.propTypes = {
+    isAuthenticated: PropTypes.bool.isRequired
+}
