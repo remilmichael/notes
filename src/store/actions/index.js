@@ -10,7 +10,7 @@ export {
     logout,
     tryAutoLogin,
     clearError
-} from './auth';
+} from './auth/auth';
 
 export {
     setMessage,

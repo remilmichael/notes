@@ -1,4 +1,4 @@
-import * as actions from './actionTypes';
+import * as actions from '../actionTypes';
 import axios from 'axios';
 
 /**
@@ -30,6 +30,11 @@ export const authStart = () => {
  * @returns {Object} - Redux action type and payload
  */
 export const authSuccess = (idToken, expiresOn, userId) => {
+
+    localStorage.setItem('token', idToken);
+    localStorage.setItem('expiresOn', expiresOn);
+    localStorage.setItem('userId', userId);
+
     return {
         type: actions.AUTH_USER_SUCCESS,
         payload: {
@@ -101,7 +106,7 @@ export const clearError = () => {
 
 
 /**
- * Function to check if authentication is valid
+ * Async action creator to check if authentication is valid
  *      by checking on `local storage`
  * 
  * @function tryAutoLogin
@@ -134,7 +139,7 @@ export const tryAutoLogin = () => {
 }
 
 /**
- * Function will validate the credential given
+ * Async Action Creators will validate the credential given
  * 
  * @function authUser
  * @param {Object} credential - Contains username and password
@@ -142,24 +147,16 @@ export const tryAutoLogin = () => {
  */
 export const authUser = (credential) => {
     return dispatch => {
-        const url = loginUrl;
         dispatch(authStart());
-        const requestObj = {
-            ...credential
-        }
-        axios.post(url, requestObj)
+        axios.post(loginUrl, credential)
             .then(response => {
                 const idToken = response.data.token;
                 const expiresOn = new Date(response.data.expiresOn * 1000);
                 const userId = response.data.userId;
 
-                if (idToken == null || expiresOn == null || userId == null) {
-                    dispatch(authFailed("Unknown error. Missing required credentials"));
+                if (!idToken || !expiresOn || !userId) {
+                    dispatch(authFailed("Unknown error."));
                 } else {
-                    localStorage.setItem('token', idToken);
-                    localStorage.setItem('expiresOn', expiresOn);
-                    localStorage.setItem('userId', userId);
-
                     dispatch(authSuccess(idToken, expiresOn, userId));
                     dispatch(checkAuthTimeOut(expiresOn - new Date().getTime()));
                 }
