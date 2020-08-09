@@ -5,7 +5,7 @@ import moxios from 'moxios';
 import Axios from '../axios-notes';
 import MainPage from '../container/MainPage/MainPage';
 import { storeFactory, authInitialState, sampleNotes, findByTestAttr, findByIdSelector } from '../testUtils';
-import { initialState as notelistInitialState } from '../store/reducers/allNotes/allNotes';
+import { initialState as notelistInitialState } from '../store/reducers/notelist/notelist';
 
 /**
  * Factory function to create a ShallowWrapper for the GuessedWords component.

@@ -3,7 +3,7 @@ import { shallow } from 'enzyme';
 
 import MainPage from './MainPage';
 import { storeFactory, findByTestAttr, authInitialState, sampleNotes } from '../../testUtils';
-import { initialState as notelistInitialState } from '../../store/reducers/allNotes/allNotes';
+import { initialState as notelistInitialState } from '../../store/reducers/notelist/notelist';
 
 /**
  * Factory function to create a ShallowWrapper for the GuessedWords component.

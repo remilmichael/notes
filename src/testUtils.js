@@ -6,7 +6,7 @@ import thunk from 'redux-thunk';
 import noteReducer from './store/reducers/notes/notes';
 import authReducer from './store/reducers/auth/auth';
 import msgReducer from './store/reducers/message/message';
-import notesList from './store/reducers/allNotes/allNotes';
+import notesList from './store/reducers/notelist/notelist';
 
 const rootReducer = combineReducers({
   note: noteReducer,

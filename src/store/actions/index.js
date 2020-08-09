@@ -20,4 +20,4 @@ export {
 export {
     fetchAllNotes,
     clearTitles
-} from './allNotes';
+} from './notelist';

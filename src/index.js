@@ -10,7 +10,7 @@ import * as serviceWorker from './serviceWorker';
 import noteReducer from './store/reducers/notes/notes';
 import authReducer from './store/reducers/auth/auth';
 import msgReducer from './store/reducers/message/message';
-import notesList from './store/reducers/allNotes/allNotes';
+import noteListReducer from './store/reducers/notelist/notelist';
 
 // const composeEnhancers = process.env.NODE_ENV === 'development' ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ : null || compose;
 const composeEnhancers = compose;
@@ -19,7 +19,7 @@ export const rootReducer = combineReducers({
   note: noteReducer,
   auth: authReducer,
   message: msgReducer,
-  notelist: notesList
+  notelist: noteListReducer
 });
 
 const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk)))

@@ -5,7 +5,7 @@ import moxios from 'moxios';
 import AxiosInstance from '../axios-notes';
 import NoteEditor from '../container/NoteEditor/NoteEditor';
 import { storeFactory, authInitialState, findByTestAttr, findByIdSelector } from '../testUtils';
-import { initialState as allNotesInitialState } from '../store/reducers/allNotes/allNotes';
+import { initialState as allNotesInitialState } from '../store/reducers/notelist/notelist';
 
 
 /**

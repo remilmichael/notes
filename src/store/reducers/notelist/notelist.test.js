@@ -1,5 +1,5 @@
 import * as actionTypes from '../../actions/actionTypes';
-import { reducer } from './allNotes';
+import { reducer } from './notelist';
 
 const initialState = {
     notes: [], // [{ noteId - String, noteHeading - String }]
