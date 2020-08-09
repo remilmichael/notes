@@ -132,7 +132,7 @@ describe('`allNotes` Reducer', () => {
 
         });
 
-        describe('When some titles exists - Should add new title to beginning of the array', () => {
+        describe('When some titles already exists - Should add new title to beginning of the array', () => {
             test('should return the updated state when a new title is added', () => {
                 const updatedState = { ...initialState, notes: [...sampleNotes], nextRecordNumber: sampleNotes.length };
                 const payload = { noteId: 'id234', noteHeading: 'Sample note heading' };
