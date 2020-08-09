@@ -7,6 +7,7 @@ import noteReducer from './store/reducers/notes/notes';
 import authReducer from './store/reducers/auth/auth';
 import msgReducer from './store/reducers/message/message';
 import notesList from './store/reducers/notelist/notelist';
+import { mock } from 'sinon';
 
 const rootReducer = combineReducers({
   note: noteReducer,
@@ -75,6 +76,35 @@ export const addDays = (date, days) => {
     const copyDate = new Date(Number(date));
     copyDate.setDate(date.getDate() + days);
     return copyDate;
+}
+
+/**
+ * Function to mock localStorage object and its functions
+ *      based on the input given
+ * 
+ * @function mockLocalStorage
+ * @param {String} token - Mock JWT auth token
+ * @param {Date} expiresOn - Mock token expiry date
+ * @param {String} userId - Mock user id
+ * @returns {undefined}
+ */
+export const mockLocalStorage = (token, expiresOn, userId) => {
+    Object.defineProperty(window, 'localStorage', {
+        value: {
+            getItem: jest.fn((item) => {
+                if (item === 'token') {
+                    return token;
+                } else if (item === 'expiresOn') {
+                    return expiresOn;
+                } else if (item === 'userId') {
+                    return userId;
+                }
+            }),
+            removeItem: jest.fn(() => null),
+            setItem: jest.fn(() => null)
+        },
+        writable: true
+    })
 }
 
 /**
