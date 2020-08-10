@@ -3,7 +3,7 @@ export {
     updateNote,
     deleteNote,
     resetToDefault
-} from './notes';
+} from './notes/notes';
 
 export {
     authUser,

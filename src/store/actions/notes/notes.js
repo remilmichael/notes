@@ -1,5 +1,7 @@
-import * as actions from './actionTypes';
-import axios from '../../axios-notes';
+import * as actions from '../actionTypes';
+import axios from '../../../axios-notes';
+
+export const defaultErrorMessage = "CHECK NETWORK CONNECTIVITY";
 
 /**
  * Action creator to initiate the spinner
@@ -127,10 +129,10 @@ export const saveNote = (note, idToken) => {
             dispatch(dbActionSuccess());
         })
         .catch(error => {
-            if (error.response) {
+            if (error.response && error.response.data && error.response.data.message) {
                 dispatch(dbActionFailed(error.response.data.message));
             } else {
-                dispatch(dbActionFailed("CHECK NETWORK CONNECTIVITY"));
+                dispatch(dbActionFailed(defaultErrorMessage));
             }
         })
     }
@@ -161,10 +163,10 @@ export const updateNote = (note, idToken) => {
                 dispatch(dbActionSuccess());
             })
             .catch(error => {
-                if (error.response) {
+                if (error.response && error.response.data && error.response.data.message) {
                     dispatch(dbActionFailed(error.response.data.message));
                 } else {
-                    dispatch(dbActionFailed("CHECK NETWORK CONNECTIVITY"));
+                    dispatch(dbActionFailed(defaultErrorMessage));
                 }
             })
     }
@@ -192,7 +194,11 @@ export const deleteNote = (noteId, idToken) => {
             dispatch(dbActionSuccess());
         })
         .catch(error => {
-            dispatch(dbActionFailed(error.response));
+            if (error.response && error.response.data && error.response.data.message) {
+                dispatch(dbActionFailed(error.response.data.message));
+            } else {
+                dispatch(dbActionFailed(defaultErrorMessage));
+            }
         })
     };
 }
