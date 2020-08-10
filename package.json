@@ -46,6 +46,7 @@
     "@types/jest": "^26.0.8",
     "@types/moxios": "^0.4.9",
     "@types/prop-types": "^15.7.3",
+    "@types/redux-mock-store": "^1.0.2",
     "check-prop-types": "^1.1.2",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
