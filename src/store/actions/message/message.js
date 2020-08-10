@@ -1,4 +1,4 @@
-import * as actions from './actionTypes';
+import * as actions from '../actionTypes';
 
 /**
  * Action creator to set global message
