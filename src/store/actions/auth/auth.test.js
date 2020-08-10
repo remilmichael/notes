@@ -157,7 +157,7 @@ describe('Testing `tryAutoLogin` action creator', () => {
         expect(store.getActions()).toEqual(expectedActions);
     });
 
-    it('should return `AUTH_USER_LOGOUT` - NO token in `localStorage`', () => {
+    it('should return action `AUTH_USER_LOGOUT` - NO token in `localStorage`', () => {
         const expectedActions = [
             { type: actionTypes.AUTH_USER_LOGOUT }
         ];
@@ -165,5 +165,32 @@ describe('Testing `tryAutoLogin` action creator', () => {
         mockLocalStorage(token, null, userId);
         store.dispatch(actions.tryAutoLogin());
         expect(store.getActions()).toEqual(expectedActions);
-    })
+    });
+
+    it('should return action `AUTH_USER_LOGOUT` - Expired token ', () => {
+        const expectedActions = [
+            { type: actionTypes.AUTH_USER_LOGOUT }
+        ];
+        mockLocalStorage(token, expiresOn_invalid, userId);
+        store.dispatch(actions.tryAutoLogin());
+        expect(store.getActions()).toEqual(expectedActions);  
+    });
+
+    it('should return action `AUTH_USER_LOGOUT` when no JWT token found in `localStorage`', () => {
+        const expectedActions = [
+            { type: actionTypes.AUTH_USER_LOGOUT }
+        ];
+        mockLocalStorage(undefined, undefined, undefined);
+        store.dispatch(actions.tryAutoLogin());
+        expect(store.getActions()).toEqual(expectedActions);  
+    });
+
+    it('should return action `AUTH_USER_LOGOUT` when no `user id` found in `localStorage`', () => {
+        const expectedActions = [
+            { type: actionTypes.AUTH_USER_LOGOUT }
+        ];
+        mockLocalStorage(token, expiresOn_valid, undefined);
+        store.dispatch(actions.tryAutoLogin());
+        expect(store.getActions()).toEqual(expectedActions);  
+    });
 });
