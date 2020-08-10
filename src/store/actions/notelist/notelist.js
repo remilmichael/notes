@@ -1,5 +1,5 @@
-import * as actions from './actionTypes';
-import axios from '../../axios-notes';
+import * as actions from '../actionTypes';
+import axios from '../../../axios-notes';
 
 /**
  * Action creator to set the error message generated
@@ -75,7 +75,12 @@ export const fetchAllNotes = (idToken, page) => {
             headers: headers
         })
         .then((response) => {
-            dispatch(fetchTitlesSuccess(response.data))
+            if (response.data) {
+                dispatch(fetchTitlesSuccess(response.data))
+            } else {
+                dispatch(fetchTitlesFailed());
+            }
+            
         })
         .catch(() => {
             dispatch(fetchTitlesFailed());

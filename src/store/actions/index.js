@@ -15,9 +15,9 @@ export {
 export {
     setMessage,
     unsetMessage,
-} from './message';
+} from './message/message';
 
 export {
     fetchAllNotes,
     clearTitles
-} from './notelist';
+} from './notelist/notelist';
