@@ -38,6 +38,16 @@ export const findByIdSelector = (wrapper, val) => {
     return wrapper.find(`#${val}`);
 }
 
+/**
+ * Return node(s) with specified `CSS class` selector
+ * 
+ * @param {ShallowWrapper} wrapper - Enzyme shallow wrapper
+ * @param {String} val - Value of the CSS id selector
+ * @returns {ShallowWrapper}
+ */
+export const findByClassSelector = (wrapper, val) => {
+    return wrapper.find(`.${val}`);
+}
 
 /**
  * Function to check the `prop types` of the component given
