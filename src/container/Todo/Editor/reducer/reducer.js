@@ -1,12 +1,12 @@
-import { useReducer } from 'react';
+import React from 'react';
 import * as actions from './actions';
 
-const initialState = {
+export const initialState = {
     todos: [], // contains { item: string, strike: boolean, index: number}
     nextIndex: 0
 }
 
-const reducer = (state = initialState, action) => {
+export const reducer = (state = initialState, action) => {
     switch(action.type) {
         case actions.APPEND_ITEM:
             return addItem(state, action.payload);
@@ -19,12 +19,12 @@ const reducer = (state = initialState, action) => {
         case actions.SAVE_CHANGES:
             return saveChangesMade(state, action.payload);
         default:
-            return state;
+            throw new Error('Unknown action type');
     }
 }
 
 export function useApiCallReducer() {
-    return useReducer(reducer, initialState);
+    return React.useReducer(reducer, initialState);
 }
 
 const addItem = (state, payload) => {
