@@ -2,6 +2,11 @@ import * as actionTypes from '../../actions/actionTypes';
 import { updateObject } from '../../../utility';
 
 /**
+ * Number of note titles to fetched on every fetch
+ */
+export const RECORD_COUNT = 10;
+
+/**
  * Initial State of `allNotes` reducer
  */
 export const initialState = {
@@ -10,7 +15,6 @@ export const initialState = {
     hasMoreNotes: true,
     loading: false,
     fetchFailed: false,
-    PAGE_SIZE: 10 //FIXED
 }
 /**
  * @function reducer - `allNotes` reducer function
@@ -58,7 +62,7 @@ const pushNote = (state, titles) => {
     const nextRecordNumber = state.nextRecordNumber + titles.length;
     const notes = [...state.notes];
     notes.push(...titles);
-    const hasMoreNote = titles.length < state.PAGE_SIZE ? false : true;
+    const hasMoreNote = titles.length < RECORD_COUNT ? false : true;
     return {
         ...state,
         notes: notes,

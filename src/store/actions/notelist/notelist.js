@@ -1,5 +1,6 @@
 import * as actions from '../actionTypes';
 import axios from '../../../axios-notes';
+import { RECORD_COUNT } from '../../reducers/notelist/notelist';
 
 /**
  * Action creator to set the error message generated
@@ -71,7 +72,7 @@ export const fetchAllNotes = (idToken, page) => {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + idToken
         };
-        axios.get('/notes/page/' + page, {
+        axios.get(`/notes/page/${page}/${RECORD_COUNT}`, {
             headers: headers
         })
         .then((response) => {
