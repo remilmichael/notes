@@ -12,7 +12,7 @@ const sampleTodos = [
 ];
 
 describe('Rendering TodoEditor component', () => {
-    it('should Input field and button and NO todo list table  ', () => {
+    it('should render Input field and `Add` button and NO todo list table  ', () => {
         render(<TodoEditor />);
         const containerComponent = screen.queryByTestId('component-container');
         const newItemInput = screen.queryByRole('textbox', { name: 'todo-new' });
@@ -25,8 +25,18 @@ describe('Rendering TodoEditor component', () => {
 
         // no todo list since it's empty
         expect(tableComponent).toBeNull();
-        
     });
+
+    it('should render `Save`, `Delete` and `Cancel` buttons and `Title` textfield', () => {
+        render(<TodoEditor />);
+        expect(screen.queryByRole('button', { name: 'action-save' })).toBeTruthy();
+        expect(screen.queryByRole('button', { name: 'action-delete' })).toBeTruthy();
+        expect(screen.queryByRole('button', { name: 'action-cancel' })).toBeTruthy();
+
+        expect(screen.queryByRole('textbox', { name: 'todo-title' })).toBeTruthy();
+    });
+
+
 });
 
 describe('Adding todos', () => {

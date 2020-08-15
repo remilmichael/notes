@@ -8,7 +8,9 @@ import { ReactComponent as EditIcon } from '../../../assets/editicon.svg';
 
 import { useApiCallReducer } from './reducer/reducer';
 
+import axios from '../.../../../../axios-notes';
 import InputComponent from '../Input/Input';
+import Actions from '../../NoteEditor/Action/Action';
 import TodoList from '../Table/Table';
 import * as actions from './reducer/actions';
 import TextField from '../../../component/UI/TextField/TextField';
@@ -27,6 +29,7 @@ function TodoEditor() {
 
     const inputRef = React.useRef(null);
     const editInputRef = React.useRef(null);
+    const titleInputRef = React.useRef(null);
 
     useEffect(() => {
         document.title = 'ToDo Editor';
@@ -172,6 +175,19 @@ function TodoEditor() {
         setEditItemIndex(-1);
     }
 
+    const saveToDatabase = () => {
+
+        const title = titleInputRef.current.value;
+
+        if (state.todos.length === 0) {
+            // raise error
+        } else if (title.trim().length === 0) {
+            // raise error
+        } else {
+            
+        }
+    }
+
     let deleteButton = null;
     if (selectedCbSet.size !== 0) {
         deleteButton = <button 
@@ -259,6 +275,28 @@ function TodoEditor() {
     }
     return (
         <Container fluid data-testid="component-container">
+            <Row className="mt-4">
+                <Col className="col-md-3 offset-md-3 pl-md-5">
+                    <input 
+                        type="text" 
+                        ref={titleInputRef}
+                        aria-label="todo-title"
+                        name="todo-title"
+                        className={`${classes.input} ${classes.question}`}
+                        id="title"
+                        required
+                        autoComplete="off" />
+                    <label 
+                        htmlFor="title">
+                        <span>Todo title</span>
+                    </label>
+                </Col>
+                <Col className="col-12 offset-0 col-md-3 mt-5 mt-lg-0 offset-md-3">
+                    <Actions 
+                        clickedSave={saveToDatabase}
+                    />
+                </Col>
+            </Row>
             <InputComponent 
                 inputRef={inputRef}
                 addItem={addItem} 

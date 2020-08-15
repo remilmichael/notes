@@ -44,7 +44,6 @@ class NoteEditor extends Component {
             this.props.onRaiseWarning("Login to continue!", "warning");
         }
 
-        
         if (!this.state.noteId && this.urlParam_Id) {
             this.setState({ noteId: this.urlParam_Id, fetchingNow: true });
         }
