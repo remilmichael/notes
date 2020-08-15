@@ -1,14 +1,5 @@
 import * as actionTypes from '../../actions/actionTypes';
-import { reducer } from './notelist';
-
-const initialState = {
-    notes: [], // [{ noteId - String, noteHeading - String }]
-    nextRecordNumber: 0,
-    hasMoreNotes: true,
-    loading: false,
-    fetchFailed: false,
-    PAGE_SIZE: 10
-}
+import { reducer, initialState } from './notelist';
 
 const sampleNotes = [
     { noteId: '123', noteHeading: 'Heading 1' },
@@ -165,8 +156,26 @@ describe('`allNotes` Reducer', () => {
         });
     });
 
-    /* Leaving two action types since they simple actions */
-    // FETCH_MORE_NOTES_START
-    // FETCH_NOTES_TITLES_FAILED
+    describe('action type `FETCH_MORE_NOTES_START`', () => {
+        it('should return the updated state with `loading` set to `true`', () => {
+            const expectedState = {
+                ...initialState,
+                loading: true
+            };
+            const receivedState = reducer(initialState, { type: actionTypes.FETCH_MORE_NOTES_START });
+            expect(receivedState).toEqual(expectedState);
+        });
+    });
 
+    describe('action type `FETCH_NOTES_TITLES_FAILED`', () => {
+        it('should update state with `loading` set to `false` and `fetchFailed` to `true`', () => {
+            const expectedState = { 
+                ...initialState,
+                loading: false,
+                fetchFailed: true
+            }
+            const receivedState = reducer(initialState, { type: actionTypes.FETCH_NOTES_TITLES_FAILED });
+            expect(receivedState).toEqual(expectedState);
+        });
+    });
 });
