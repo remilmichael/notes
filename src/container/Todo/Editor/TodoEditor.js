@@ -185,7 +185,12 @@ function TodoEditor() {
     let tableBody;
     if (state.todos.length !== 0) {
         tableBody = state.todos.map(item => {
-            const content = item.strike === true ? <del>{item.item}</del> : item.item;
+            const content = item.strike === true 
+                ? 
+                <del data-testid={`striked-todo-${item.index}`}>{item.item}</del>
+                :
+                item.item;
+
             return (
                 <tr key={item.index} data-test="todoitem">
                     <td>

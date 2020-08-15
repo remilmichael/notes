@@ -129,7 +129,7 @@ describe('Editing an existing todo - todo 1', () => {
     });
 });
 
-describe('Clicking checkboxes and deleting todos', () => {
+describe('Deleting multiple todos', () => {
     let newItemInput, addButton;
     beforeEach(() => {
         render(<TodoEditor />);
@@ -154,7 +154,7 @@ describe('Clicking checkboxes and deleting todos', () => {
         fireEvent.click(screen.getByTestId('checkbox-2'));
         fireEvent.click(screen.getByTestId('checkbox-4'));
 
-        // deletes todos 1,2,4
+        // delete todos 1,2,4
         fireEvent.click(screen.queryByRole('button', { name: 'delete-multiple-todos' }));
 
         expect(screen.queryByText(sampleTodos[1])).toBeFalsy();
@@ -176,7 +176,6 @@ describe('Deleting a single item', () => {
             fireEvent.click(addButton);
         }
     })
-
     it('should delete first item - index 0', () => {
         const indexToDelete = 0;
         const trashIcon = screen.getByTestId(`trash-icon-${indexToDelete}`);
@@ -184,5 +183,32 @@ describe('Deleting a single item', () => {
 
         // second todo should now be the first todo.
         expect(screen.getByTestId(`todo-item-${indexToDelete}`)).toEqual(screen.getByText(sampleTodos[indexToDelete + 1]));
+    });
+});
+
+describe('Striking and unstriking todos', () => {  
+    beforeEach(() => {
+        render(<TodoEditor />);
+        const newItemInput = screen.queryByRole('textbox', { name: 'todo-new' });
+        const addButton = screen.queryByText('Add');
+        for (let i = 0; i < 3; ++i) {
+            fireEvent.change(newItemInput, { target: { value: sampleTodos[i] } });
+            fireEvent.click(addButton);
+        }
+    });
+
+    it('should strike an existing todo item', () => {
+        const strikingIndex = 2;
+        fireEvent.click(screen.getByTestId(`todo-item-${strikingIndex}`));
+        expect(screen.queryByTestId(`striked-todo-${strikingIndex}`)).toBeTruthy();
+        // some other existing todo item
+        expect(screen.queryByTestId(`striked-todo-${strikingIndex - 1}`)).toBeFalsy();
+    });
+
+    it('should unstrike an existing', () => {
+        const strikingIndex = 2;
+        fireEvent.click(screen.getByTestId(`todo-item-${strikingIndex}`));
+        fireEvent.click(screen.getByTestId(`todo-item-${strikingIndex}`));
+        expect(screen.queryByTestId(`striked-todo-${strikingIndex}`)).toBeFalsy();
     });
 });
