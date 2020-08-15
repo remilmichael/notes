@@ -1,11 +1,26 @@
 import React from 'react';
 import * as actions from './actions';
 
+/**
+ * Initial state of the reducer
+ * 
+ * @property {Array} todos - Todos list
+ * @property {String} todos.item - Todo name
+ * @property {Boolean} todos.strike - Indicates whether todo is striked
+ * @property {Number} todos.index - Index of the item
+ */
 export const initialState = {
     todos: [], // contains { item: string, strike: boolean, index: number}
-    nextIndex: 0
 }
 
+/**
+ * Reducer function for TodoEditor
+ * 
+ * @function reducer
+ * @param {Object} state - State given to the reducer
+ * @param {Object} action - type and payload
+ * @returns {Object} - Updated state
+ */
 export const reducer = (state = initialState, action) => {
     switch(action.type) {
         case actions.APPEND_ITEM:
@@ -17,47 +32,49 @@ export const reducer = (state = initialState, action) => {
         case actions.DELETE_MULTIPLE_ITEMS:
             return deleteMultipleItems(state, action.payload);
         case actions.SAVE_CHANGES:
-            return saveChangesMade(state, action.payload);
+            return updateTodo(state, action.payload);
         default:
             throw new Error('Unknown action type');
     }
 }
 
+/**
+ * Function to call `useReducer` hook.
+ * 
+ * @function useApiCallReducer
+ * @returns {Array} - state and dispatch function
+ */
 export function useApiCallReducer() {
     return React.useReducer(reducer, initialState);
 }
 
+/**
+ * Function to add a new item into the todo list
+ * 
+ * @function addItem
+ * @param {Object} state - current state
+ * @param {Object} payload - new todo item
+ * @return {Object} - updated state
+ */
 const addItem = (state, payload) => {
 
     const todos = [...state.todos];
     todos.push(payload);
-    const nextIndex = state.nextIndex + 1;
     return {
         ...state,
         todos: todos,
-        nextIndex: nextIndex
     };
 }
 
-const saveChangesMade = (state, payload) => {
-    
-    // payload = { index: number, value: string }
-
-    const updatedTodos = state.todos.map(item => {
-        if (item.index === payload.index) {
-            return { ...item, item: payload.value}
-        }
-        return item;
-    });
-
-    return {
-        ...state,
-        todos: updatedTodos
-    };
-}
-
+/**
+ * Function to delete an exisiting item from the todo list
+ * 
+ * @function deleteItem
+ * @param {Object} state - current state
+ * @param {Number} index - index of  todo item
+ * @return {Object} - updated state
+ */
 const deleteItem = (state, index) => {
-
     let indexCounter = 0;
     const newTodos = [];
     
@@ -70,20 +87,41 @@ const deleteItem = (state, index) => {
     });
 
     return {
-        ...state,
-        todos: newTodos,
-        nextIndex: indexCounter
+        todos: newTodos
     };
-    
 }
 
+/**
+ * 
+ * @param {Object} state - current state
+ * @param {Number} index - index to change strike status
+ * @returns {Object} - updated state
+ */
+const changeStrikeState = (state, index) => {
+    const newTodos = state.todos.map(item => {
+        if (item.index === index) {
+            const newItem =  Object.assign({}, item);
+            newItem.strike = !newItem.strike;
+            return newItem;
+        } 
+        return item;
+    });  
+    return {
+        ...state,
+        todos: newTodos
+    };
+}
+
+/**
+ * 
+ * @param {Object} state - current state
+ * @param {Set} set - Set of indexes (as string) to delete
+ * @returns {Object} - updated state
+ */
 const deleteMultipleItems = (state, set) => {
-
-    const tempSet = new Set(set); 
-
+    const tempSet = new Set(set);
     let indexCounter = 0;
     const newTodos = [];
-
     state.todos.filter(item => {
         if (tempSet.has(item.index.toString())) {
             tempSet.delete(item.index.toString());
@@ -94,29 +132,30 @@ const deleteMultipleItems = (state, set) => {
     });
 
     return {
-        ...state,
         todos: newTodos,
-        nextIndex: indexCounter
     };
-
 }
 
-const changeStrikeState = (state, index) => {
-
-    const newTodos = state.todos.map(item => {
-        if (item.index === index) {
-            const newItem =  Object.assign({}, item);
-            newItem.strike = !newItem.strike;
-            return newItem;
-        } 
-        return item;
+/**
+ * Function to update the changes made to the todo item
+ * 
+ * @function updateTodo
+ * @param {Object} state - current state
+ * @param {Object} payload - index and updated todo
+ * @property {Number} payload.index - index of the updated todo
+ * @property {String} payload.value - updated todo
+ * @returns {Object} - updated state
+ */
+const updateTodo = (state, payload) => {
+    const updatedTodos = state.todos.map(todoItem => {
+        if (todoItem.index === payload.index) {
+            return { ...todoItem, item: payload.value}
+        }
+        return todoItem;
     });
-    
     return {
-        ...state,
-        todos: newTodos
+        todos: updatedTodos
     };
-
 }
 
 export default reducer;

@@ -19,7 +19,6 @@ function TodoEditor() {
     /**
     *    initialState = {
     *        todos: [], // contains { item: string, strike: boolean, index: number}
-    *        nextIndex: 0
     *    }
     */
     const [state, dispatch] = useApiCallReducer();
@@ -45,7 +44,7 @@ function TodoEditor() {
             if (item.trim().length === 0) {
                 // Raise error
             } else {
-                const nextIndex = state.nextIndex;
+                const nextIndex = state.todos.length;
                 const newTodo = {
                     item: item.trim(),
                     strike: false,
