@@ -15,7 +15,8 @@ describe('Appending items', () => {
         const newTodo = { item: 'New todo item', strike: false, index: 0 };
         const receivedState = reducer(initialState, { type: actionTypes.APPEND_ITEM, payload: newTodo });
         const expectedState = {
-            todos: [newTodo],
+            ...initialState,
+            todos: [newTodo]
         }
         expect(receivedState).toEqual(expectedState);
     });
@@ -116,6 +117,17 @@ describe('Updating an existing todo', () => {
         const receivedState = reducer(currentStatus,
             { type: actionTypes.CHANGE_STRIKE_STATE, payload: indexToUpdate });
 
+        expect(receivedState).toEqual(expectedState);
+    });
+});
+
+describe('Pushing note to the server', () => {
+    it('should return state with `loading` to true', () => {
+        const receivedState = reducer(initialState, { type: actionTypes.SAVE_TO_DB_START });
+        const expectedState = {
+            ...initialState,
+            loading: true
+        };
         expect(receivedState).toEqual(expectedState);
     });
 });

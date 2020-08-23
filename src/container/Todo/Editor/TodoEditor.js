@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
+import { Redirect } from 'react-router';
 
 import { ReactComponent as CheckMarkIcon } from '../../../assets/checkmark.svg';
 import { ReactComponent as ReturnIcon } from '../../../assets/returnicon.svg';
@@ -17,7 +18,7 @@ import TodoList from '../Table/Table';
 import * as actions from './reducer/actions';
 import TextField from '../../../component/UI/TextField/TextField';
 import classes from './TodoEditor.module.css';
-import { Redirect } from 'react-router';
+import Spinner from '../../../component/UI/Spinner/Spinner';
 
 function TodoEditor() {
 
@@ -207,6 +208,7 @@ function TodoEditor() {
                 lastUpdated: new Date().getTime(),
                 todoItems: todoItems
             };
+            dispatch({ type: actions.SAVE_TO_DB_START });
             axios.post('/todos', newTodo, {
                 headers: headers
             }).then(() => {
@@ -306,7 +308,7 @@ function TodoEditor() {
     }
     return (
         <>
-            {/* {authReduxReducer.idToken === null ? <Redirect data-test="component-redirect-plain" to="/login?redirect=todo" /> : null} */}
+            {authReduxReducer.idToken === null ? <Redirect to="/login?redirect=todo" /> : null}
             <Container fluid data-testid="component-container">
                 <Row className="mt-4">
                     <Col className="col-md-3 offset-md-3 pl-md-5">

@@ -10,7 +10,8 @@ import * as actions from './actions';
  * @property {Number} todos.index - Index of the item
  */
 export const initialState = {
-    todos: [], // contains { item: string, strike: boolean, index: number}
+    todos: [], // contains { item: string, strike: boolean, index: number},
+    loading: false
 }
 
 /**
@@ -33,6 +34,8 @@ export const reducer = (state = initialState, action) => {
             return deleteMultipleItems(state, action.payload);
         case actions.SAVE_CHANGES:
             return updateTodo(state, action.payload);
+        case actions.SAVE_TO_DB_START:
+            return { ...state, loading: true };
         default:
             throw new Error('Unknown action type');
     }

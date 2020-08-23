@@ -1,9 +1,11 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import { Router } from 'react-router-dom';
+import { createMemoryHistory } from 'history';
 
 import TodoEditor from './TodoEditor';
-import { storeFactory } from '../../../testUtils';
-import { Provider } from 'react-redux';
+import { storeFactory, authInitialState } from '../../../testUtils';
 
 const sampleTodos = [
     'This is todo task 0',
@@ -13,10 +15,40 @@ const sampleTodos = [
     'This is todo task 4'
 ];
 
-const setup = () => {
-    const store = storeFactory();
-    render(<Provider store={store}><TodoEditor /></Provider>);
+const authUpdatedState = {
+    ...authInitialState,
+    idToken: 'sampleToken123',
+    userId: 'id123',
+    expiresOn: new Date()
 }
+
+
+const setup = () => {
+    const history = createMemoryHistory();
+    const store = storeFactory();
+    store.getState().auth = authUpdatedState;
+    render(<Provider store={store}>
+                <Router history={history}>
+                    <TodoEditor />
+                </Router>
+            </Provider>);
+}
+
+
+describe('Accessing TodoEditor without logging in', () => {
+    const history = createMemoryHistory();
+
+    it('should redirect to `/login`', () => {
+        const store = storeFactory();
+        render(<Provider store={store}>
+                <Router history={history}>
+                    <TodoEditor />
+                </Router>
+            </Provider>);
+        
+        expect(history.location.pathname).toEqual("/login");
+    });
+});
 
 
 describe('Rendering TodoEditor component', () => {
