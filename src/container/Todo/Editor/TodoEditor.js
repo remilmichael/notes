@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { v4 as uuidv4 } from 'uuid';
 
 import { ReactComponent as CheckMarkIcon } from '../../../assets/checkmark.svg';
 import { ReactComponent as ReturnIcon } from '../../../assets/returnicon.svg';
@@ -16,6 +17,7 @@ import TodoList from '../Table/Table';
 import * as actions from './reducer/actions';
 import TextField from '../../../component/UI/TextField/TextField';
 import classes from './TodoEditor.module.css';
+import { Redirect } from 'react-router';
 
 function TodoEditor() {
 
@@ -28,7 +30,7 @@ function TodoEditor() {
     const [selectedCbSet, setSelectedCbSet] = useState(new Set());
     const [editItemIndex, setEditItemIndex] = useState(-1);
 
-    const reduxState = useSelector(rstate => rstate.auth);
+    const authReduxReducer = useSelector(rstate => rstate.auth);
 
     const inputRef = React.useRef(null);
     const editInputRef = React.useRef(null);
@@ -178,23 +180,44 @@ function TodoEditor() {
         setEditItemIndex(-1);
     }
 
+    /**
+     * Function to push the todo to the database
+     * 
+     * @function saveToDatabase
+     */
     const saveToDatabase = () => {
-
         const title = titleInputRef.current.value;
-
         if (state.todos.length === 0) {
             // raise error
         } else if (title.trim().length === 0) {
             // raise error
         } else {
-            const todoItem = {
-                title: title,
-                todo: state.todos,
-            }
-            
-            axios.post();
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + authReduxReducer.idToken
+            };
+            const todoItems = [];
+            state.todos.forEach(item => {
+                todoItems.push({todoIndex: item.index, todoItem: item.item, strike: item.strike});
+            });
+            const newTodo = {
+                todoId: uuidv4(),
+                todoTitle: title,
+                username: authReduxReducer.userId,
+                lastUpdated: new Date().getTime(),
+                todoItems: todoItems
+            };
+            axios.post('/todos', newTodo, {
+                headers: headers
+            }).then(() => {
+                
+            }).catch((error) => {
+                console.log(error.data);
+            })
         }
     }
+
+
 
     let deleteButton = null;
     if (selectedCbSet.size !== 0) {
@@ -282,42 +305,45 @@ function TodoEditor() {
         })
     }
     return (
-        <Container fluid data-testid="component-container">
-            <Row className="mt-4">
-                <Col className="col-md-3 offset-md-3 pl-md-5">
-                    <input 
-                        type="text" 
-                        ref={titleInputRef}
-                        aria-label="todo-title"
-                        name="todo-title"
-                        className={`${classes.input} ${classes.question}`}
-                        id="title"
-                        required
-                        autoComplete="off" />
-                    <label 
-                        htmlFor="title">
-                        <span>Todo title</span>
-                    </label>
-                </Col>
-                <Col className="col-12 offset-0 col-md-3 mt-5 mt-lg-0 offset-md-3">
-                    <Actions 
-                        clickedSave={saveToDatabase}
-                    />
-                </Col>
-            </Row>
-            <InputComponent 
-                inputRef={inputRef}
-                addItem={addItem} 
-                keyPressed={checkKeyEvent} 
-                clicked={addItem}
-            />
-            <Row className="mt-3 mt-lg-5">
-                <Col className="col-12 col-lg-5 offset-6 pl-4 offset-lg-6">
-                    {deleteButton}
-                </Col>
-            </Row>
-            <TodoList body={tableBody} />
-        </Container>
+        <>
+            {/* {authReduxReducer.idToken === null ? <Redirect data-test="component-redirect-plain" to="/login?redirect=todo" /> : null} */}
+            <Container fluid data-testid="component-container">
+                <Row className="mt-4">
+                    <Col className="col-md-3 offset-md-3 pl-md-5">
+                        <input 
+                            type="text" 
+                            ref={titleInputRef}
+                            aria-label="todo-title"
+                            name="todo-title"
+                            className={`${classes.input} ${classes.question}`}
+                            id="title"
+                            required
+                            autoComplete="off" />
+                        <label 
+                            htmlFor="title">
+                            <span>Todo title</span>
+                        </label>
+                    </Col>
+                    <Col className="col-12 offset-0 col-md-3 mt-5 mt-lg-0 offset-md-3">
+                        <Actions 
+                            clickedSave={saveToDatabase}
+                        />
+                    </Col>
+                </Row>
+                <InputComponent 
+                    inputRef={inputRef}
+                    addItem={addItem} 
+                    keyPressed={checkKeyEvent} 
+                    clicked={addItem}
+                />
+                <Row className="mt-3 mt-lg-5">
+                    <Col className="col-12 col-lg-5 offset-6 pl-4 offset-lg-6">
+                        {deleteButton}
+                    </Col>
+                </Row>
+                <TodoList body={tableBody} />
+            </Container>
+        </>
     );
 }
 

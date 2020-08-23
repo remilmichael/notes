@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 import TodoEditor from './TodoEditor';
+import { storeFactory } from '../../../testUtils';
+import { Provider } from 'react-redux';
 
 const sampleTodos = [
     'This is todo task 0',
@@ -11,9 +13,15 @@ const sampleTodos = [
     'This is todo task 4'
 ];
 
+const setup = () => {
+    const store = storeFactory();
+    render(<Provider store={store}><TodoEditor /></Provider>);
+}
+
+
 describe('Rendering TodoEditor component', () => {
     it('should render Input field and `Add` button and NO todo list table  ', () => {
-        render(<TodoEditor />);
+        setup();
         const containerComponent = screen.queryByTestId('component-container');
         const newItemInput = screen.queryByRole('textbox', { name: 'todo-new' });
         const tableComponent = screen.queryByRole('table', { name: 'todo-list' });
@@ -28,7 +36,7 @@ describe('Rendering TodoEditor component', () => {
     });
 
     it('should render `Save`, `Delete` and `Cancel` buttons and `Title` textfield', () => {
-        render(<TodoEditor />);
+        setup();
         expect(screen.queryByRole('button', { name: 'action-save' })).toBeTruthy();
         expect(screen.queryByRole('button', { name: 'action-delete' })).toBeTruthy();
         expect(screen.queryByRole('button', { name: 'action-cancel' })).toBeTruthy();
@@ -42,7 +50,7 @@ describe('Rendering TodoEditor component', () => {
 describe('Adding todos', () => {
     let newItemInput, addButton;
     beforeEach(() => {
-        render(<TodoEditor />);
+        setup();
         newItemInput = screen.queryByRole('textbox', { name: 'todo-new' });
         addButton = screen.queryByText('Add');
         fireEvent.change(newItemInput, { target: { value: sampleTodos[0] } });
@@ -86,7 +94,7 @@ describe('Adding todos', () => {
 describe('Editing an existing todo - todo 1', () => {
     let newItemInput, addButton;
     beforeEach(() => {
-        render(<TodoEditor />);
+        setup();
         newItemInput = screen.queryByRole('textbox', { name: 'todo-new' });
         addButton = screen.queryByText('Add');
         // Adding two todos
@@ -142,7 +150,7 @@ describe('Editing an existing todo - todo 1', () => {
 describe('Deleting multiple todos', () => {
     let newItemInput, addButton;
     beforeEach(() => {
-        render(<TodoEditor />);
+        setup();
         newItemInput = screen.queryByRole('textbox', { name: 'todo-new' });
         addButton = screen.queryByText('Add');
         for ( let i = 0; i < sampleTodos.length; ++i) {
@@ -178,7 +186,7 @@ describe('Deleting multiple todos', () => {
 
 describe('Deleting a single item', () => {
     beforeEach(() => {
-        render(<TodoEditor />);
+        setup();
         const newItemInput = screen.queryByRole('textbox', { name: 'todo-new' });
         const addButton = screen.queryByText('Add');
         for (let i = 0; i < 2; ++i) {
@@ -198,7 +206,7 @@ describe('Deleting a single item', () => {
 
 describe('Striking and unstriking todos', () => {  
     beforeEach(() => {
-        render(<TodoEditor />);
+        setup();
         const newItemInput = screen.queryByRole('textbox', { name: 'todo-new' });
         const addButton = screen.queryByText('Add');
         for (let i = 0; i < 3; ++i) {

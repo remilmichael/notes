@@ -71,7 +71,7 @@ const addItem = (state, payload) => {
  * 
  * @function deleteItem
  * @param {Object} state - current state
- * @param {Number} index - index of  todo item
+ * @param {Number} index - index of the todo item
  * @return {Object} - updated state
  */
 const deleteItem = (state, index) => {
