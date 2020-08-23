@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { ReactComponent as CheckMarkIcon } from '../../../assets/checkmark.svg';
 import { ReactComponent as ReturnIcon } from '../../../assets/returnicon.svg';
@@ -26,6 +27,8 @@ function TodoEditor() {
     const [state, dispatch] = useApiCallReducer();
     const [selectedCbSet, setSelectedCbSet] = useState(new Set());
     const [editItemIndex, setEditItemIndex] = useState(-1);
+
+    const reduxState = useSelector(rstate => rstate.auth);
 
     const inputRef = React.useRef(null);
     const editInputRef = React.useRef(null);
@@ -184,7 +187,12 @@ function TodoEditor() {
         } else if (title.trim().length === 0) {
             // raise error
         } else {
+            const todoItem = {
+                title: title,
+                todo: state.todos,
+            }
             
+            axios.post();
         }
     }
 
