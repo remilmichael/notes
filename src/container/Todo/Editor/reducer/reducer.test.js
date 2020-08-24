@@ -121,12 +121,54 @@ describe('Updating an existing todo', () => {
     });
 });
 
+describe('Setting error', () => {
+    const payload = {
+        error: 'Sample error',
+        errorType: 'warning'
+    };
+
+    it('should set the error with given type', () => {
+        const receivedState = reducer(initialState, { type: actionTypes.SET_ERROR, payload: payload });
+        const expectedState = {
+            ...initialState,
+            ...payload
+        };
+        expect(receivedState).toEqual(expectedState);
+    });
+
+    it('should set error and its type to `null`', () => {
+        const receivedState = 
+            reducer({ ...initialState, ...payload }, { type: actionTypes.UNSET_ERROR } );
+        const expectedState = initialState;
+        expect(receivedState).toEqual(expectedState);
+    });
+});
+
 describe('Pushing note to the server', () => {
     it('should return state with `loading` to true', () => {
         const receivedState = reducer(initialState, { type: actionTypes.SAVE_TO_DB_START });
         const expectedState = {
             ...initialState,
             loading: true
+        };
+        expect(receivedState).toEqual(expectedState);
+    });
+
+    it ('should return state with `loading` set to false and `saveSuccessful` to true', () => {
+        const receivedState = reducer({ ...initialState, loading: true }, { type: actionTypes.SAVE_TO_DB_SUCCESS });
+        const expectedState = {
+            ...initialState,
+            loading: false,
+            saveSuccessful: true
+        };
+        expect(receivedState).toEqual(expectedState);
+    });
+
+    it('should return with `loading` set to false', () => {
+        const receivedState = reducer({ ...initialState, loading: true }, { type: actionTypes.SAVE_TO_DB_FAILED });
+        const expectedState = {
+            ...initialState,
+            loading: false
         };
         expect(receivedState).toEqual(expectedState);
     });

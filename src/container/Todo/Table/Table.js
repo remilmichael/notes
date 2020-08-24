@@ -9,7 +9,7 @@ function table(props) {
     }
 
     return (
-        <Row className="mt-3">
+        <Row>
             <Col className="col-12 col-lg-5 offset-lg-3">
                 <Table hover className={classes.Table} role="table" aria-label="todo-list">
                     <tbody>
