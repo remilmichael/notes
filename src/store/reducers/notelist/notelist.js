@@ -2,12 +2,12 @@ import * as actionTypes from '../../actions/actionTypes';
 import { updateObject } from '../../../utility';
 
 /**
- * Number of note titles to fetched on every fetch
+ * Number of note titles to be fetched on every fetch
  */
 export const RECORD_COUNT = 10;
 
 /**
- * Initial State of `allNotes` reducer
+ * Initial State of `notelist` reducer
  */
 export const initialState = {
     notes: [], // [{ noteId - String, noteHeading - String }]
@@ -17,12 +17,12 @@ export const initialState = {
     fetchFailed: false,
 }
 /**
- * @function reducer - `allNotes` reducer function
+ * @function reducer - `notelist` reducer function
  * @param {Object} state - State given to reducer
  * @param {Object} action - Consists of type and payload
  */
 export const reducer = (state = initialState, action) => {
-    switch(action.type) {
+    switch (action.type) {
         case actionTypes.SAVE_NOTES_LIST:
             return pushNote(state, action.payload);
         case actionTypes.SAVE_NOTE_REDUX:
@@ -51,7 +51,7 @@ export const reducer = (state = initialState, action) => {
  * @returns {Object}
  */
 const pushNote = (state, titles) => {
-    if (titles.length === 0 ) {
+    if (titles.length === 0) {
         return {
             ...state,
             hasMoreNotes: false,
