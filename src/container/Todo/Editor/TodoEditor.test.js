@@ -30,7 +30,7 @@ const authUpdatedState = {
     expiresOn: new Date(),
 };
 
-let history = createMemoryHistory();
+let history;
 const setup = () => {
     history = createMemoryHistory();
     const store = storeFactory();
@@ -56,7 +56,6 @@ describe("Accessing TodoEditor without logging in", () => {
                 </Router>
             </Provider>
         );
-
         expect(history.location.pathname).toEqual("/login");
     });
 });
@@ -342,7 +341,7 @@ describe("Saving to database", () => {
 
     describe("Mocking axios", () => {
         const server = setupServer(
-            rest.post('http://localhost:8080/api/todos', (req, res, ctx) => {
+            rest.post("http://localhost:8080/api/todos", (req, res, ctx) => {
                 return res(
                     ctx.status(200),
                     ctx.set({ "Access-Control-Allow-Origin": "*" })
@@ -366,21 +365,21 @@ describe("Saving to database", () => {
                 target: { value: "Sample title" },
             });
             act(() => {
-                fireEvent.click(screen.queryByRole("button", { name: "action-save" }))
-            })
+                fireEvent.click(screen.queryByRole("button", { name: "action-save" }));
+            });
             await waitFor(() => {
                 expect(history.action).toEqual("REPLACE");
                 expect(history.location.pathname).toEqual("/");
             });
         });
 
-        it('should display `Alert` when response failed', async () => {
+        it("should display `Alert` when response failed", async () => {
             const defultErrorMessage = "Something went wrong";
             server.use(
-                rest.post('http://localhost:8080/api/todos', (req, res, ctx) => {
+                rest.post("http://localhost:8080/api/todos", (req, res, ctx) => {
                     return res(ctx.status(401));
                 })
-            )
+            );
 
             setup();
             const newItemInput = screen.queryByRole("textbox", { name: "todo-new" });
@@ -392,7 +391,7 @@ describe("Saving to database", () => {
             fireEvent.change(screen.queryByRole("textbox", { name: "todo-title" }), {
                 target: { value: "Sample title" },
             });
-            fireEvent.click(screen.queryByRole("button", { name: "action-save" }))
+            fireEvent.click(screen.queryByRole("button", { name: "action-save" }));
             await waitFor(() => {
                 expect(screen.queryByText(defultErrorMessage)).toBeTruthy();
             });
