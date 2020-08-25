@@ -7,12 +7,14 @@ import noteReducer from './store/reducers/notes/notes';
 import authReducer from './store/reducers/auth/auth';
 import msgReducer from './store/reducers/message/message';
 import notesList from './store/reducers/notelist/notelist';
+import todosList from './store/reducers/todolist/todolist';
 
 const rootReducer = combineReducers({
     note: noteReducer,
     auth: authReducer,
     message: msgReducer,
-    notelist: notesList
+    notelist: notesList,
+    todolist: todosList
 });
 
 /**
