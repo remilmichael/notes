@@ -5,6 +5,7 @@ import NoteEditor from './container/NoteEditor/NoteEditor';
 import Auth from './container/Auth/Auth';
 import Logout from './container/Auth/Logout/Logout';
 import MainPage from './container/MainPage/MainPage';
+import TodoViewer from './container/Todo/Viewer/TodoViewer';
 import TodoEditor from './container/Todo/Editor/TodoEditor';
 import { connect } from 'react-redux';
 import * as actions from './store/actions/index';
@@ -14,29 +15,31 @@ let routes = null;
 
 class App extends Component {
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.onTryAutoLogin();
   }
 
-  render () {
+  render() {
     if (this.props.isAuthenticated) {
       routes = (
-          <Switch>
-            <Route path="/note" component={NoteEditor} />
-            <Route path="/logout" component={Logout} exact />
-            <Route path="/login" component={Auth} exact />
-            <Route path="/todo" component={TodoEditor} />
-            <Route path="/" component={MainPage} />
-          </Switch>
+        <Switch>
+          <Route path="/note" component={NoteEditor} />
+          <Route path="/logout" component={Logout} exact />
+          <Route path="/login" component={Auth} exact />
+          <Route path="/todo" component={TodoEditor} />
+          <Route path="/todoviewer" component={TodoViewer} />
+          <Route path="/" component={MainPage} />
+        </Switch>
       );
     } else {
       routes = (
-          <Switch>
-            <Route path="/note" component={NoteEditor} />
-            <Route path="/todo" component={TodoEditor} />
-            <Route path="/login" component={Auth} exact />
-            <Route path="/" component={MainPage} />
-          </Switch>
+        <Switch>
+          <Route path="/todoviewer" component={TodoViewer} />
+          <Route path="/note" component={NoteEditor} />
+          <Route path="/todo" component={TodoEditor} />
+          <Route path="/login" component={Auth} exact />
+          <Route path="/" component={MainPage} />
+        </Switch>
       );
     }
 
