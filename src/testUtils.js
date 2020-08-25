@@ -7,13 +7,12 @@ import noteReducer from './store/reducers/notes/notes';
 import authReducer from './store/reducers/auth/auth';
 import msgReducer from './store/reducers/message/message';
 import notesList from './store/reducers/notelist/notelist';
-import { mock } from 'sinon';
 
 const rootReducer = combineReducers({
-  note: noteReducer,
-  auth: authReducer,
-  message: msgReducer,
-  notelist: notesList
+    note: noteReducer,
+    auth: authReducer,
+    message: msgReducer,
+    notelist: notesList
 });
 
 /**
