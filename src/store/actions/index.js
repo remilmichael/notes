@@ -21,3 +21,7 @@ export {
     fetchAllNotes,
     clearTitles
 } from './notelist/notelist';
+
+export {
+    fetchAllTodos
+} from './todolist/todolist';

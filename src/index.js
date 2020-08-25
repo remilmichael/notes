@@ -11,6 +11,7 @@ import noteReducer from './store/reducers/notes/notes';
 import authReducer from './store/reducers/auth/auth';
 import msgReducer from './store/reducers/message/message';
 import noteListReducer from './store/reducers/notelist/notelist';
+import todoListReducer from './store/reducers/todolist/todolist';
 
 // const composeEnhancers = process.env.NODE_ENV === 'development' ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ : null || compose;
 const composeEnhancers = compose;
@@ -19,7 +20,8 @@ export const rootReducer = combineReducers({
   note: noteReducer,
   auth: authReducer,
   message: msgReducer,
-  notelist: noteListReducer
+  notelist: noteListReducer,
+  todolist: todoListReducer,
 });
 
 const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk)))
