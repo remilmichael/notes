@@ -75,7 +75,7 @@ const pushNote = (state, titles) => {
 
 /**
  * Function to add a new note title (noteHeading and noteId) to the redux.
- * Since it's last modified note, it'll be appearing in the beginning.
+ * Since it's last modified note, it'll be added to the beginning.
  * 
  * @function addNote
  * @param {Object} state
@@ -107,7 +107,6 @@ const addNote = (state, newNote) => {
  * @param {Object} note 
  */
 const updateNote = (state, note) => {
-
     const notes = [];
     notes.push({ noteId: note.noteId, noteHeading: note.noteHeading });
     const otherNotes = state.notes.filter((item) => {
