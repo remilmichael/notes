@@ -7,47 +7,53 @@ import logo from '../../../assets/note.png';
 import classes from './Navbar.module.css';
 import NavItem from './NavItem/NavItem';
 
-class Toolbar extends Component{
-    render () {
+class Toolbar extends Component {
+    render() {
         return (
-            <Navbar 
+            <Navbar
                 data-test="component-navbar"
                 collapseOnSelect
-                expand="md" 
+                expand="md"
                 bg="dark"
                 variant="dark">
-                    <Navbar.Brand>
-                        <img
-                            src={logo}
-                            width="32"
-                            height="32"
-                            className="d-inline-block align-top"
-                            alt="Logo"
-                        />{' '}
-                        <span className={classes.BrandName}>NOTES</span>
-                    </Navbar.Brand>
-                    <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-                    <Navbar.Collapse id="responsive-navbar-nav">
-                        <Nav className={classes.NavbarItem + ' mr-auto'}>
-                            <NavItem link="/">Home</NavItem>
-                        </Nav>
-                        {/*<Nav className={classes.NavbarItem + ' md-auto'}>
+                <Navbar.Brand>
+                    <img
+                        src={logo}
+                        width="32"
+                        height="32"
+                        className="d-inline-block align-top"
+                        alt="Logo"
+                    />{' '}
+                    <span className={classes.BrandName}>NOTES</span>
+                </Navbar.Brand>
+                <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+                <Navbar.Collapse id="responsive-navbar-nav">
+                    <Nav className={classes.NavbarItem + ' mr-auto'}>
+                        <NavItem link="/">Home</NavItem>
+                    </Nav>
+                    <Nav className={classes.NavbarItem + ' mr-auto'}>
+                        <NavItem link="/todo">Todo</NavItem>
+                    </Nav>
+                    <Nav className={classes.NavbarItem + ' mr-auto'}>
+                        <NavItem link="/todoviewer">TodoViewer</NavItem>
+                    </Nav>
+                    {/*<Nav className={classes.NavbarItem + ' md-auto'}>
                             {this.props.isAuthenticated ? <NavItem link="/note">Add Note</NavItem> : null}
                         </Nav>*/}
-                        <Nav className={classes.NavbarItem + ' ml-auto'}>
-                            {
-                                this.props.isAuthenticated
-                                 ? 
-                                <NavItem 
+                    <Nav className={classes.NavbarItem + ' ml-auto'}>
+                        {
+                            this.props.isAuthenticated
+                                ?
+                                <NavItem
                                     data-test="link-logout"
                                     link="/logout">Logout</NavItem>
                                 :
-                                <NavItem 
+                                <NavItem
                                     data-test="link-login"
                                     link="/login">Login</NavItem>
-                            }
-                        </Nav>
-                    </Navbar.Collapse>
+                        }
+                    </Nav>
+                </Navbar.Collapse>
             </Navbar>
         );
     }
