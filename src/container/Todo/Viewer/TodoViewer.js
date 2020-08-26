@@ -31,18 +31,18 @@ function TodoViewer() {
 
     /**
      * Function to fetch more todos from server
-     *      of length ${RECORD_COUNT} 
+     *      of length ${RECORD_COUNT}
      * @function loadMoreTodos
      */
     const loadMoreTodos = () => {
         dispatch(actions.fetchAllTodos(auth.idToken, todolist.nextRecordNumber));
     }
 
-
     let todoList = todolist.todos.map((item, index) => {
         return (<Col className="col-12 col-md-4 mt-3" key={item.todoId}>
             <Card bg="light" text="dark" data-testid={`todo-title-${index}`}>
-                <NavLink to={`/todos?id=${item.todoId}`} className={classes.link}>
+                {/* <NavLink to={`/todo?id=${item.todoId}`} className={classes.link}> */}
+                <NavLink to={`/todo?id=${item.todoId}`} className={classes.link}>
                     <Card.Body>
                         <Card.Text>
                             {item.todoTitle}

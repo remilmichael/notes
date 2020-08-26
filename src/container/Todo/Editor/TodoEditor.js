@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
-import { Redirect } from "react-router";
+import { Redirect, useHistory, useParams } from "react-router";
 import axios from "axios";
 
 import { ReactComponent as CheckMarkIcon } from "../../../assets/checkmark.svg";
@@ -21,6 +21,7 @@ import TextField from "../../../component/UI/TextField/TextField";
 import classes from "./TodoEditor.module.css";
 import Spinner from "../../../component/UI/Spinner/Spinner";
 import Alert from "../../../component/UI/Alert/Alert";
+import * as reduxActionTypes from '../../../store/actions/actionTypes';
 
 function TodoEditor() {
   /**
@@ -30,17 +31,28 @@ function TodoEditor() {
    *        saveSuccessful: boolean
    *    }
    */
+
   const [state, dispatch] = useApiCallReducer();
   const [selectedCbSet, setSelectedCbSet] = useState(new Set());
   const [editItemIndex, setEditItemIndex] = useState(-1);
 
   const authReduxReducer = useSelector((rstate) => rstate.auth);
+  const dispatchRedux = useDispatch();
 
   const inputRef = React.useRef(null);
   const editInputRef = React.useRef(null);
   const titleInputRef = React.useRef(null);
 
   const source = axios.CancelToken.source();
+  const history = useHistory();
+  const urlParams = new URLSearchParams(history.location.search);
+  const urlParamsId = urlParams.get('id');
+
+  useEffect(() => {
+    if (urlParamsId) {
+      //continue from here
+    }
+  })
 
   useEffect(() => {
     document.title = "ToDo Editor";
@@ -243,6 +255,7 @@ function TodoEditor() {
       })
         .then(() => {
           dispatch({ type: actions.SAVE_TO_DB_SUCCESS });
+          dispatchRedux({ type: reduxActionTypes.SAVE_TODO_REDUX, payload: newTodo });
         })
         .catch((error) => {
           if (!axios.isCancel(error)) {

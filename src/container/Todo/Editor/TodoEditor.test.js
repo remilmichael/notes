@@ -30,10 +30,10 @@ const authUpdatedState = {
     expiresOn: new Date(),
 };
 
-let history;
+let history, store;
 const setup = () => {
     history = createMemoryHistory();
-    const store = storeFactory();
+    store = storeFactory();
     store.getState().auth = authUpdatedState;
     render(
         <Provider store={store}>
