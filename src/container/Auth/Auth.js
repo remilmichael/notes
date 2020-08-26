@@ -18,19 +18,19 @@ class Auth extends Component {
         error: null,
         errorType: null, // For setting the error message type
         errorAck: false // Set to true, when error has been acknowledged properly, since errors are faded after few seconds,
-                        // to avoid re-rendering due to that.
+        // to avoid re-rendering due to that.
     }
 
-    componentDidMount () {
+    componentDidMount() {
         if (this.props.message) {
             this.props.onClearMessage();
-            this.setState({error: this.props.message, errorType: this.props.msgType})
+            this.setState({ error: this.props.message, errorType: this.props.msgType })
         }
     }
-    
-    componentDidUpdate () {
+
+    componentDidUpdate() {
         if (this.props.authError) {
-            this.setState({ error: this.props.authError, errorType: "danger"});
+            this.setState({ error: this.props.authError, errorType: "danger" });
             this.props.onClearError();
         }
     }
@@ -40,11 +40,11 @@ class Auth extends Component {
     }
 
     usernameChangeHandler = (event) => {
-        this.setState({username: event.target.value});
+        this.setState({ username: event.target.value });
     }
 
     passwordChangeHandler = (event) => {
-        this.setState({password: event.target.value});
+        this.setState({ password: event.target.value });
     }
 
     /**
@@ -73,7 +73,7 @@ class Auth extends Component {
         this.props.history.push('/');
     }
 
-    render () {
+    render() {
         let currentLoginComponent = null;
         if (this.props.isAuthenticated) {
             let redirectPath = '/';
@@ -86,10 +86,10 @@ class Auth extends Component {
             currentLoginComponent = <Spinner data-test="component-spinner" />;
         } else {
             currentLoginComponent = (
-                <AuthPresentationalComponents 
+                <AuthPresentationalComponents
                     data-test="component-loginform"
-                    userNameChanged={this.usernameChangeHandler} 
-                    passwordChanged={this.passwordChangeHandler} 
+                    userNameChanged={this.usernameChangeHandler}
+                    passwordChanged={this.passwordChangeHandler}
                     loginClicked={this.loginHandler}
                     cancelClicked={this.goBackHandler}
                 />
@@ -99,7 +99,7 @@ class Auth extends Component {
         if (this.state.error) {
             clearTimeout(this.errorTimeout);
             this.errorTimeout = setTimeout(() => {
-                this.setState({error: null, errorType: null});
+                this.setState({ error: null, errorType: null });
             }, 3000);
         }
 
@@ -115,19 +115,19 @@ class Auth extends Component {
                         <Col className="col-md-5 offset-md-4 text-center">
                             {
                                 this.state.error
-                                ?
-                                <Alert 
-                                    data-test="component-alert"
-                                    type={this.state.errorType} 
-                                    message={this.state.error}/>
-                                :
-                                null
+                                    ?
+                                    <Alert
+                                        data-test="component-alert"
+                                        type={this.state.errorType}
+                                        message={this.state.error} />
+                                    :
+                                    null
                             }
                         </Col>
                     </Row>
                 </Container>
             </>
-        );  
+        );
     }
 }
 
@@ -144,7 +144,7 @@ export const mapStateToProps = state => {
 export const mapDispatchToProps = dispatch => {
     return {
         onLogin: (credential) => dispatch(actions.authUser(credential)),
-        onClearError : () => dispatch(actions.clearError()),
+        onClearError: () => dispatch(actions.clearError()),
         onClearMessage: () => dispatch(actions.unsetMessage())
     };
 }

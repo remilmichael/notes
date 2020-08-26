@@ -353,7 +353,7 @@ describe("Saving to database", () => {
         afterAll(() => server.close());
         afterEach(() => server.resetHandlers());
 
-        it("should redirect to the main page after successful submission", async () => {
+        it("should redirect to `TodoViewer` after successful submission", async () => {
             setup();
             const newItemInput = screen.queryByRole("textbox", { name: "todo-new" });
             const addButton = screen.queryByText("Add");
@@ -369,7 +369,7 @@ describe("Saving to database", () => {
             });
             await waitFor(() => {
                 expect(history.action).toEqual("REPLACE");
-                expect(history.location.pathname).toEqual("/");
+                expect(history.location.pathname).toEqual("/todoviewer");
             });
         });
 

@@ -47,7 +47,6 @@ function TodoEditor() {
     let errorTimeout;
     if (state.error) {
       errorTimeout = setTimeout(() => {
-        // setError(null);
         dispatch({ type: actions.UNSET_ERROR });
       }, 3000);
     }
@@ -369,7 +368,7 @@ function TodoEditor() {
       {authReduxReducer.idToken === null ? (
         <Redirect to="/login?redirect=todo" />
       ) : null}
-      {state.saveSuccessful ? <Redirect to="/" /> : null}
+      {state.saveSuccessful ? <Redirect to="/todoviewer" /> : null}
       {state.loading ? (
         <Spinner />
       ) : (
