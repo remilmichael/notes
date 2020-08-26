@@ -6,31 +6,42 @@ import { NavLink } from 'react-router-dom';
 
 import * as actions from '../../../store/actions/';
 import classes from './TodoViewer.module.css';
+import SpinnerAndButton from '../../../component/UI/SpinnerAndButton/SpinnerAndButton';
 
 function TodoViewer() {
 
     const auth = useSelector((state) => state.auth);
     const todolist = useSelector(state => state.todolist);
-
     const dispatch = useDispatch();
     const history = useHistory();
 
     useEffect(() => {
         if (!auth.idToken) {
-            history.push('/login');
             dispatch(actions.clearTitles());
+            history.push('/login?redirect=todoviewer');
         }
     }, [auth.idToken, history, dispatch]);
 
     useEffect(() => {
-        if (todolist.todos.length === 0 && !todolist.fetchFailed && auth.idToken) {
-            dispatch(actions.fetchAllTodos());
+        if (todolist.todos.length === 0 && !todolist.fetchFailed && auth.idToken && !todolist.loading) {
+            dispatch(actions.fetchAllTodos(auth.idToken, todolist.nextRecordNumber));
         }
     }, [todolist, dispatch, auth.idToken]);
 
-    const todoList = todolist.todos.map((item) => {
+
+    /**
+     * Function to fetch more todos from server
+     *      of length ${RECORD_COUNT} 
+     * @function loadMoreTodos
+     */
+    const loadMoreTodos = () => {
+        dispatch(actions.fetchAllTodos(auth.idToken, todolist.nextRecordNumber));
+    }
+
+
+    let todoList = todolist.todos.map((item, index) => {
         return (<Col className="col-12 col-md-4 mt-3" key={item.todoId}>
-            <Card bg="light" text="dark" data-testid="component-note-item">
+            <Card bg="light" text="dark" data-testid={`todo-title-${index}`}>
                 <NavLink to={`/todos?id=${item.todoId}`} className={classes.link}>
                     <Card.Body>
                         <Card.Text>
@@ -42,11 +53,66 @@ function TodoViewer() {
         </Col>);
     });
 
+    let moreButton;
+    if (todolist.hasMoreTodos && auth.idToken) {
+        if (todolist.fetchFailed) {
+            moreButton = (
+                <SpinnerAndButton
+                    disabled={true}
+                    variant="secondary"
+                    message="Failed to connect"
+                    clickedMore={loadMoreTodos}
+                />
+            );
+        } else if (!todolist.loading) {
+            moreButton = (
+                <SpinnerAndButton
+                    disabled={false}
+                    variant="primary"
+                    message="Load more"
+                    clickedMore={loadMoreTodos}
+                />
+            );
+        } else {
+            moreButton = (
+                <SpinnerAndButton
+                    disabled={true}
+                    variant="primary"
+                    message=" Loading..."
+                />
+            );
+        }
+    }
+
+    const addNewButton = (
+        <>
+            <Row className="mt-3">
+                <Col>
+                    <NavLink to="/todo">
+                        <button
+                            data-test="component-addbutton"
+                            type="button"
+                            className="btn btn-dark"
+                        >
+                            New Todo
+                </button>
+                    </NavLink>
+                </Col>
+            </Row>
+        </>
+    );
+
     return (
         <Container>
+            {addNewButton}
             <Row>{todoList}</Row>
+            <Row className="mt-5 justify-content-center">
+                <Col></Col>
+                <Col>{moreButton}</Col>
+                <Col></Col>
+            </Row>
         </Container>
-    )
+    );
 }
 
 export default TodoViewer;

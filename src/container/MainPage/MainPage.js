@@ -9,15 +9,19 @@ import classes from "./MainPage.module.css";
 
 class MainPage extends Component {
   componentDidMount() {
-    // console.log('ComponentDidMount -> MainPage.js');
     this.fetchOrClearNotes();
   }
 
   componentDidUpdate() {
-    // console.log("componentDidUpdate -> MainPage");
     this.fetchOrClearNotes();
   }
 
+  /**
+   * Function to fetch existing note titles from server or
+   *     clear existing note titles from the redux store.
+   * 
+   * @function fetchOrClearNotes
+   */
   fetchOrClearNotes() {
     if (this.props.notelist.length === 0 && !this.props.loading) {
       if (this.props.idToken !== null && !this.props.fetchFailed) {
@@ -34,12 +38,17 @@ class MainPage extends Component {
     }
   }
 
+  /**
+   * Function to fetch ${RECORD_COUNT} more titles from
+   *    server
+   * 
+   * @function loadMoreNotesHandler
+   */
   loadMoreNotesHandler = () => {
     this.props.onFetchNotes(this.props.idToken, this.props.nextRecordNumber);
   };
 
   render() {
-    // console.log('Inside rendering function => [MainPage.js]');
     let noteList = null;
     let moreButton = null;
     if (this.props.notelist.length > 0) {
