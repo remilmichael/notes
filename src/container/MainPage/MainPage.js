@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { NavLink } from "react-router-dom";
 
 import * as actions from "../../store/actions/index";
-import SpinnerOrButton from "./Actions/SpinnerOrButton";
+import SpinnerAndButton from "../../component/UI/SpinnerAndButton/SpinnerAndButton";
 import classes from "./MainPage.module.css";
 
 class MainPage extends Component {
@@ -19,8 +19,8 @@ class MainPage extends Component {
   }
 
   fetchOrClearNotes() {
-    if (this.props.notelist.length === 0 && this.props.loading === false) {
-      if (this.props.idToken !== null && this.props.fetchFailed === false) {
+    if (this.props.notelist.length === 0 && !this.props.loading) {
+      if (this.props.idToken !== null && !this.props.fetchFailed) {
         this.props.onFetchNotes(
           this.props.idToken,
           this.props.nextRecordNumber
@@ -61,27 +61,27 @@ class MainPage extends Component {
     if (this.props.hasMoreNotes && this.props.idToken) {
       if (this.props.fetchFailed) {
         moreButton = (
-          <SpinnerOrButton
+          <SpinnerAndButton
             data-test="component-button-failed"
             disabled={true}
             variant="secondary"
             message="Unable to connect"
-            clickedMoreNotes={this.loadMoreNotesHandler}
+            clickedMore={this.loadMoreNotesHandler}
           />
         );
       } else if (!this.props.loading) {
         moreButton = (
-          <SpinnerOrButton
+          <SpinnerAndButton
             data-test="component-loadmore"
             disabled={false}
             variant="primary"
             message="Load more"
-            clickedMoreNotes={this.loadMoreNotesHandler}
+            clickedMore={this.loadMoreNotesHandler}
           />
         );
       } else {
         moreButton = (
-          <SpinnerOrButton
+          <SpinnerAndButton
             data-test="component-loading"
             disabled={true}
             variant="primary"
