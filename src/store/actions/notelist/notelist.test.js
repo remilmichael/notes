@@ -16,9 +16,9 @@ describe('notelist actions', () => {
         { noteId: '456', noteHeading: 'Heading 2' },
         { noteId: '789', noteHeading: 'Heading 3' }
     ];
-    
+
     it('should return action type `FETCH_NOTES_TITLES_FAILED`', () => {
-        const expectedAction = { type: actionTypes.FETCH_NOTES_TITLES_FAILED};
+        const expectedAction = { type: actionTypes.FETCH_NOTES_TITLES_FAILED };
         expect(actions.fetchTitlesFailed()).toEqual(expectedAction);
     });
 
@@ -28,7 +28,7 @@ describe('notelist actions', () => {
     });
 
     it('should return action type `SAVE_NOTES_LIST`', () => {
-        const expectedAction = { 
+        const expectedAction = {
             type: actionTypes.SAVE_NOTES_LIST,
             payload: titles
         };
@@ -41,7 +41,7 @@ describe('notelist actions', () => {
         };
         expect(actions.clearTitles()).toEqual(expectedAction);
     });
-    
+
     describe('Testing `fetchAllNotes` action creator', () => {
         let store;
         beforeEach(() => {
@@ -53,7 +53,7 @@ describe('notelist actions', () => {
             store.clearActions();
         })
 
-        it('should return actions { FETCH_MORE_NOTES_START, SAVE_NOTES_LIST }', (done) => {
+        it('should return action types { FETCH_MORE_NOTES_START, SAVE_NOTES_LIST }', (done) => {
             store.dispatch(actions.fetchAllNotes(idToken, recordNumber));
 
             const expectedActions = [
@@ -75,7 +75,7 @@ describe('notelist actions', () => {
             })
         });
 
-        it('should return actions { FETCH_MORE_NOTES_START, FETCH_NOTES_TITLES_FAILED } ', (done) => {
+        it('should return action types { FETCH_MORE_NOTES_START, FETCH_NOTES_TITLES_FAILED } ', (done) => {
             store.dispatch(actions.fetchAllNotes(idToken, recordNumber));
 
             const expectedActions = [
@@ -93,5 +93,4 @@ describe('notelist actions', () => {
             })
         });
     });
-
 });
