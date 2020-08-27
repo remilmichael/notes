@@ -55,11 +55,11 @@ export const reducer = (state = initialState, action) => {
             return { ...state, loading: false, saveSuccessful: true };
         case actions.SAVE_TO_DB_FAILED:
             return { ...state, loading: false, saveSuccessful: false };
-        case actions.FETCH_FROM_DB_START:
+        case actions.INIT_SPINNER:
             return { ...state, loading: true };
         case actions.FETCH_FROM_DB_SUCCESS:
             return saveToState(state, action.payload);
-        case actions.FETCH_FROM_DB_FAILED:
+        case actions.STOP_SPINNER:
             return { ...state, loading: false };
         default:
             throw new Error('Unknown action type');
