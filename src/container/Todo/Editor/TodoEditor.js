@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
-import { Redirect, useHistory, useParams } from "react-router";
+import { Redirect, useHistory } from "react-router";
 import axios from "axios";
 
 import { ReactComponent as CheckMarkIcon } from "../../../assets/checkmark.svg";
@@ -22,6 +22,7 @@ import classes from "./TodoEditor.module.css";
 import Spinner from "../../../component/UI/Spinner/Spinner";
 import Alert from "../../../component/UI/Alert/Alert";
 import * as reduxActionTypes from '../../../store/actions/actionTypes';
+import { generateHeader } from '../../../utility';
 
 function TodoEditor() {
   /**
@@ -49,10 +50,48 @@ function TodoEditor() {
   const urlParamsId = urlParams.get('id');
 
   useEffect(() => {
-    if (urlParamsId) {
-      //continue from here
+    if (urlParamsId && authReduxReducer.idToken) {
+      const header = generateHeader(authReduxReducer.idToken);
+      dispatch({ type: actions.INIT_SPINNER });
+      Axios.get(`/todos/${urlParamsId}`, {
+        headers: header
+      }).then((response) => {
+        if (response.data) {
+          const todoId = response.data.todoId;
+          const todoTitle = response.data.todoTitle;
+          const todoItems = response.data.todoItems;
+          if (!todoId || !todoTitle || !todoItems) {
+            dispatch({ type: actions.STOP_SPINNER });
+            alert('Something went wrong');
+            history.push('/todoviewer');
+          } else {
+            const todos = [];
+            todoItems.forEach((item) => {
+              todos.push({
+                item: item.todoItem,
+                index: item.todoIndex,
+                strike: item.strike
+              });
+            });
+            const fetchedTodo = {
+              todos: todos,
+              todoId: todoId,
+              todoTitle: todoTitle
+            }
+            dispatch({ type: actions.FETCH_FROM_DB_SUCCESS, payload: fetchedTodo });
+          }
+        }
+      }).catch((error) => {
+        dispatch({ type: actions.STOP_SPINNER });
+        if (error.response && error.response.data && error.response.data.message) {
+          alert(error.response.data.message);
+        } else {
+          alert('Something went wrong');
+        }
+        history.push('/todoviewer');
+      })
     }
-  })
+  }, [urlParamsId, authReduxReducer.idToken, dispatch, history]);
 
   useEffect(() => {
     document.title = "ToDo Editor";
@@ -79,11 +118,11 @@ function TodoEditor() {
     if (inputRef.current && inputRef.current.value) {
       const item = inputRef.current.value;
       if (item.trim().length === 0) {
-        // Raise error
+        alert('Nothing to add');
       } else {
         const nextIndex = state.todos.length;
         const newTodo = {
-          item: item.trim(),
+          item: item,
           strike: false,
           index: nextIndex,
         };
@@ -206,12 +245,13 @@ function TodoEditor() {
     setEditItemIndex(-1);
   };
 
+
   /**
    * Function to push the todo to the database
    *
    * @function saveToDatabase
    */
-  const saveToDatabase = () => {
+  const saveToDatabase = async () => {
     const title = titleInputRef.current.value;
     if (state.todos.length === 0) {
       dispatch({
@@ -230,10 +270,7 @@ function TodoEditor() {
         },
       });
     } else {
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + authReduxReducer.idToken,
-      };
+      const headers = generateHeader(authReduxReducer.idToken);
       const todoItems = [];
       state.todos.forEach((item) => {
         todoItems.push({
@@ -243,44 +280,75 @@ function TodoEditor() {
         });
       });
       const newTodo = {
-        todoId: uuidv4(),
+        todoId: state.fetchTodoId ? state.fetchTodoId : uuidv4(),
         todoTitle: title,
         username: authReduxReducer.userId,
         lastUpdated: new Date().getTime(),
         todoItems: todoItems,
       };
       dispatch({ type: actions.SAVE_TO_DB_START });
-      Axios.post("/todos", newTodo, {
-        headers: headers,
-      })
-        .then(() => {
+
+      try {
+        let response;
+        if (state.fetchTodoId) {
+          response = await Axios.put("/todos", newTodo, { headers: headers });
+        } else {
+          response = await Axios.post("/todos", newTodo, { headers: headers });
+        }
+        if (response) {
           dispatch({ type: actions.SAVE_TO_DB_SUCCESS });
-          dispatchRedux({ type: reduxActionTypes.SAVE_TODO_REDUX, payload: newTodo });
-        })
-        .catch((error) => {
-          if (!axios.isCancel(error)) {
-            dispatch({ type: actions.SAVE_TO_DB_FAILED });
-            if (error && error.response && error.response.message) {
-              dispatch({
-                type: actions.SET_ERROR,
-                payload: {
-                  error: error.data.message,
-                  errorType: "error",
-                },
-              });
-            } else {
-              dispatch({
-                type: actions.SET_ERROR,
-                payload: {
-                  error: "Something went wrong",
-                  errorType: "error",
-                },
-              });
-            }
+          if (state.fetchTodoId) {
+            dispatchRedux({ type: reduxActionTypes.UPDATE_TODO_REDUX, payload: newTodo });
+          } else {
+            dispatchRedux({ type: reduxActionTypes.SAVE_TODO_REDUX, payload: newTodo });
           }
-        });
+        }
+      } catch (error) {
+        if (!axios.isCancel(error)) {
+          dispatch({ type: actions.SAVE_TO_DB_FAILED });
+          if (error && error.response && error.response.message) {
+            dispatch({
+              type: actions.SET_ERROR,
+              payload: {
+                error: error.data.message,
+                errorType: "error",
+              },
+            });
+          } else {
+            dispatch({
+              type: actions.SET_ERROR,
+              payload: {
+                error: "Something went wrong",
+                errorType: "error",
+              },
+            });
+          }
+        }
+      }
     }
-  };
+  }
+
+  /**
+   * Function to delete the todo from redux and database
+   * 
+   * @function deleteThisTodo
+   */
+  const deleteThisTodo = async () => {
+    const header = generateHeader(authReduxReducer.idToken);
+    dispatch({ type: actions.INIT_SPINNER })
+    try {
+      const response = await Axios.delete(`/todos/${state.fetchTodoId}`,
+        { headers: header });
+      if (response) {
+        dispatchRedux({ type: reduxActionTypes.DELETE_TODO_REDUX, payload: state.fetchTodoId });
+        dispatch({ type: actions.STOP_SPINNER })
+        history.push('/todoviewer')
+      }
+    } catch (error) {
+      alert('Something went wrong');
+      dispatch({ type: actions.STOP_SPINNER })
+    }
+  }
 
   let deleteButton = null;
   if (selectedCbSet.size !== 0) {
@@ -397,13 +465,19 @@ function TodoEditor() {
                   id="title"
                   required
                   autoComplete="off"
+                  defaultValue={state.fetchTodoTitle}
                 />
                 <label htmlFor="title">
                   <span>Todo title</span>
                 </label>
               </Col>
               <Col className="col-12 offset-0 col-md-3 mt-5 mt-lg-0 offset-md-3">
-                <Actions clickedSave={saveToDatabase} />
+                <Actions
+                  clickedSave={saveToDatabase}
+                  clickedCancel={() => history.push('/todoviewer')}
+                  clickedDelete={deleteThisTodo}
+                  delDisabled={state.fetchTodoId ? false : true}
+                />
               </Col>
             </Row>
             <InputComponent

@@ -23,7 +23,11 @@ function TodoViewer() {
     }, [auth.idToken, history, dispatch]);
 
     useEffect(() => {
-        if (todolist.todos.length === 0 && !todolist.fetchFailed && auth.idToken && !todolist.loading) {
+        if (todolist.todos.length === 0 &&
+            !todolist.fetchFailed &&
+            auth.idToken &&
+            !todolist.loading &&
+            todolist.hasMoreTodos) {
             dispatch(actions.fetchAllTodos(auth.idToken, todolist.nextRecordNumber));
         }
     }, [todolist, dispatch, auth.idToken]);
@@ -41,7 +45,6 @@ function TodoViewer() {
     let todoList = todolist.todos.map((item, index) => {
         return (<Col className="col-12 col-md-4 mt-3" key={item.todoId}>
             <Card bg="light" text="dark" data-testid={`todo-title-${index}`}>
-                {/* <NavLink to={`/todo?id=${item.todoId}`} className={classes.link}> */}
                 <NavLink to={`/todo?id=${item.todoId}`} className={classes.link}>
                     <Card.Body>
                         <Card.Text>
