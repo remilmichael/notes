@@ -9,6 +9,8 @@ import * as actions from './actions';
  * @property {Boolean} saveSuccessful - To redirect after successful submission
  * @property {String} error - Error message generated
  * @property {String} errorType - Type error message { warning, error }
+ * @property {String} fetchTodoId - Existing todo id fetched from database
+ * @property {String} fetchTodoTitle - Existing todo title fetched from database
  * @property {String} todos.item - Todo name
  * @property {Boolean} todos.strike - Indicates whether todo is striked
  * @property {Number} todos.index - Index of the item
@@ -18,7 +20,9 @@ export const initialState = {
     loading: false,
     saveSuccessful: false,
     error: null,
-    errorType: null
+    errorType: null,
+    fetchTodoId: null,
+    fetchTodoTitle: null
 }
 
 /**
@@ -30,7 +34,7 @@ export const initialState = {
  * @returns {Object} - Updated state
  */
 export const reducer = (state = initialState, action) => {
-    switch(action.type) {
+    switch (action.type) {
         case actions.APPEND_ITEM:
             return addItem(state, action.payload);
         case actions.DELETE_ITEM:
@@ -51,6 +55,12 @@ export const reducer = (state = initialState, action) => {
             return { ...state, loading: false, saveSuccessful: true };
         case actions.SAVE_TO_DB_FAILED:
             return { ...state, loading: false, saveSuccessful: false };
+        case actions.FETCH_FROM_DB_START:
+            return { ...state, loading: true };
+        case actions.FETCH_FROM_DB_SUCCESS:
+            return saveToState(state, action.payload);
+        case actions.FETCH_FROM_DB_FAILED:
+            return { ...state, loading: false };
         default:
             throw new Error('Unknown action type');
     }
@@ -95,16 +105,17 @@ const addItem = (state, payload) => {
 const deleteItem = (state, index) => {
     let indexCounter = 0;
     const newTodos = [];
-    
+
     state.todos.filter(item => {
         if (index !== item.index) {
-            newTodos.push({...item, index: indexCounter++});
+            newTodos.push({ ...item, index: indexCounter++ });
             return true;
         }
         return false;
     });
 
     return {
+        ...state,
         todos: newTodos
     };
 }
@@ -118,12 +129,12 @@ const deleteItem = (state, index) => {
 const changeStrikeState = (state, index) => {
     const newTodos = state.todos.map(item => {
         if (item.index === index) {
-            const newItem =  Object.assign({}, item);
+            const newItem = Object.assign({}, item);
             newItem.strike = !newItem.strike;
             return newItem;
-        } 
+        }
         return item;
-    });  
+    });
     return {
         ...state,
         todos: newTodos
@@ -145,11 +156,12 @@ const deleteMultipleItems = (state, set) => {
             tempSet.delete(item.index.toString());
             return false;
         }
-        newTodos.push({...item, index: indexCounter++});
+        newTodos.push({ ...item, index: indexCounter++ });
         return true;
     });
 
     return {
+        ...state,
         todos: newTodos,
     };
 }
@@ -167,11 +179,12 @@ const deleteMultipleItems = (state, set) => {
 const updateTodo = (state, payload) => {
     const updatedTodos = state.todos.map(todoItem => {
         if (todoItem.index === payload.index) {
-            return { ...todoItem, item: payload.value}
+            return { ...todoItem, item: payload.value }
         }
         return todoItem;
     });
     return {
+        ...state,
         todos: updatedTodos
     };
 }
@@ -190,6 +203,32 @@ const setError = (state, payload) => {
         error: payload.error,
         errorType: payload.errorType
     };
+}
+
+/**
+ * Function to update the state with fetched todos
+ *      from database
+ * 
+ * @function saveToState
+ * @param {Object} state - current state
+ * @param {Object} payload - Fetched todos and it's id
+ * @returns {Object} - updated state
+ */
+const saveToState = (state, payload) => {
+    const todos = payload.todos;
+    const sortedTodos = todos.sort((todo1, todo2) => {
+        return todo1.index - todo2.index;
+    })
+
+    const updatedState = {
+        ...state,
+        loading: false,
+        fetchTodoId: payload.todoId,
+        fetchTodoTitle: payload.todoTitle,
+        todos: sortedTodos
+    };
+
+    return updatedState;
 }
 
 export default reducer;

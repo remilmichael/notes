@@ -2,6 +2,7 @@ import * as actionTypes from './actions';
 import { initialState, reducer } from './reducer';
 
 const updatedInitialState = {
+    ...initialState,
     todos: [
         { item: 'Todo 1', strike: false, index: 0 },
         { item: 'Todo 2', strike: false, index: 1 },
@@ -22,17 +23,19 @@ describe('Appending items', () => {
     });
 
     it('should append a new item to exisiting list', () => {
-        const newTodo = { item: 'Todo 5',
-             strike: false,
-             index: updatedInitialState.todos.length
+        const newTodo = {
+            item: 'Todo 5',
+            strike: false,
+            index: updatedInitialState.todos.length
         };
         const receivedState = reducer(updatedInitialState, { type: actionTypes.APPEND_ITEM, payload: newTodo });
-        const expectedState = { 
+        const expectedState = {
+            ...initialState,
             todos: [...updatedInitialState.todos, newTodo],
         };
         expect(receivedState).toEqual(expectedState);
     });
-    
+
 });
 
 describe('Deleting todos from the list', () => {
@@ -44,6 +47,7 @@ describe('Deleting todos from the list', () => {
             { item: 'Todo 4', strike: false, index: 2 }
         ]
         const expectedState = {
+            ...initialState,
             todos: modifiedTodos
         };
         const receivedState = reducer(updatedInitialState, { type: actionTypes.DELETE_ITEM, payload: indexToRemove });
@@ -55,7 +59,8 @@ describe('Deleting todos from the list', () => {
         set.add('3');
 
         const expectedState = {
-            todos : [
+            ...initialState,
+            todos: [
                 { item: 'Todo 2', strike: false, index: 0 },
                 { item: 'Todo 3', strike: false, index: 1 },
             ]
@@ -71,9 +76,12 @@ describe('Updating an existing todo', () => {
         const indexToUpdate = 2;
         const modifiedTodo = 'This is todo 3';
         const receivedState = reducer(updatedInitialState,
-            { type: actionTypes.SAVE_CHANGES,
-                payload: { value: modifiedTodo, index: indexToUpdate } });
+            {
+                type: actionTypes.SAVE_CHANGES,
+                payload: { value: modifiedTodo, index: indexToUpdate }
+            });
         const expectedState = {
+            ...initialState,
             todos: [
                 { item: 'Todo 1', strike: false, index: 0 },
                 { item: 'Todo 2', strike: false, index: 1 },
@@ -87,6 +95,7 @@ describe('Updating an existing todo', () => {
     it('should `strike` the todo item with given index', () => {
         const indexToUpdate = 2;
         const expectedState = {
+            ...initialState,
             todos: [
                 { item: 'Todo 1', strike: false, index: 0 },
                 { item: 'Todo 2', strike: false, index: 1 },
@@ -106,6 +115,7 @@ describe('Updating an existing todo', () => {
         const expectedState = updatedInitialState;
 
         const currentStatus = {
+            ...initialState,
             todos: [
                 { item: 'Todo 1', strike: false, index: 0 },
                 { item: 'Todo 2', strike: false, index: 1 },
@@ -137,8 +147,8 @@ describe('Setting error', () => {
     });
 
     it('should set error and its type to `null`', () => {
-        const receivedState = 
-            reducer({ ...initialState, ...payload }, { type: actionTypes.UNSET_ERROR } );
+        const receivedState =
+            reducer({ ...initialState, ...payload }, { type: actionTypes.UNSET_ERROR });
         const expectedState = initialState;
         expect(receivedState).toEqual(expectedState);
     });
@@ -154,7 +164,7 @@ describe('Pushing note to the server', () => {
         expect(receivedState).toEqual(expectedState);
     });
 
-    it ('should return state with `loading` set to false and `saveSuccessful` to true', () => {
+    it('should return state with `loading` set to false and `saveSuccessful` to true', () => {
         const receivedState = reducer({ ...initialState, loading: true }, { type: actionTypes.SAVE_TO_DB_SUCCESS });
         const expectedState = {
             ...initialState,
