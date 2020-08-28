@@ -25,14 +25,6 @@ import * as reduxActionTypes from '../../../store/actions/actionTypes';
 import { generateHeader } from '../../../utility';
 
 function TodoEditor() {
-  /**
-   *    initialState = {
-   *        todos: [], // contains { item: string, strike: boolean, index: number}
-   *        loading: boolean
-   *        saveSuccessful: boolean
-   *    }
-   */
-
   const [state, dispatch] = useApiCallReducer();
   const [selectedCbSet, setSelectedCbSet] = useState(new Set());
   const [editItemIndex, setEditItemIndex] = useState(-1);
@@ -43,18 +35,22 @@ function TodoEditor() {
   const inputRef = React.useRef(null);
   const editInputRef = React.useRef(null);
   const titleInputRef = React.useRef(null);
+  const source = React.useRef(null);
 
-  const source = axios.CancelToken.source();
   const history = useHistory();
   const urlParams = new URLSearchParams(history.location.search);
   const urlParamsId = urlParams.get('id');
+
+  if (!source.current) {
+    source.current = axios.CancelToken.source();
+  }
 
   useEffect(() => {
     if (urlParamsId && authReduxReducer.idToken) {
       const header = generateHeader(authReduxReducer.idToken);
       dispatch({ type: actions.INIT_SPINNER });
       Axios.get(`/todos/${urlParamsId}`, {
-        headers: header
+        headers: header, cancelToken: source.current.token
       }).then((response) => {
         if (response.data) {
           const todoId = response.data.todoId;
@@ -82,13 +78,15 @@ function TodoEditor() {
           }
         }
       }).catch((error) => {
-        dispatch({ type: actions.STOP_SPINNER });
-        if (error.response && error.response.data && error.response.data.message) {
-          alert(error.response.data.message);
-        } else {
-          alert('Something went wrong');
+        if (!axios.isCancel(error)) {
+          dispatch({ type: actions.STOP_SPINNER });
+          if (error.response && error.response.data && error.response.data.message) {
+            alert(error.response.data.message);
+          } else {
+            alert('Something went wrong');
+          }
+          history.push('/todoviewer');
         }
-        history.push('/todoviewer');
       })
     }
   }, [urlParamsId, authReduxReducer.idToken, dispatch, history]);
@@ -104,9 +102,11 @@ function TodoEditor() {
 
     return () => {
       clearTimeout(errorTimeout);
-      source.cancel();
+      if (source.current) {
+        source.current.cancel('TodoEditor unmounted');
+      }
     };
-  }, [state.error, dispatch, source]);
+  }, [dispatch, state.error]);
 
   /**
    * Function to add a new item in to the todo list
@@ -137,7 +137,7 @@ function TodoEditor() {
   };
 
   /**
-   * Check whether the key pressed was 'Enter' key,
+   * Checks whether the key pressed was 'Enter' key,
    *      if yes adds the item to the todo list
    *
    * @function checkKeyEvent
@@ -174,6 +174,7 @@ function TodoEditor() {
     }
   };
 
+
   /**
    * Function to delete multiple todo items whose index in
    *      the `selectedCbSet` state
@@ -189,6 +190,7 @@ function TodoEditor() {
     setSelectedCbSet(new Set());
   };
 
+
   /**
    * Function to delete the item when clicked on Trash icon
    *      against the label
@@ -201,6 +203,7 @@ function TodoEditor() {
     setSelectedCbSet(new Set());
   };
 
+
   /**
    * Function to replace the todo item with a textfield
    *      to edit an already existing item.
@@ -211,6 +214,7 @@ function TodoEditor() {
   const itemEditHandler = (index) => {
     setEditItemIndex(index);
   };
+
 
   /**
    * Function to save changes made to an existing todo item
@@ -235,6 +239,7 @@ function TodoEditor() {
     }
   };
 
+
   /**
    * Function discard changes made to an existing todo item
    * Calls setEditItemIndex(-1);
@@ -247,7 +252,8 @@ function TodoEditor() {
 
 
   /**
-   * Function to push the todo to the database
+   * Function either creates a new todo with new 
+   *    random uuid or updates an exisitng one.
    *
    * @function saveToDatabase
    */
@@ -286,14 +292,15 @@ function TodoEditor() {
         lastUpdated: new Date().getTime(),
         todoItems: todoItems,
       };
+
       dispatch({ type: actions.SAVE_TO_DB_START });
 
       try {
         let response;
         if (state.fetchTodoId) {
-          response = await Axios.put("/todos", newTodo, { headers: headers });
+          response = await Axios.put("/todos", newTodo, { headers: headers, cancelToken: source.current.token });
         } else {
-          response = await Axios.post("/todos", newTodo, { headers: headers });
+          response = await Axios.post("/todos", newTodo, { headers: headers, cancelToken: source.current.token });
         }
         if (response) {
           dispatch({ type: actions.SAVE_TO_DB_SUCCESS });
@@ -338,18 +345,25 @@ function TodoEditor() {
     dispatch({ type: actions.INIT_SPINNER })
     try {
       const response = await Axios.delete(`/todos/${state.fetchTodoId}`,
-        { headers: header });
+        { headers: header, cancelToken: source.current.token });
       if (response) {
         dispatchRedux({ type: reduxActionTypes.DELETE_TODO_REDUX, payload: state.fetchTodoId });
         dispatch({ type: actions.STOP_SPINNER })
         history.push('/todoviewer')
       }
     } catch (error) {
-      alert('Something went wrong');
-      dispatch({ type: actions.STOP_SPINNER })
+      if (!axios.isCancel(error)) {
+        alert('Something went wrong');
+        dispatch({ type: actions.STOP_SPINNER })
+      }
     }
   }
 
+
+  /**
+   * Delete button to delete multiple todos
+   *    when checkboxes are selected
+   */
   let deleteButton = null;
   if (selectedCbSet.size !== 0) {
     deleteButton = (
@@ -364,6 +378,12 @@ function TodoEditor() {
     );
   }
 
+
+
+  /**
+   * Actual todo contents including the icons
+   *    and the checkboxes
+   */
   let tableBody;
   if (state.todos.length !== 0) {
     tableBody = state.todos.map((item) => {
