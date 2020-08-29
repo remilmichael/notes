@@ -458,7 +458,10 @@ function TodoEditor() {
   return (
     <>
       {authReduxReducer.idToken === null ? (
-        <Redirect to="/login?redirect=todo" />
+        urlParamsId === null ?
+          <Redirect to="/login?redirect=todo" />
+          :
+          <Redirect to={`/login?redirect=todo?id=${urlParamsId}`} />
       ) : null}
       {state.saveSuccessful ? <Redirect to="/todoviewer" /> : null}
       {state.loading ? (

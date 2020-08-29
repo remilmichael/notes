@@ -99,6 +99,20 @@ describe('Accessing TodoEditor without logging in', () => {
         )
         expect(history.location.pathname).toEqual('/login')
     })
+
+    it('should redirect to `/login` with url params', () => {
+        const store = storeFactory()
+        history.location.search = '?id=ce28159b-e2cf-43d8-892c-ac15af89cf43';
+        render(
+            <Provider store={store}>
+                <Router history={history}>
+                    <TodoEditor />
+                </Router>
+            </Provider>
+        )
+        expect(history.location.pathname).toEqual('/login');
+        expect(history.location.search).toEqual(`?redirect=todo?id=${sampleFetchResponse.todoId}`)
+    });
 })
 
 test('should redirect to `TodoViewer`', () => {
