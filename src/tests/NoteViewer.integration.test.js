@@ -3,7 +3,7 @@ import { shallow } from 'enzyme';
 import moxios from 'moxios';
 
 import Axios from '../axios-notes';
-import MainPage from '../container/MainPage/MainPage';
+import NoteViewer from '../container/NoteViewer/NoteViewer';
 import { storeFactory, authInitialState, sampleNotes, findByTestAttr, findByIdSelector } from '../testUtils';
 import { initialState as notelistInitialState } from '../store/reducers/notelist/notelist';
 
@@ -14,13 +14,13 @@ import { initialState as notelistInitialState } from '../store/reducers/notelist
  * @param {Object} props - Component props specific to this setup.
  * @returns {ShallowWrapper}
  */
-const setup = (initialState={}, props={}) => {
+const setup = (initialState = {}, props = {}) => {
     const store = storeFactory(initialState);
-    return shallow(<MainPage store={store} { ...props } />).dive().dive();
+    return shallow(<NoteViewer store={store} {...props} />).dive().dive();
 };
 
 
-describe('Accessing `MainPage` after logged-in', () => {
+describe('Accessing `NoteViewer` after logged-in', () => {
 
     const authWithCredentials = {
         ...authInitialState,

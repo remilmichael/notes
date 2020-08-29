@@ -5,7 +5,7 @@ import { NavLink } from "react-router-dom";
 
 import * as actions from "../../store/actions/index";
 import SpinnerAndButton from "../../component/UI/SpinnerAndButton/SpinnerAndButton";
-import classes from "./MainPage.module.css";
+import classes from "./NoteViewer.module.css";
 
 class MainPage extends Component {
   componentDidMount() {

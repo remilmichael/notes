@@ -1,7 +1,7 @@
 import React from "react";
 import { shallow } from "enzyme";
 
-import MainPage from "./MainPage";
+import NoteViewer from "./NoteViewer";
 import {
   storeFactory,
   findByTestAttr,
@@ -19,12 +19,12 @@ import { initialState as notelistInitialState } from "../../store/reducers/notel
  */
 const setup = (initialState = {}, props = {}) => {
   const store = storeFactory(initialState);
-  return shallow(<MainPage store={store} {...props} />)
+  return shallow(<NoteViewer store={store} {...props} />)
     .dive()
     .dive();
 };
 
-describe("Accessing `MainPage` without signing in", () => {
+describe("Accessing `NoteViewer` without signing in", () => {
   let wrapper;
 
   beforeEach(() => {
@@ -42,7 +42,7 @@ describe("Accessing `MainPage` without signing in", () => {
   });
 });
 
-describe("Accessing `MainPage` with credentials", () => {
+describe("Accessing `NoteViewer` with credentials", () => {
   const authWithCredentials = {
     ...authInitialState,
     idToken: "sampleToken123",
