@@ -28,19 +28,19 @@ class Toolbar extends Component {
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
-                    <Nav className={classes.NavbarItem + ' mr-auto'}>
-                        <NavItem link="/">Home</NavItem>
+                    <Nav>
+                        <NavItem className={classes.NavbarItem} link="/">Home</NavItem>
                     </Nav>
-                    <Nav className={classes.NavbarItem + ' mr-auto'}>
-                        <NavItem link="/todo">Todo</NavItem>
+                    <Nav>
+                        <NavItem className={classes.NavbarItem} link="/todo">Add Todo</NavItem>
                     </Nav>
-                    <Nav className={classes.NavbarItem + ' mr-auto'}>
-                        <NavItem link="/todoviewer">TodoViewer</NavItem>
+                    <Nav>
+                        <NavItem className={classes.NavbarItem} link="/todoviewer">TodoViewer</NavItem>
                     </Nav>
-                    {/*<Nav className={classes.NavbarItem + ' md-auto'}>
-                            {this.props.isAuthenticated ? <NavItem link="/note">Add Note</NavItem> : null}
-                        </Nav>*/}
-                    <Nav className={classes.NavbarItem + ' ml-auto'}>
+                    <Nav>
+                        <NavItem className={classes.NavbarItem} link="/note">Add Note</NavItem>
+                    </Nav>
+                    <Nav className="ml-auto">
                         {
                             this.props.isAuthenticated
                                 ?

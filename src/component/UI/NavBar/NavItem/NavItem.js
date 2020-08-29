@@ -6,7 +6,7 @@ import classes from './NavItem.module.css';
 
 const navItem = (props) => {
     return (
-        <NavLink className={classes.Navlink}
+        <NavLink className={`${classes.Navlink} nav-link`}
             to={props.link}
             exact
             activeClassName={classes.NavlinkActive}>
