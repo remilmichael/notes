@@ -10,6 +10,7 @@ import TodoEditor from './container/Todo/Editor/TodoEditor';
 import { connect } from 'react-redux';
 import * as actions from './store/actions/index';
 import './App.css';
+import Homepage from './container/Homepage/Homepage';
 
 let routes = null;
 
@@ -28,7 +29,8 @@ class App extends Component {
           <Route path="/login" component={Auth} exact />
           <Route path="/todo" component={TodoEditor} />
           <Route path="/todoviewer" component={TodoViewer} />
-          <Route path="/" component={NoteViewer} />
+          <Route path="/noteviewer" component={NoteViewer} />
+          <Route path="/" component={Homepage} />
         </Switch>
       );
     } else {
@@ -38,7 +40,8 @@ class App extends Component {
           <Route path="/note" component={NoteEditor} />
           <Route path="/todo" component={TodoEditor} />
           <Route path="/login" component={Auth} exact />
-          <Route path="/" component={NoteViewer} />
+          <Route path="/noteviewer" component={NoteViewer} />
+          <Route path="/" component={Homepage} />
         </Switch>
       );
     }

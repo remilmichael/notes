@@ -28,18 +28,26 @@ class Toolbar extends Component {
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
-                    <Nav>
-                        <NavItem className={classes.NavbarItem} link="/">Home</NavItem>
-                    </Nav>
-                    <Nav>
-                        <NavItem className={classes.NavbarItem} link="/todo">Add Todo</NavItem>
-                    </Nav>
-                    <Nav>
-                        <NavItem className={classes.NavbarItem} link="/todoviewer">TodoViewer</NavItem>
-                    </Nav>
-                    <Nav>
-                        <NavItem className={classes.NavbarItem} link="/note">Add Note</NavItem>
-                    </Nav>
+                    {
+                        this.props.isAuthenticated ?
+                            <>
+                                <Nav>
+                                    <NavItem className={classes.NavbarItem} link="/">Home</NavItem>
+                                </Nav>
+                                <Nav>
+                                    <NavItem className={classes.NavbarItem} link="/todo">Add Todo</NavItem>
+                                </Nav>
+                                <Nav>
+                                    <NavItem className={classes.NavbarItem} link="/todoviewer">Todoviewer</NavItem>
+                                </Nav>
+                                <Nav>
+                                    <NavItem className={classes.NavbarItem} link="/note">Add Note</NavItem>
+                                </Nav>
+                                <Nav>
+                                    <NavItem className={classes.NavbarItem} link="/noteviewer">Noteviewer</NavItem>
+                                </Nav>
+                            </> : null
+                    }
                     <Nav className="ml-auto">
                         {
                             this.props.isAuthenticated
