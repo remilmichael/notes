@@ -7,6 +7,7 @@ import Logout from './container/Auth/Logout/Logout';
 import NoteViewer from './container/NoteViewer/NoteViewer';
 import TodoViewer from './container/Todo/Viewer/TodoViewer';
 import TodoEditor from './container/Todo/Editor/TodoEditor';
+import TestComponent from './TestComponent'
 import { connect } from 'react-redux';
 import * as actions from './store/actions/index';
 import './App.css';
@@ -30,6 +31,7 @@ class App extends Component {
           <Route path="/todo" component={TodoEditor} />
           <Route path="/todoviewer" component={TodoViewer} />
           <Route path="/noteviewer" component={NoteViewer} />
+          <Route path="/test" component={TestComponent} />
           <Route path="/" component={Homepage} />
         </Switch>
       );
@@ -41,6 +43,7 @@ class App extends Component {
           <Route path="/todo" component={TodoEditor} />
           <Route path="/login" component={Auth} exact />
           <Route path="/noteviewer" component={NoteViewer} />
+          <Route path="/test" component={TestComponent} />
           <Route path="/" component={Homepage} />
         </Switch>
       );
