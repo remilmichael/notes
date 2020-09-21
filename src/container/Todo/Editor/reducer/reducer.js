@@ -5,15 +5,16 @@ import * as actions from './actions';
  * Initial state of the reducer
  * 
  * @property {Array} todos - Todos list
+ * @property {String} todos.item - Todo name
+ * @property {Boolean} todos.strike - Indicates whether todo is striked
+ * @property {Number} todos.index - Index of the item
+ * 
  * @property {Boolean} loading - For spinner
  * @property {Boolean} saveSuccessful - To redirect after successful submission
  * @property {String} error - Error message generated
  * @property {String} errorType - Type error message { warning, error }
  * @property {String} fetchTodoId - Existing todo id fetched from database
  * @property {String} fetchTodoTitle - Existing todo title fetched from database
- * @property {String} todos.item - Todo name
- * @property {Boolean} todos.strike - Indicates whether todo is striked
- * @property {Number} todos.index - Index of the item
  */
 export const initialState = {
     todos: [], // contains { item: string, strike: boolean, index: number},
