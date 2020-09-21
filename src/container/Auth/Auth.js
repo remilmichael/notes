@@ -134,7 +134,7 @@ class Auth extends Component {
 export const mapStateToProps = state => {
     return {
         isLoggingNow: state.auth.logging,
-        isAuthenticated: state.auth.idToken !== null,
+        isAuthenticated: state.auth.userId !== null,
         authError: state.auth.error,
         message: state.message.message,
         msgType: state.message.type

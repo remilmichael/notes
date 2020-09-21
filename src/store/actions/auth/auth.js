@@ -24,21 +24,18 @@ export const authStart = () => {
  *      as successful
  * 
  * @function authSuccess
- * @param {String} idToken - JWT authentication token 
  * @param {Number} expiresOn - Time when token expires (in milliseconds)
  * @param {String} userId - User Id
  * @returns {Object} - Redux action type and payload
  */
-export const authSuccess = (idToken, expiresOn, userId) => {
+export const authSuccess = (expiresOn, userId) => {
 
-    localStorage.setItem('token', idToken);
     localStorage.setItem('expiresOn', expiresOn);
     localStorage.setItem('userId', userId);
 
     return {
         type: actions.AUTH_USER_SUCCESS,
         payload: {
-            idToken: idToken,
             expiresOn: expiresOn,
             userId: userId
         }
@@ -53,7 +50,6 @@ export const authSuccess = (idToken, expiresOn, userId) => {
  * @returns {Object} - Redux action type.
  */
 export const logout = () => {
-    localStorage.removeItem('token');
     localStorage.removeItem('expiresOn');
     localStorage.removeItem('userId');
     return {
@@ -73,7 +69,7 @@ export const checkAuthTimeOut = (expiresIn) => {
     return dispatch => {
         setTimeout(() => {
             dispatch(logout());
-        }, expiresIn);  
+        }, expiresIn);
     };
 }
 
@@ -114,25 +110,21 @@ export const clearError = () => {
  */
 export const tryAutoLogin = () => {
     return dispatch => {
-        const idToken  = localStorage.getItem('token');
-        if (!idToken) dispatch(logout());
-        else {
-            const expiryTime = localStorage.getItem('expiresOn');
-            if (!expiryTime) {
-                dispatch(logout());
-            } else {
-                const expiresOn = new Date(expiryTime);
-                if (expiresOn > new Date()) {
-                    const userId = localStorage.getItem('userId');
-                    if (!userId) dispatch(logout());
-                    else {
-                        dispatch(authSuccess(idToken, expiresOn, userId));
-                        const timeInSeconds = (expiresOn.getTime() - new Date().getTime());
-                        dispatch(checkAuthTimeOut(timeInSeconds));
-                    }
-                } else {
-                    dispatch(logout());
+        const expiryTime = localStorage.getItem('expiresOn');
+        if (!expiryTime) {
+            dispatch(logout());
+        } else {
+            const expiresOn = new Date(expiryTime);
+            if (expiresOn > new Date()) {
+                const userId = localStorage.getItem('userId');
+                if (!userId) dispatch(logout());
+                else {
+                    dispatch(authSuccess(expiresOn, userId));
+                    const timeInSeconds = (expiresOn.getTime() - new Date().getTime());
+                    dispatch(checkAuthTimeOut(timeInSeconds));
                 }
+            } else {
+                dispatch(logout());
             }
         }
     }
@@ -148,16 +140,15 @@ export const tryAutoLogin = () => {
 export const authUser = (credential) => {
     return dispatch => {
         dispatch(authStart());
-        axios.post(loginUrl, credential)
+        axios.post(loginUrl, credential, { withCredentials: true })
             .then(response => {
-                const idToken = response.data.token;
                 const expiresOn = new Date(response.data.expiresOn * 1000);
                 const userId = response.data.userId;
 
-                if (!idToken || !expiresOn || !userId) {
+                if (!expiresOn || !userId) {
                     dispatch(authFailed("Unknown error."));
                 } else {
-                    dispatch(authSuccess(idToken, expiresOn, userId));
+                    dispatch(authSuccess(expiresOn, userId));
                     dispatch(checkAuthTimeOut(expiresOn - new Date().getTime()));
                 }
             })

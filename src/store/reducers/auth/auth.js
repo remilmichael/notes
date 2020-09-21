@@ -5,9 +5,8 @@ import { updateObject } from '../../../utility';
  * Initial state given to the `reducer` function.
  */
 const initialState = {
-    userId: null, // User Id generated from firebase (server)
+    userId: null, // userId of the user
     logging: false, // For spinner
-    idToken: null, // Stores token for authentication
     expiresOn: null, // Token expiry timestamp
     authCheckComplete: false, // To check if authentication procedure is complete. Used when app reloads.
     error: null // Is set if any failure occurs during authentication
@@ -20,7 +19,7 @@ const initialState = {
  * @returns {Object} - Reduced state
  */
 export const reducer = (state = initialState, action) => {
-    switch(action.type) {
+    switch (action.type) {
         case actionTypes.AUTH_USER_START:
             return updateObject(state, authStartReducer());
         case actionTypes.AUTH_USER_SUCCESS:
@@ -28,7 +27,7 @@ export const reducer = (state = initialState, action) => {
         case actionTypes.AUTH_USER_FAILED:
             return updateObject(state, authFailedReducer(action.payload))
         case actionTypes.AUTH_USER_LOGOUT:
-            return {...initialState};
+            return { ...initialState };
         case actionTypes.AUTH_ERROR_RESET:
             return updateObject(state, authErrorResetReducer());
         default:
@@ -51,13 +50,12 @@ const authStartReducer = () => {
 /**
  * Function to reduce the state to a `successful` logged-in state.
  * @function authSuccessReducer
- * @param {Object} payload - payload consists of idToken, expiresOn, userId
+ * @param {Object} payload - payload consists of expiresOn, userId
  * @return {Object} - Reduced state
  */
 const authSuccessReducer = (payload) => {
     return {
         logging: false,
-        idToken: payload.idToken,
         expiresOn: payload.expiresOn,
         userId: payload.userId,
         error: null,

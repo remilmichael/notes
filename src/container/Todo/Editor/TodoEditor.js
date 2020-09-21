@@ -22,7 +22,6 @@ import classes from './TodoEditor.module.css'
 import Spinner from '../../../component/UI/Spinner/Spinner'
 import Alert from '../../../component/UI/Alert/Alert'
 import * as reduxActionTypes from '../../../store/actions/actionTypes'
-import { generateHeader } from '../../../utility'
 
 function TodoEditor() {
   const [state, dispatch] = useApiCallReducer()
@@ -46,11 +45,10 @@ function TodoEditor() {
   }
 
   useEffect(() => {
-    if (urlParamsId && authReduxReducer.idToken) {
-      const header = generateHeader(authReduxReducer.idToken)
+    if (urlParamsId && authReduxReducer.userId) {
       dispatch({ type: actions.INIT_SPINNER })
       Axios.get(`/todos/${urlParamsId}`, {
-        headers: header, cancelToken: source.current.token
+        withCredentials: true, cancelToken: source.current.token
       }).then((response) => {
         if (response.data) {
           const todoId = response.data.todoId
@@ -89,7 +87,7 @@ function TodoEditor() {
         }
       })
     }
-  }, [urlParamsId, authReduxReducer.idToken, dispatch, history])
+  }, [urlParamsId, authReduxReducer.userId, dispatch, history])
 
   useEffect(() => {
     document.title = 'ToDo Editor'
@@ -270,7 +268,6 @@ function TodoEditor() {
         }
       })
     } else {
-      const headers = generateHeader(authReduxReducer.idToken)
       const todoItems = []
       state.todos.forEach((item) => {
         todoItems.push({
@@ -292,9 +289,9 @@ function TodoEditor() {
       try {
         let response
         if (state.fetchTodoId) {
-          response = await Axios.put('/todos', newTodo, { headers: headers, cancelToken: source.current.token })
+          response = await Axios.put('/todos', newTodo, { withCredentials: true, cancelToken: source.current.token })
         } else {
-          response = await Axios.post('/todos', newTodo, { headers: headers, cancelToken: source.current.token })
+          response = await Axios.post('/todos', newTodo, { withCredentials: true, cancelToken: source.current.token })
         }
         if (response) {
           dispatch({ type: actions.SAVE_TO_DB_SUCCESS })
@@ -335,11 +332,10 @@ function TodoEditor() {
    * @function deleteThisTodo
    */
   const deleteThisTodo = async () => {
-    const header = generateHeader(authReduxReducer.idToken)
     dispatch({ type: actions.INIT_SPINNER })
     try {
       const response = await Axios.delete(`/todos/${state.fetchTodoId}`,
-        { headers: header, cancelToken: source.current.token })
+        { withCredentials: true, cancelToken: source.current.token })
       if (response) {
         dispatchRedux({ type: reduxActionTypes.DELETE_TODO_REDUX, payload: state.fetchTodoId })
         dispatch({ type: actions.STOP_SPINNER })
@@ -457,7 +453,7 @@ function TodoEditor() {
 
   return (
     <>
-      {authReduxReducer.idToken === null ? (
+      {authReduxReducer.userId === null ? (
         urlParamsId === null ?
           <Redirect to="/login?redirect=todo" />
           :

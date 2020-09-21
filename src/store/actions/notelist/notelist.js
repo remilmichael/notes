@@ -61,31 +61,26 @@ export const clearTitles = () => {
  * Function to fetch note titles from server
  * 
  * @function fetchAllNotes
- * @param {String} idToken - JWT authentication token
  * @param {Number} page - Next record to fetch
  * @returns {Function}
  */
-export const fetchAllNotes = (idToken, page) => {
+export const fetchAllNotes = (page) => {
     return dispatch => {
         dispatch(fetchMoreTitleStart());
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + idToken
-        };
         axios.get(`/notes/page/${page}/${RECORD_COUNT}`, {
-            headers: headers
+            withCredentials: true
         })
-        .then((response) => {
-            if (response.data) {
-                dispatch(fetchTitlesSuccess(response.data))
-            } else {
+            .then((response) => {
+                if (response.data) {
+                    dispatch(fetchTitlesSuccess(response.data))
+                } else {
+                    dispatch(fetchTitlesFailed());
+                }
+
+            })
+            .catch(() => {
                 dispatch(fetchTitlesFailed());
-            }
-            
-        })
-        .catch(() => {
-            dispatch(fetchTitlesFailed());
-        });
+            });
     }
 }
 

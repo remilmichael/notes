@@ -17,7 +17,7 @@ class NoteEditor extends Component {
     source = axios.CancelToken.source();
 
     constructor(props) {
-        super(props);
+        super(props)
         this.errorTimeout = null;
         this.urlParam_Id = null;
         if (this.props.location && this.props.location.search) {
@@ -39,8 +39,8 @@ class NoteEditor extends Component {
         fetchingNow: false
     };
 
-    componentDidMount () {
-        if (!this.props.idToken) {
+    componentDidMount() {
+        if (!this.props.userId) {
             this.props.onRaiseWarning("Login to continue!", "warning");
         }
 
@@ -49,17 +49,17 @@ class NoteEditor extends Component {
         }
     }
 
-    componentWillUnmount () {
+    componentWillUnmount() {
         clearTimeout(this.errorTimeout);
         this.source.cancel();
     }
 
-    componentDidUpdate () {
+    componentDidUpdate() {
         if (this.props.dbActionSuccessful) {
             this.props.onResetToDefault();
         }
         if (this.props.error && !this.state.error && !this.state.errorAck) {
-            this.setState({error: this.props.error, errorAck: true});
+            this.setState({ error: this.props.error, errorAck: true });
         }
         if (this.state.fetchingNow) {
             this.fetchNoteFromDb();
@@ -73,9 +73,9 @@ class NoteEditor extends Component {
      * @param {Object} event - Event object to get the current content in input components
      */
     formInputHandler = (event) => {
-        if (event.target.id === 'notearea') this.setState({note: event.target.value});
+        if (event.target.id === 'notearea') this.setState({ note: event.target.value });
         else if (event.target.id === 'noteheading') {
-            this.setState({heading: event.target.value});
+            this.setState({ heading: event.target.value });
         }
     }
 
@@ -86,7 +86,7 @@ class NoteEditor extends Component {
      * @function fetchNoteFromDb
      */
     fetchNoteFromDb = async () => {
-        if (this.props.idToken && this.state.note.length === 0 && !this.state.error) {
+        if (this.props.userId && this.state.note.length === 0 && !this.state.error) {
             this.fetchNoteHandler();
         }
     }
@@ -97,19 +97,15 @@ class NoteEditor extends Component {
      * 
      * @function fetchNoteHandler
      */
-    fetchNoteHandler = async() => {      
+    fetchNoteHandler = async () => {
         let response;
         let data;
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + this.props.idToken
-        }
-        
+
         try {
             response = await axios.get(`${ROOT_URL}/notes/${this.state.noteId}`,
-                 { headers: headers, cancelToken: this.source.token });
+                { withCredentials: true, cancelToken: this.source.token });
             data = await response.data;
-        } catch(error) {
+        } catch (error) {
             if (!axios.isCancel(error)) {
                 this.setState({
                     fetchingNow: false,
@@ -140,16 +136,16 @@ class NoteEditor extends Component {
             this.setState({
                 error: "Note can't be empty"
             })
-        } else if (this.state.heading === null || this.state.heading.trim() === '' ) {
+        } else if (this.state.heading === null || this.state.heading.trim() === '') {
             let heading = "";
             if (this.state.note.length <= 10) {
                 heading = this.state.note;
             } else {
                 heading = this.state.note.slice(0, 10);
             }
-            this.setState({heading: heading}, () => {
+            this.setState({ heading: heading }, () => {
                 // call this function only after the state gets updated.
-                this.saveNoteHandler(); 
+                this.saveNoteHandler();
             });
         } else {
             this.saveNoteHandler();
@@ -172,9 +168,9 @@ class NoteEditor extends Component {
         };
         if (this.state.noteId === null) {
             note.noteId = uuidv4();
-            this.props.onSaveNote(note, this.props.idToken);
+            this.props.onSaveNote(note);
         } else {
-            this.props.onUpdateNote(note, this.props.idToken);
+            this.props.onUpdateNote(note);
         }
     }
 
@@ -193,26 +189,26 @@ class NoteEditor extends Component {
      * @function deleteNoteHandler
      */
     deleteNoteHandler = () => {
-        if (this.state.noteId !== null && this.props.idToken !== null) {
-            this.props.onDeleteNote(this.state.noteId, this.props.idToken);
+        if (this.state.noteId !== null && this.props.userId !== null) {
+            this.props.onDeleteNote(this.state.noteId);
         }
     }
 
-    render () {
+    render() {
         // console.log("Inside rendering function => [NoteEditor.js]");
         let dispComponent = null;
 
         if (this.props.dbActionSuccessful) {
             dispComponent = <Redirect data-test="component-redirect-plain" to="/" />;
         }
-        else if (!this.props.idToken) {
+        else if (!this.props.userId) {
             if (this.urlParam_Id) {
                 dispComponent = <Redirect data-test="component-redirect-param" to={`/login?redirect=note?id=${this.urlParam_Id}`} />;
             } else {
                 dispComponent = <Redirect data-test="component-redirect-plain" to="/login?redirect=note" />;
             }
-            
-        } 
+
+        }
         else if (this.props.isStoringNow || this.state.fetchingNow === true) {
             dispComponent = <Spinner data-test="component-spinner" />;
         } else {
@@ -223,22 +219,22 @@ class NoteEditor extends Component {
                         <Row>
                             <Col>
                                 {
-                                    this.state.error 
-                                    ? 
-                                    <Alert 
-                                        data-test="component-alert"
-                                        type="danger"
-                                        message={this.state.error} />
-                                    :
-                                    null
+                                    this.state.error
+                                        ?
+                                        <Alert
+                                            data-test="component-alert"
+                                            type="danger"
+                                            message={this.state.error} />
+                                        :
+                                        null
                                 }
                             </Col>
                         </Row>
                     </Col>
                     <Col className="col-lg-3 mt-3 mt-lg-0">
-                        <Actions 
+                        <Actions
                             data-test="component-action"
-                            clickedSave={this.checkNoteValidity} 
+                            clickedSave={this.checkNoteValidity}
                             clickedCancel={this.cancelNoteHandler}
                             clickedDelete={this.deleteNoteHandler}
                             delDisabled={this.state.noteId === null}
@@ -250,8 +246,8 @@ class NoteEditor extends Component {
 
         if (this.state.error) {
             clearTimeout(this.errorTimeout);
-            this.errorTimeout = setTimeout(()=> {
-                    this.setState({error: null})
+            this.errorTimeout = setTimeout(() => {
+                this.setState({ error: null })
             }, 5000);
         }
 
@@ -270,16 +266,15 @@ const mapStateToProps = state => {
         isStoringNow: state.note.loadingNow,
         error: state.note.error,
         dbActionSuccessful: state.note.saveSuccessful,
-        idToken: state.auth.idToken,
         userId: state.auth.userId,
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
-        onSaveNote: (note, idToken) => dispatch(actions.saveNote(note, idToken)),
-        onUpdateNote: (note, idToken) => dispatch(actions.updateNote(note, idToken)),
-        onDeleteNote: (noteId, idToken) => dispatch(actions.deleteNote(noteId, idToken)),
+        onSaveNote: (note) => dispatch(actions.saveNote(note)),
+        onUpdateNote: (note) => dispatch(actions.updateNote(note)),
+        onDeleteNote: (noteId) => dispatch(actions.deleteNote(noteId)),
         onResetToDefault: () => dispatch(actions.resetToDefault()),
         onRaiseWarning: (message, type) => dispatch(actions.setMessage(message, type)),
     };

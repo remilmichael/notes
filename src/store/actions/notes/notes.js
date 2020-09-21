@@ -110,31 +110,26 @@ export const resetToDefault = () => {
  * 
  * @function saveNote
  * @param {Object} note - Note to be saved
- * @param {String} idToken - JWT token for authentication
  * @returns {Function} - Redux Thunk function
  */
-export const saveNote = (note, idToken) => {
+export const saveNote = (note) => {
     return dispatch => {
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + idToken
-        };
 
         dispatch(dbActionStart());
         axios.post('/notes', note, {
-            headers: headers
+            withCredentials: true
         })
-        .then(() => {
-            dispatch(saveNoteRedux(note));
-            dispatch(dbActionSuccess());
-        })
-        .catch(error => {
-            if (error.response && error.response.data && error.response.data.message) {
-                dispatch(dbActionFailed(error.response.data.message));
-            } else {
-                dispatch(dbActionFailed(defaultErrorMessage));
-            }
-        })
+            .then(() => {
+                dispatch(saveNoteRedux(note));
+                dispatch(dbActionSuccess());
+            })
+            .catch(error => {
+                if (error.response && error.response.data && error.response.data.message) {
+                    dispatch(dbActionFailed(error.response.data.message));
+                } else {
+                    dispatch(dbActionFailed(defaultErrorMessage));
+                }
+            })
     }
 }
 
@@ -147,17 +142,13 @@ export const saveNote = (note, idToken) => {
  * @param {String} idToken - JWT token for authentication
  * @returns {Function} - Redux Thunk function
  */
-export const updateNote = (note, idToken) => {
+export const updateNote = (note) => {
     return dispatch => {
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + idToken
-        };
 
         dispatch(dbActionStart());
-        axios.put('/notes', note,{
-                headers: headers
-            })
+        axios.put('/notes', note, {
+            withCredentials: true
+        })
             .then(() => {
                 dispatch(updateNoteInRedux(note));
                 dispatch(dbActionSuccess());
@@ -181,24 +172,21 @@ export const updateNote = (note, idToken) => {
  */
 export const deleteNote = (noteId, idToken) => {
     return dispatch => {
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + idToken
-        };
+
         dispatch(dbActionStart());
         axios.delete('/notes/' + noteId, {
-            headers: headers
+            withCredentials: true
         })
-        .then(() => {
-            dispatch(deleteNoteFromRedux(noteId));
-            dispatch(dbActionSuccess());
-        })
-        .catch(error => {
-            if (error.response && error.response.data && error.response.data.message) {
-                dispatch(dbActionFailed(error.response.data.message));
-            } else {
-                dispatch(dbActionFailed(defaultErrorMessage));
-            }
-        })
+            .then(() => {
+                dispatch(deleteNoteFromRedux(noteId));
+                dispatch(dbActionSuccess());
+            })
+            .catch(error => {
+                if (error.response && error.response.data && error.response.data.message) {
+                    dispatch(dbActionFailed(error.response.data.message));
+                } else {
+                    dispatch(dbActionFailed(defaultErrorMessage));
+                }
+            })
     };
 }

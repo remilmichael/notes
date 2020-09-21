@@ -7,7 +7,7 @@ import * as actions from "../../store/actions/index";
 import SpinnerAndButton from "../../component/UI/SpinnerAndButton/SpinnerAndButton";
 import classes from "./NoteViewer.module.css";
 
-class MainPage extends Component {
+class NoteViewer extends Component {
   componentDidMount() {
     this.fetchOrClearNotes();
   }
@@ -24,15 +24,14 @@ class MainPage extends Component {
    */
   fetchOrClearNotes() {
     if (this.props.notelist.length === 0 && !this.props.loading) {
-      if (this.props.idToken !== null && !this.props.fetchFailed) {
+      if (this.props.userId !== null && !this.props.fetchFailed) {
         this.props.onFetchNotes(
-          this.props.idToken,
           this.props.nextRecordNumber
         );
       }
     } else if (
       this.props.notelist.length !== 0 &&
-      this.props.idToken === null
+      this.props.userId === null
     ) {
       this.props.onClearNotes();
     }
@@ -45,7 +44,7 @@ class MainPage extends Component {
    * @function loadMoreNotesHandler
    */
   loadMoreNotesHandler = () => {
-    this.props.onFetchNotes(this.props.idToken, this.props.nextRecordNumber);
+    this.props.onFetchNotes(this.props.nextRecordNumber);
   };
 
   render() {
@@ -67,7 +66,7 @@ class MainPage extends Component {
       });
     }
 
-    if (this.props.hasMoreNotes && this.props.idToken) {
+    if (this.props.hasMoreNotes && this.props.userId) {
       if (this.props.fetchFailed) {
         moreButton = (
           <SpinnerAndButton
@@ -134,7 +133,6 @@ class MainPage extends Component {
 export const mapStateToProps = (state) => {
   return {
     userId: state.auth.userId,
-    idToken: state.auth.idToken,
     notelist: state.notelist.notes,
     nextRecordNumber: state.notelist.nextRecordNumber,
     hasMoreNotes: state.notelist.hasMoreNotes,
@@ -145,10 +143,10 @@ export const mapStateToProps = (state) => {
 
 export const mapDispatchToProps = (dispatch) => {
   return {
-    onFetchNotes: (idToken, nextRecordNumber) =>
-      dispatch(actions.fetchAllNotes(idToken, nextRecordNumber)),
+    onFetchNotes: (nextRecordNumber) =>
+      dispatch(actions.fetchAllNotes(nextRecordNumber)),
     onClearNotes: () => dispatch(actions.clearTitles()),
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(MainPage);
+export default connect(mapStateToProps, mapDispatchToProps)(NoteViewer);

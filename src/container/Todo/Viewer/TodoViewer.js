@@ -16,21 +16,21 @@ function TodoViewer() {
     const history = useHistory();
 
     useEffect(() => {
-        if (!auth.idToken) {
+        if (!auth.userId) {
             dispatch(actions.clearTitles());
             history.push('/login?redirect=todoviewer');
         }
-    }, [auth.idToken, history, dispatch]);
+    }, [auth.userId, history, dispatch]);
 
     useEffect(() => {
         if (todolist.todos.length === 0 &&
             !todolist.fetchFailed &&
-            auth.idToken &&
+            auth.userId &&
             !todolist.loading &&
             todolist.hasMoreTodos) {
-            dispatch(actions.fetchAllTodos(auth.idToken, todolist.nextRecordNumber));
+            dispatch(actions.fetchAllTodos(todolist.nextRecordNumber));
         }
-    }, [todolist, dispatch, auth.idToken]);
+    }, [todolist, dispatch, auth.userId]);
 
 
     /**
@@ -39,7 +39,7 @@ function TodoViewer() {
      * @function loadMoreTodos
      */
     const loadMoreTodos = () => {
-        dispatch(actions.fetchAllTodos(auth.idToken, todolist.nextRecordNumber));
+        dispatch(actions.fetchAllTodos(todolist.nextRecordNumber));
     }
 
     let todoList = todolist.todos.map((item, index) => {
@@ -57,7 +57,7 @@ function TodoViewer() {
     });
 
     let moreButton;
-    if (todolist.hasMoreTodos && auth.idToken) {
+    if (todolist.hasMoreTodos && auth.userId) {
         if (todolist.fetchFailed) {
             moreButton = (
                 <SpinnerAndButton

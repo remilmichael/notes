@@ -51,15 +51,11 @@ export const fetchTitlesSuccess = (titles) => {
  * @param {Number} page - Next record to fetch
  * @returns {Function}
  */
-export const fetchAllTodos = (idToken, page) => {
+export const fetchAllTodos = (page) => {
     return dispatch => {
         dispatch(fetchMoreTitleStart());
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + idToken
-        };
         axios.get(`/todos/page/${page}/${RECORD_COUNT}`, {
-            headers: headers
+            withCredentials: true
         })
             .then((response) => {
                 if (response.data) {
