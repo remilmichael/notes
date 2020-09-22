@@ -41,10 +41,9 @@ function Popup(props) {
     } else if (props.type === 'warning') {
         messageType = classes.popup_warning;
     }
-
     return (
         <>
-            <div className={`${classes.popup} ${messageType} ${visibility}`} data-testid="popup-element">
+            <div className={`${classes.popup} ${visibility} ${messageType}`} data-testid="popup-element">
                 <div className={classes.popup__message}>{props.message}</div>
                 <div className={classes.popup__closeButton} onClick={removePopup} data-testid="close-button">
                     <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-x-circle" fill="currentColor"
