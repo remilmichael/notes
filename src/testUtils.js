@@ -118,18 +118,6 @@ export const mockLocalStorage = (token, expiresOn, userId) => {
     })
 }
 
-/**
- * Initial state of `auth` reducer
- */
-export const authInitialState = {
-    userId: null,
-    logging: false,
-    idToken: null,
-    expiresOn: null,
-    authCheckComplete: false,
-    error: null
-}
-
 export const sampleNotes = [
     { noteId: '123', noteHeading: 'Heading 1' },
     { noteId: '456', noteHeading: 'Heading 2' },

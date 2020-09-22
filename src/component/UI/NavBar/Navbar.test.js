@@ -1,7 +1,8 @@
 import React from 'react';
 
 import Navbar from './Navbar';
-import { checkProps, storeFactory, findByTestAttr, authInitialState } from '../../../testUtils';
+import { checkProps, storeFactory, findByTestAttr } from '../../../testUtils';
+import { authInitialState } from '../../../store/reducers/auth/auth';
 import { shallow } from 'enzyme';
 
 /**
@@ -11,9 +12,9 @@ import { shallow } from 'enzyme';
  * @param {Object} props - Component props specific to this setup.
  * @returns {ShallowWrapper}
  */
-const setup = (initialState={}, props={}) => {
+const setup = (initialState = {}, props = {}) => {
     const store = storeFactory(initialState);
-    return shallow(<Navbar store={store} { ...props } />).dive().dive();
+    return shallow(<Navbar store={store} {...props} />).dive().dive();
 };
 
 

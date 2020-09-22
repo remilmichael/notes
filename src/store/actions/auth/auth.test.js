@@ -10,7 +10,6 @@ const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 
 describe('auth actions', () => {
-    const idToken = 'id123';
     const expiresOn = addDays(new Date(), 1);
     const userId = 'abcd';
 
@@ -23,12 +22,12 @@ describe('auth actions', () => {
 
     it('should create an action to stop spinner and set authentication to success', () => {
         const spy = jest.spyOn(Storage.prototype, 'setItem');
-        const receivedAction = actions.authSuccess(idToken, expiresOn, userId);
+        const receivedAction = actions.authSuccess(expiresOn, userId);
         const expectedAction = {
             type: actionTypes.AUTH_USER_SUCCESS,
-            payload: { idToken, expiresOn, userId }
+            payload: { expiresOn, userId }
         };
-        expect(spy.mock.calls.length).toBe(3);
+        expect(spy.mock.calls.length).toBe(2);
         expect(receivedAction).toEqual(expectedAction);
     });
 
@@ -38,7 +37,7 @@ describe('auth actions', () => {
         const expectedAction = {
             type: actionTypes.AUTH_USER_LOGOUT
         };
-        expect(spy.mock.calls.length).toBe(3);
+        expect(spy.mock.calls.length).toBe(2);
         expect(receivedAction).toEqual(expectedAction);
     });
 
@@ -72,13 +71,12 @@ describe('auth actions', () => {
 
         it('should return actions { AUTH_USER_START, AUTH_USER_SUCCESS } ', (done) => {
             const response = {
-                token: 'abcd',
                 expiresOn: addDays(new Date(), 1) / 1000,
                 userId: '1234'
             }
             const expectedActions = [
                 actions.authStart(),
-                actions.authSuccess(response.token, new Date(response.expiresOn * 1000), response.userId)
+                actions.authSuccess(new Date(response.expiresOn * 1000), response.userId)
             ];
             const store = mockStore({});
             store.dispatch(actions.authUser({ username: 'user', password: 'password' }));
@@ -143,10 +141,9 @@ describe('Testing `tryAutoLogin` action creator', () => {
 
     it('should return action `AUTH_USER_SUCCESS`', () => {
         const expectedActions = [
-            { 
+            {
                 type: actionTypes.AUTH_USER_SUCCESS,
                 payload: {
-                    idToken: token,
                     expiresOn: expiresOn_valid,
                     userId: userId
                 }
@@ -161,7 +158,7 @@ describe('Testing `tryAutoLogin` action creator', () => {
         const expectedActions = [
             { type: actionTypes.AUTH_USER_LOGOUT }
         ];
-        
+
         mockLocalStorage(token, null, userId);
         store.dispatch(actions.tryAutoLogin());
         expect(store.getActions()).toEqual(expectedActions);
@@ -173,7 +170,7 @@ describe('Testing `tryAutoLogin` action creator', () => {
         ];
         mockLocalStorage(token, expiresOn_invalid, userId);
         store.dispatch(actions.tryAutoLogin());
-        expect(store.getActions()).toEqual(expectedActions);  
+        expect(store.getActions()).toEqual(expectedActions);
     });
 
     it('should return action `AUTH_USER_LOGOUT` when no JWT token found in `localStorage`', () => {
@@ -182,7 +179,7 @@ describe('Testing `tryAutoLogin` action creator', () => {
         ];
         mockLocalStorage(undefined, undefined, undefined);
         store.dispatch(actions.tryAutoLogin());
-        expect(store.getActions()).toEqual(expectedActions);  
+        expect(store.getActions()).toEqual(expectedActions);
     });
 
     it('should return action `AUTH_USER_LOGOUT` when no `user id` found in `localStorage`', () => {
@@ -191,6 +188,6 @@ describe('Testing `tryAutoLogin` action creator', () => {
         ];
         mockLocalStorage(token, expiresOn_valid, undefined);
         store.dispatch(actions.tryAutoLogin());
-        expect(store.getActions()).toEqual(expectedActions);  
+        expect(store.getActions()).toEqual(expectedActions);
     });
 });

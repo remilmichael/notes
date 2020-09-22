@@ -13,14 +13,13 @@ import { storeFactory, findByTestAttr, findByIdSelector, addDays } from '../test
  * @param {Object} props - Component props specific to this setup.
  * @returns {ShallowWrapper}
  */
-const setup = (initialState={}, props={}) => {
+const setup = (initialState = {}, props = {}) => {
     const store = storeFactory(initialState);
-    return shallow(<Auth store={store} { ...props } />).dive().dive();
+    return shallow(<Auth store={store} {...props} />).dive().dive();
 };
 
 const sampleResponse = {
-    token: 'token1234',
-    expiresOn: Math.round(addDays(new Date(), 1).getTime()/1000),
+    expiresOn: Math.round(addDays(new Date(), 1).getTime() / 1000),
     userId: '123'
 }
 
@@ -49,9 +48,8 @@ describe('User authenticates', () => {
                 const authReceivedState = wrapper.instance().props.store.getState().auth;
                 const expectedState = {
                     userId: sampleResponse.userId,
-                    idToken: sampleResponse.token,
                     expiresOn: new Date(sampleResponse.expiresOn * 1000),
-                    authCheckComplete: true, 
+                    authCheckComplete: true,
                     error: null,
                     logging: false,
                 }
@@ -72,7 +70,6 @@ describe('User authenticates', () => {
                 const expectedState = {
                     userId: null,
                     expiresOn: null,
-                    idToken: null,
                     logging: false,
                     authCheckComplete: true,
                     error: 'Invalid credentials'

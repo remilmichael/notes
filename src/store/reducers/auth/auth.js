@@ -4,7 +4,7 @@ import { updateObject } from '../../../utility';
 /**
  * Initial state given to the `reducer` function.
  */
-const initialState = {
+export const initialState = {
     userId: null, // userId of the user
     logging: false, // For spinner
     expiresOn: null, // Token expiry timestamp
