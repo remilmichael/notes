@@ -6,6 +6,7 @@ import classes from './Popup.module.css';
  * @param {Object} props 
  * @property {Boolean} props.show - Determines whether to show the popup.
  * @property {String} props.message - Message given in to the popup.
+ * @property {String} props.type - Type of message (success, error or warning)
  */
 function Popup(props) {
     const [visibility, setVisibility] = React.useState('');
@@ -32,9 +33,18 @@ function Popup(props) {
         return (<> </>);
     }
 
+    let messageType;
+    if (props.type === 'success') {
+        messageType = classes.popup_success;
+    } else if (props.type === 'error') {
+        messageType = classes.popup_error;
+    } else if (props.type === 'warning') {
+        messageType = classes.popup_warning;
+    }
+
     return (
         <>
-            <div className={`${classes.popup} ${visibility}`} data-testid="popup-element">
+            <div className={`${classes.popup} ${messageType} ${visibility}`} data-testid="popup-element">
                 <div className={classes.popup__message}>{props.message}</div>
                 <div className={classes.popup__closeButton} onClick={removePopup} data-testid="close-button">
                     <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-x-circle" fill="currentColor"
