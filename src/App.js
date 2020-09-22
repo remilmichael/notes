@@ -7,6 +7,7 @@ import Logout from './container/Auth/Logout/Logout';
 import NoteViewer from './container/NoteViewer/NoteViewer';
 import TodoViewer from './container/Todo/Viewer/TodoViewer';
 import TodoEditor from './container/Todo/Editor/TodoEditor';
+import CreateAccount from './container/Auth/CreateAccount/CreateAccount';
 import TestComponent from './TestComponent'
 import { connect } from 'react-redux';
 import * as actions from './store/actions/index';
@@ -28,6 +29,7 @@ class App extends Component {
           <Route path="/note" component={NoteEditor} />
           <Route path="/logout" component={Logout} exact />
           <Route path="/login" component={Auth} exact />
+          <Route path="/create-account" component={CreateAccount} exact />
           <Route path="/todo" component={TodoEditor} />
           <Route path="/todoviewer" component={TodoViewer} />
           <Route path="/noteviewer" component={NoteViewer} />
@@ -42,6 +44,7 @@ class App extends Component {
           <Route path="/note" component={NoteEditor} />
           <Route path="/todo" component={TodoEditor} />
           <Route path="/login" component={Auth} exact />
+          <Route path="/create-account" component={CreateAccount} exact />
           <Route path="/noteviewer" component={NoteViewer} />
           <Route path="/test" component={TestComponent} />
           <Route path="/" component={Homepage} />
@@ -60,7 +63,7 @@ class App extends Component {
 
 export const mapStateToProps = state => {
   return {
-    isAuthenticated: state.auth.idToken !== null
+    isAuthenticated: state.auth.userId !== null
   };
 }
 
