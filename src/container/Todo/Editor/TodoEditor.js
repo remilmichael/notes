@@ -155,7 +155,7 @@ function TodoEditor() {
    * To perform actions later on multiple todo items (e.g. delete)
    *
    * @function handleCheckBoxEvent
-   * @param {Event} event - Event on checkbox
+   * @param {event} event - Event on checkbox
    */
   const handleCheckBoxEvent = (event) => {
     const isChecked = event.target.checked
@@ -192,7 +192,7 @@ function TodoEditor() {
    *      against the label
    *
    * @function singleItemDeleteHandler
-   * @param {Number} index
+   * @param {number} index
    */
   const singleItemDeleteHandler = (index) => {
     dispatch({ type: actions.DELETE_ITEM, payload: index })
@@ -204,7 +204,7 @@ function TodoEditor() {
    *      to edit an already existing item.
    *
    * @function itemEditHandler
-   * @param {Number} index
+   * @param {number} index
    */
   const itemEditHandler = (index) => {
     setEditItemIndex(index)

@@ -1,5 +1,9 @@
 import React from 'react';
+import CryptoJS from 'crypto-js';
+import bcryptjs from 'bcryptjs';
 
+import Axios from '../../../axios-notes';
+import { ReactComponent as GreenTick } from '../../../assets/greentick.svg'
 import classes from './CreateAccount.module.css';
 
 function CreateAccount() {
@@ -7,18 +11,27 @@ function CreateAccount() {
     const [username, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [passwordRetry, setPasswordRetry] = React.useState('');
-    const [currentEventIndex, setCurrentEventIndex] = React.useState(0);
+    const [currentEventIndex, setCurrentEventIndex] = React.useState(-1);
+    const [error, setError] = React.useState(null);
+    const [disableInput, setDisableInput] = React.useState(false);
+    const [success, setSuccess] = React.useState(false);
 
     const signupEvents = [
         'Checking username',
         'Creating secret keys',
-        'Saving to database'
+        'Creating user account'
     ];
 
     React.useEffect(() => {
         document.title = 'Create an account';
     }, [])
 
+    /**
+     * Function to reset the form
+     * 
+     * @function resetForm
+     * @param {MouseEvent|KeyboardEvent} event - Click/KeyPress event on button
+     */
     const resetForm = (event) => {
         event.preventDefault();
         setUsername('');
@@ -26,9 +39,83 @@ function CreateAccount() {
         setPasswordRetry('');
     }
 
+    /**
+     * 
+     * @param {MouseEvent} event 
+     */
     const submitForm = (event) => {
         event.preventDefault();
+        setError(null);
+        if (username.trim().length === 0) {
+            setError(`Username can't be empty`);
+        } else if (username.trim().length < 5) {
+            setError(`Username should be atleast 5 characters long`);
+        } else if (password.trim().length < 8) {
+            setError('Password should be atleast 8 characters long');
+        } else if (password.trim().length > 32) {
+            setError('Password max. length is 32 characters');
+        } else if (passwordRetry !== password) {
+            setError('Passwords does not match');
+        } else {
+            setDisableInput(true);
+            createAccount();
+        }
+        // createAccount();
     }
+
+    const createAccount = async () => {
+        let userExists = true;
+        try {
+            setCurrentEventIndex((index) => index + 1);
+            const requestBody = {
+                username: username
+            }
+            const response = await Axios.post('/check-username', requestBody);
+            if (response) {
+                if (response.data === true) {
+                    setCurrentEventIndex(-1);
+                    setError('Username already taken');
+                } else if (response.data === false) {
+                    userExists = false;
+                }
+            } else {
+                setError('Something went wrong')
+            }
+        } catch (error) {
+            setCurrentEventIndex(-1);
+            console.log(error);
+        }
+
+        if (!userExists) {
+            setCurrentEventIndex((index) => index + 1);
+            const salt = CryptoJS.lib.WordArray.random(128 / 8);
+            const key = CryptoJS.PBKDF2(username + password + new Date().getTime(), salt, {
+                keySize: 256 / 32,
+            });
+            const encryptedKey = CryptoJS.AES.encrypt(key.toString(), password); // 128 chars Base64
+            const hmac = CryptoJS.HmacSHA256(encryptedKey, username + password); // 64 chars Base64
+            const finalKey = hmac.toString() + encryptedKey.toString();
+            const hashedPassword = bcryptjs.hashSync(password, 10);
+
+            const requestObject = {
+                username: username,
+                password: hashedPassword,
+                secretKey: finalKey,
+                creationTimestamp: new Date().getTime()
+            }
+            setCurrentEventIndex((index) => index + 1);
+            try {
+                const response = await Axios.post('/create-account', requestObject);
+                if (response) {
+                    setCurrentEventIndex(-1);
+                    setSuccess(true);
+                }
+            } catch (error) {
+                setError('Something went wrong');
+            }
+        }
+    }
+
     return (
         <main>
             <form className={classes.Form}>
@@ -39,6 +126,8 @@ function CreateAccount() {
                     id="username"
                     placeholder="Enter username"
                     value={username}
+                    required
+                    disabled={disableInput}
                     onChange={(e) => setUsername(e.target.value)} />
                 <label htmlFor="password">Password</label>
                 <input
@@ -46,6 +135,8 @@ function CreateAccount() {
                     id="password"
                     placeholder="Enter password"
                     value={password}
+                    required
+                    disabled={disableInput}
                     onChange={(e) => setPassword(e.target.value)} />
                 <label htmlFor="confirm-password">Re-enter password</label>
                 <input
@@ -53,15 +144,33 @@ function CreateAccount() {
                     id="confirm-password"
                     placeholder="Confirm password"
                     value={passwordRetry}
+                    required
+                    disabled={disableInput}
                     onChange={(e) => setPasswordRetry(e.target.value)} />
+                {error ? <p className={classes.Form_error}>{error}</p> : null}
                 <div className={classes.Form_buttonPalette}>
-                    <button id="reset" onClick={(event) => resetForm(event)}>Reset</button>
-                    <button id="create" onClick={(event) => submitForm(event)}>Create Account</button>
+                    <button
+                        id="reset"
+                        disabled={disableInput}
+                        onClick={(event) => resetForm(event)}>Reset</button>
+                    <button
+                        id="create"
+                        disabled={disableInput}
+                        onClick={(event) => submitForm(event)}>Create Account</button>
                 </div>
                 {
                     currentEventIndex !== -1 ?
                         <div className={classes.Form_signupProgress}>
                             <p>{signupEvents[currentEventIndex]}</p>
+                        </div>
+                        :
+                        null
+                }
+                {
+                    success ?
+                        <div className={classes.Form_successMessage}>
+                            <div>User account Created. Login now!</div>
+                            <div className={classes.Form_successMessage__tick}><GreenTick /></div>
                         </div>
                         :
                         null
