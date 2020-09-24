@@ -1,6 +1,7 @@
 import React from 'react';
 import CryptoJS from 'crypto-js';
 import bcryptjs from 'bcryptjs';
+import axios from 'axios';
 
 import Axios from '../../../axios-notes';
 import { ReactComponent as GreenTick } from '../../../assets/greentick.svg'
@@ -16,6 +17,12 @@ function CreateAccount() {
     const [disableInput, setDisableInput] = React.useState(false);
     const [success, setSuccess] = React.useState(false);
 
+    const source = React.useRef(null);
+
+    if (!source.current) {
+        source.current = axios.CancelToken.source();
+    }
+
     const signupEvents = [
         'Checking username',
         'Creating secret keys',
@@ -24,6 +31,12 @@ function CreateAccount() {
 
     React.useEffect(() => {
         document.title = 'Create an account';
+
+        return () => {
+            if (source.current) {
+                source.current.cancel('Unmounted');
+            }
+        }
     }, [])
 
     /**
@@ -69,7 +82,8 @@ function CreateAccount() {
             const requestBody = {
                 username: username
             }
-            const response = await Axios.post('/check-username', requestBody);
+            const response = await Axios.post('/check-username', requestBody,
+                { cancelToken: source.current.token });
             if (response) {
                 if (response.data === true) {
                     setCurrentEventIndex(-1);
@@ -81,8 +95,10 @@ function CreateAccount() {
                 setError('Something went wrong')
             }
         } catch (error) {
-            setCurrentEventIndex(-1);
-            setError(error);
+            if (!axios.isCancel(error)) {
+                setCurrentEventIndex(-1);
+                setError(error);
+            }
         }
 
         if (!userExists) {
@@ -104,14 +120,21 @@ function CreateAccount() {
             }
             setCurrentEventIndex((index) => index + 1);
             try {
-                const response = await Axios.post('/create-account', requestObject);
+                const response = await Axios.post('/create-account', requestObject,
+                    { cancelToken: source.current.token });
                 if (response) {
                     setCurrentEventIndex(-1);
                     setSuccess(true);
                 }
             } catch (error) {
-                setCurrentEventIndex(-1);
-                setError('Something went wrong');
+                if (!axios.isCancel(error)) {
+                    setCurrentEventIndex(-1);
+                    if (error.response && error.response.data && error.response.data.message) {
+                        setError(error.response.data.message)
+                    } else {
+                        setError('Something went wrong');
+                    }
+                }
             }
         }
     }
@@ -177,7 +200,7 @@ function CreateAccount() {
                     success ?
                         <div className={classes.Form_successMessage}>
                             <div>User account Created. Login now!</div>
-                            <div className={classes.Form_successMessage__tick}><GreenTick /></div>
+                            <div className={classes.Form_successMessage__tick}><GreenTick data-testid="greentick" /></div>
                         </div>
                         :
                         null
