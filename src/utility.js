@@ -11,3 +11,5 @@ export const generateHeader = (idToken) => {
         Authorization: "Bearer " + idToken,
     };
 }
+
+export const ROOT_URL = "http://localhost:8080/api";

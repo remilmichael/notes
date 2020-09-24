@@ -60,7 +60,6 @@ function CreateAccount() {
             setDisableInput(true);
             createAccount();
         }
-        // createAccount();
     }
 
     const createAccount = async () => {
@@ -83,7 +82,7 @@ function CreateAccount() {
             }
         } catch (error) {
             setCurrentEventIndex(-1);
-            console.log(error);
+            setError(error);
         }
 
         if (!userExists) {
@@ -111,6 +110,7 @@ function CreateAccount() {
                     setSuccess(true);
                 }
             } catch (error) {
+                setCurrentEventIndex(-1);
                 setError('Something went wrong');
             }
         }
@@ -118,7 +118,7 @@ function CreateAccount() {
 
     return (
         <main>
-            <form className={classes.Form}>
+            <form className={classes.Form} name="signup_form">
                 <h1>Signup</h1>
                 <label htmlFor="username">Username</label>
                 <input
@@ -147,14 +147,21 @@ function CreateAccount() {
                     required
                     disabled={disableInput}
                     onChange={(e) => setPasswordRetry(e.target.value)} />
-                {error ? <p className={classes.Form_error}>{error}</p> : null}
+
+                {
+                    error ?
+                        <p className={classes.Form_error} data-testid="error-message">{error}</p>
+                        :
+                        null
+                }
+
                 <div className={classes.Form_buttonPalette}>
                     <button
-                        id="reset"
+                        id="resetButton"
                         disabled={disableInput}
                         onClick={(event) => resetForm(event)}>Reset</button>
                     <button
-                        id="create"
+                        id="createButton"
                         disabled={disableInput}
                         onClick={(event) => submitForm(event)}>Create Account</button>
                 </div>

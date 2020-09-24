@@ -10,7 +10,7 @@ import Spinner from '../../component/UI/Spinner/Spinner';
 import Alert from '../../component/UI/Alert/Alert';
 import Actions from './Action/Action';
 import Input from './Input/Input';
-import { ROOT_URL } from '../../axios-notes';
+import { ROOT_URL } from '../../utility';
 
 class NoteEditor extends Component {
 

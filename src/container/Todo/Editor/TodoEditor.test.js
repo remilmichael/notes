@@ -4,9 +4,6 @@ import {
     screen,
     fireEvent,
     waitFor,
-    findByText,
-    waitForElementToBeRemoved,
-    queryByTestId
 } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { Router } from 'react-router-dom'
@@ -15,7 +12,8 @@ import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 
 import TodoEditor from './TodoEditor'
-import { storeFactory, authInitialState } from '../../../testUtils'
+import { storeFactory, authInitialState } from '../../../testUtils';
+import { ROOT_URL } from '../../../utility';
 
 const sampleTodos = [
     'This is todo task 0',
@@ -363,7 +361,7 @@ describe('Striking and unstriking todos', () => {
 // the server inside a single `describe` to avoid unexpected errors.
 describe('Saving and fetching to/from database', () => {
     const server = setupServer(
-        rest.post('http://localhost:8080/api/todos', (req, res, ctx) => {
+        rest.post(`${ROOT_URL}/todos`, (req, res, ctx) => {
             return res(
                 ctx.status(200),
                 ctx.set({ 'Access-Control-Allow-Origin': '*' })
@@ -446,7 +444,7 @@ describe('Saving and fetching to/from database', () => {
     it('should display `Alert` when response failed', async () => {
         const defultErrorMessage = 'Something went wrong'
         server.use(
-            rest.post('http://localhost:8080/api/todos', (req, res, ctx) => {
+            rest.post(`${ROOT_URL}/todos`, (req, res, ctx) => {
                 return res(ctx.status(401), ctx.set({ 'Access-Control-Allow-Origin': '*' }))
             })
         )
@@ -473,7 +471,7 @@ describe('Saving and fetching to/from database', () => {
 
     it('should render the todo items, make changes and push it back to the server', async () => {
         server.use(
-            rest.get(`http://localhost:8080/api/todos/${sampleFetchResponse.todoId}`, (req, res, ctx) => {
+            rest.get(`${ROOT_URL}/todos/${sampleFetchResponse.todoId}`, (req, res, ctx) => {
                 return res(
                     ctx.status(200),
                     ctx.set({ 'Access-Control-Allow-Origin': '*' }),
@@ -482,7 +480,7 @@ describe('Saving and fetching to/from database', () => {
             })
         )
         server.use(
-            rest.put('http://localhost:8080/api/todos', (req, res, ctx) => {
+            rest.put(`${ROOT_URL}/todos/`, (req, res, ctx) => {
                 return res(
                     ctx.status(200),
                     ctx.set({ 'Access-Control-Allow-Origin': '*' })
@@ -511,7 +509,7 @@ describe('Saving and fetching to/from database', () => {
         let errorReceived;
         window.alert = (error) => { errorReceived = error }
         server.use(
-            rest.get(`http://localhost:8080/api/todos/${sampleFetchResponse.todoId}`, (req, res, ctx) => {
+            rest.get(`${ROOT_URL}/todos/${sampleFetchResponse.todoId}`, (req, res, ctx) => {
                 return res(
                     ctx.status(401),
                     ctx.set({ 'Access-Control-Allow-Origin': '*' }),
@@ -526,7 +524,7 @@ describe('Saving and fetching to/from database', () => {
 
     it('should delete the fetched todo', async () => {
         server.use(
-            rest.get(`http://localhost:8080/api/todos/${sampleFetchResponse.todoId}`, (req, res, ctx) => {
+            rest.get(`${ROOT_URL}/todos/${sampleFetchResponse.todoId}`, (req, res, ctx) => {
                 return res(
                     ctx.status(200),
                     ctx.set({ 'Access-Control-Allow-Origin': '*' }),
@@ -535,7 +533,7 @@ describe('Saving and fetching to/from database', () => {
             })
         )
         server.use(
-            rest.delete(`http://localhost:8080/api/todos/${sampleFetchResponse.todoId}`, (req, res, ctx) => {
+            rest.delete(`${ROOT_URL}/todos/${sampleFetchResponse.todoId}`, (req, res, ctx) => {
                 return res(
                     ctx.status(200),
                     ctx.set({ 'Access-Control-Allow-Origin': '*' }),
@@ -557,7 +555,7 @@ describe('Saving and fetching to/from database', () => {
         window.alert = (error) => { errorReceived = error }
 
         server.use(
-            rest.get(`http://localhost:8080/api/todos/${sampleFetchResponse.todoId}`, (req, res, ctx) => {
+            rest.get(`${ROOT_URL}/todos/${sampleFetchResponse.todoId}`, (req, res, ctx) => {
                 return res(
                     ctx.status(200),
                     ctx.set({ 'Access-Control-Allow-Origin': '*' }),
@@ -566,7 +564,7 @@ describe('Saving and fetching to/from database', () => {
             })
         )
         server.use(
-            rest.delete(`http://localhost:8080/api/todos/${sampleFetchResponse.todoId}`, (req, res, ctx) => {
+            rest.delete(`${ROOT_URL}/todos/${sampleFetchResponse.todoId}`, (req, res, ctx) => {
                 return res(
                     ctx.status(401),
                     ctx.set({ 'Access-Control-Allow-Origin': '*' }),

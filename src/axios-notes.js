@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-export const ROOT_URL = 'http://localhost:8080/api';
+import { ROOT_URL } from './utility';
 
 const instance = axios.create({
     baseURL: ROOT_URL,
