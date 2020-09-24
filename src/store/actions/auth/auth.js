@@ -1,10 +1,9 @@
 import * as actions from '../actionTypes';
 import axios from 'axios';
+import CryptoJS from 'crypto-js';
 
-/**
- * Authentication end point
- */
-const loginUrl = "http://localhost:8080/api/authenticate";
+import { ROOT_URL } from '../../../utility';
+
 
 /**
  * Action creator to start the spinner up
@@ -134,20 +133,36 @@ export const tryAutoLogin = () => {
  * Async Action Creators will validate the credential given
  * 
  * @function authUser
- * @param {Object} credential - Contains username and password
+ * @param {Object} credential
+ * @param {string} credential.username
+ * @param {string} credential.password
  * @returns {function}
  */
 export const authUser = (credential) => {
     return dispatch => {
         dispatch(authStart());
-        axios.post(loginUrl, credential, { withCredentials: true })
+        axios.post(`${ROOT_URL}/authenticate`, credential, { withCredentials: true })
             .then(response => {
-                const expiresOn = new Date(response.data.expiresOn * 1000);
-                const userId = response.data.userId;
-
-                if (!expiresOn || !userId) {
+                let expiresOn, userId, secretKey;
+                if (response.data) {
+                    expiresOn = new Date(response.data.expiresOn * 1000);
+                    userId = response.data.userId;
+                    secretKey = response.data.secretKey;
+                    const hmac = secretKey.substring(0, 64);
+                    const encryptedKey = secretKey.substring(64, secretKey.length);
+                    const computedHmac = CryptoJS.HmacSHA256(encryptedKey, credential.username + credential.password);
+                    if (hmac !== computedHmac.toString()) {
+                        dispatch(authFailed('WARNING: Secret tampered'));
+                    } else {
+                        secretKey = CryptoJS.AES.decrypt(encryptedKey, credential.password).toString(CryptoJS.enc.Utf8);
+                    }
+                }
+                if (!expiresOn || !userId || !secretKey) {
                     dispatch(authFailed("Unknown error."));
                 } else {
+
+
+
                     dispatch(authSuccess(expiresOn, userId));
                     dispatch(checkAuthTimeOut(expiresOn - new Date().getTime()));
                 }

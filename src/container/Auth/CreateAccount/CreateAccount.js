@@ -116,7 +116,7 @@ function CreateAccount() {
                 keySize: 256 / 32,
             });
             const encryptedKey = CryptoJS.AES.encrypt(key.toString(), password); // 128 chars Base64
-            const hmac = CryptoJS.HmacSHA256(encryptedKey, username + password); // 64 chars Base64
+            const hmac = CryptoJS.HmacSHA256(encryptedKey.toString(), username + password); // 64 chars Base64
             const finalKey = hmac.toString() + encryptedKey.toString();
             const hashedPassword = bcryptjs.hashSync(password, 10);
 
