@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Container, Row, Col } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
 
-import AuthPresentationalComponents from './AuthComponents';
-import Spinner from '../../component/UI/Spinner/Spinner';
-import * as actions from '../../store/actions/index';
-import Alert from '../../component/UI/Alert/Alert';
+import SigninComponent from './SigninComponent/SigninComponent';
+import Spinner from '../../../component/UI/Spinner/Spinner';
+import * as actions from '../../../store/actions/index';
+import classes from './Signin.module.css';
 
 class Auth extends Component {
 
@@ -49,9 +48,12 @@ class Auth extends Component {
 
     /**
      * Function to start sign-in process 
+     * 
      * @function loginHandler
+     * @param {Event} event - Event object
      */
-    loginHandler = () => {
+    loginHandler = (event) => {
+        event.preventDefault();
         if (this.state.username === null || this.state.username.trim() === '') {
             this.setState({ error: "Username can't be empty", errorType: "warning" });
         } else if (this.state.password === null || this.state.password.trim() === '') {
@@ -67,6 +69,7 @@ class Auth extends Component {
 
     /**
      * Function to navigate to home page
+     * 
      * @function goBackHandler
      */
     goBackHandler = () => {
@@ -86,11 +89,11 @@ class Auth extends Component {
             currentLoginComponent = <Spinner data-test="component-spinner" />;
         } else {
             currentLoginComponent = (
-                <AuthPresentationalComponents
+                <SigninComponent
                     data-test="component-loginform"
                     userNameChanged={this.usernameChangeHandler}
                     passwordChanged={this.passwordChangeHandler}
-                    loginClicked={this.loginHandler}
+                    loginClicked={(event) => this.loginHandler(event)}
                     cancelClicked={this.goBackHandler}
                 />
             );
@@ -105,27 +108,20 @@ class Auth extends Component {
 
         return (
             <>
-                <Container className="mt-5 pt-2" data-test="component-container">
-                    <Row>
-                        <Col className={'col-12 offset-0 col-md-5 offset-md-4'}>
-                            {currentLoginComponent}
-                        </Col>
-                    </Row>
-                    <Row className="mt-4">
-                        <Col className="col-md-5 offset-md-4 text-center">
-                            {
-                                this.state.error
-                                    ?
-                                    <Alert
-                                        data-test="component-alert"
-                                        type={this.state.errorType}
-                                        message={this.state.error} />
-                                    :
-                                    null
-                            }
-                        </Col>
-                    </Row>
-                </Container>
+                {
+                    currentLoginComponent
+                }
+                {
+                    this.state.error
+                        ?
+                        <div
+                            className={classes.Alert}
+                            data-test="component-alert">
+                            {this.state.error}
+                        </div>
+                        :
+                        null
+                }
             </>
         );
     }

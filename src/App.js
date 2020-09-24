@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Navbar from './component/UI/NavBar/Navbar';
 import { Route, Switch } from 'react-router-dom';
 import NoteEditor from './container/NoteEditor/NoteEditor';
-import Auth from './container/Auth/Auth';
+import Signin from './container/Auth/SignIn/Signin';
 import Logout from './container/Auth/Logout/Logout';
 import NoteViewer from './container/NoteViewer/NoteViewer';
 import TodoViewer from './container/Todo/Viewer/TodoViewer';
@@ -28,7 +28,7 @@ class App extends Component {
         <Switch>
           <Route path="/note" component={NoteEditor} />
           <Route path="/logout" component={Logout} exact />
-          <Route path="/login" component={Auth} exact />
+          <Route path="/login" component={Signin} exact />
           <Route path="/create-account" component={CreateAccount} exact />
           <Route path="/todo" component={TodoEditor} />
           <Route path="/todoviewer" component={TodoViewer} />
@@ -43,7 +43,7 @@ class App extends Component {
           <Route path="/todoviewer" component={TodoViewer} />
           <Route path="/note" component={NoteEditor} />
           <Route path="/todo" component={TodoEditor} />
-          <Route path="/login" component={Auth} exact />
+          <Route path="/login" component={Signin} exact />
           <Route path="/create-account" component={CreateAccount} exact />
           <Route path="/noteviewer" component={NoteViewer} />
           <Route path="/test" component={TestComponent} />

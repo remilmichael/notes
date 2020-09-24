@@ -2,7 +2,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import moxios from 'moxios';
 
-import Auth from '../container/Auth/Auth';
+import Signin from '../container/Auth/SignIn/Signin';
 import { storeFactory, findByTestAttr, findByIdSelector, addDays } from '../testUtils';
 
 
@@ -15,7 +15,7 @@ import { storeFactory, findByTestAttr, findByIdSelector, addDays } from '../test
  */
 const setup = (initialState = {}, props = {}) => {
     const store = storeFactory(initialState);
-    return shallow(<Auth store={store} {...props} />).dive().dive();
+    return shallow(<Signin store={store} {...props} />).dive().dive();
 };
 
 const sampleResponse = {
@@ -31,7 +31,7 @@ describe('User authenticates', () => {
         wrapper.setState({ username: 'user', password: 'pass' });
         const component = findByTestAttr(wrapper, 'component-loginform').dive();
         const loginBtn = findByIdSelector(component, 'loginBtn');
-        loginBtn.simulate('click');
+        loginBtn.simulate('click', { preventDefault: () => { } });
     })
 
     afterEach(() => {

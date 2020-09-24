@@ -1,8 +1,8 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import Auth from './Auth';
-import { storeFactory, findByTestAttr, findByIdSelector } from '../../testUtils';
+import Signin from './Signin';
+import { storeFactory, findByTestAttr, findByIdSelector } from '../../../testUtils';
 
 
 /**
@@ -33,9 +33,9 @@ const messageInitialState = {
  * @param {Object} props - Component props specific to this setup.
  * @returns {ShallowWrapper}
  */
-const setup = (initialState={}, props={}) => {
+const setup = (initialState = {}, props = {}) => {
     const store = storeFactory(initialState);
-    return shallow(<Auth store={store} { ...props } />).dive().dive();
+    return shallow(<Signin store={store} {...props} />).dive().dive();
 }
 
 
@@ -45,10 +45,6 @@ describe('When user is `NOT` logged in', () => {
         wrapper = setup({});
     });
 
-    test('should render the `Container`', () => {
-        const component = findByTestAttr(wrapper, 'component-container');
-        expect(component.length).toBe(1);
-    });
     test('should render `login form`', () => {
         const component = findByTestAttr(wrapper, 'component-loginform');
         expect(component.length).toBe(1);
@@ -124,7 +120,7 @@ describe('When alert `message` is set', () => {
 });
 
 describe('When user is logging in - `loading`', () => {
-    
+
     const auth = {
         ...authInitialState,
         logging: true
@@ -161,13 +157,13 @@ describe('Simulating events', () => {
     });
 
     describe('Change textfield value', () => {
-    
+
         it('should update the state without error', () => {
             const usernameTF = findByIdSelector(loginComponent, 'username');
             const passwordTF = findByIdSelector(loginComponent, 'password');
 
-            usernameTF.simulate('change', { target: { value: username }});
-            passwordTF.simulate('change', { target: { value: password }});
+            usernameTF.simulate('change', { target: { value: username } });
+            passwordTF.simulate('change', { target: { value: password } });
             expect(wrapper.state('username')).toEqual(username);
             expect(wrapper.state('password')).toEqual(password);
         });
@@ -178,10 +174,10 @@ describe('Simulating events', () => {
             const usernameTF = findByIdSelector(loginComponent, 'username');
             const passwordTF = findByIdSelector(loginComponent, 'password');
             const loginBtn = findByIdSelector(loginComponent, 'loginBtn');
-            
-            usernameTF.simulate('change', { target: { value: username }});
-            passwordTF.simulate('change', { target: { value: password }});
-            loginBtn.simulate('click');
+
+            usernameTF.simulate('change', { target: { value: username } });
+            passwordTF.simulate('change', { target: { value: password } });
+            loginBtn.simulate('click', { preventDefault: () => { } });
             const isLoading = wrapper.instance().props.store.getState().auth.logging;
             expect(isLoading).toBe(true);
         })
@@ -194,5 +190,5 @@ describe('Simulating events', () => {
             expect(historyMock.push.mock.calls[0]).toEqual(['/']);
         })
     });
-    
+
 });

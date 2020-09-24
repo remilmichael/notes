@@ -1,0 +1,12 @@
+.Alert {
+  position: relative;
+  top: 10rem;
+  max-width: 30rem;
+  margin: 2rem auto;
+  border: 1px solid salmon;
+  padding: 0.5rem;
+  text-align: center;
+  background-color: rgb(224, 36, 77);
+  color: white;
+  border-radius: 10px;
+}
