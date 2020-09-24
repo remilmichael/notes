@@ -53,7 +53,9 @@ function CreateAccount() {
     }
 
     /**
+     * Function to perform form validation
      * 
+     * @function submitForm
      * @param {MouseEvent} event 
      */
     const submitForm = (event) => {
@@ -75,6 +77,12 @@ function CreateAccount() {
         }
     }
 
+    /**
+     * Function to generate keys and submit details 
+     *      to the server.
+     * 
+     * @function createAccount
+     */
     const createAccount = async () => {
         let userExists = true;
         try {
@@ -141,7 +149,7 @@ function CreateAccount() {
 
     return (
         <main>
-            <form className={classes.Form} name="signup_form">
+            <form className={classes.SignupForm} name="signup_form">
                 <h1>Signup</h1>
                 <label htmlFor="username">Username</label>
                 <input
@@ -173,12 +181,12 @@ function CreateAccount() {
 
                 {
                     error ?
-                        <p className={classes.Form_error} data-testid="error-message">{error}</p>
+                        <p className={classes.SignupForm_error} data-testid="error-message">{error}</p>
                         :
                         null
                 }
 
-                <div className={classes.Form_buttonPalette}>
+                <div className={classes.SignupForm_buttonPalette}>
                     <button
                         id="resetButton"
                         disabled={disableInput}
@@ -190,7 +198,7 @@ function CreateAccount() {
                 </div>
                 {
                     currentEventIndex !== -1 ?
-                        <div className={classes.Form_signupProgress}>
+                        <div className={classes.SignupForm_signupProgress}>
                             <p>{signupEvents[currentEventIndex]}</p>
                         </div>
                         :
@@ -198,9 +206,9 @@ function CreateAccount() {
                 }
                 {
                     success ?
-                        <div className={classes.Form_successMessage}>
+                        <div className={classes.SignupForm_successMessage}>
                             <div>User account Created. Login now!</div>
-                            <div className={classes.Form_successMessage__tick}><GreenTick data-testid="greentick" /></div>
+                            <div className={classes.SignupForm_successMessage__tick}><GreenTick data-testid="greentick" /></div>
                         </div>
                         :
                         null

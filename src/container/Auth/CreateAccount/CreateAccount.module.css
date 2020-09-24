@@ -3,7 +3,7 @@ main {
   height: 100vh;
 }
 
-.Form {
+.SignupForm {
   position: relative;
   top: 1rem;
   display: flex;
@@ -16,29 +16,34 @@ main {
   box-shadow: 1px 1px 9px #161e65;
 }
 
-.Form input {
+.SignupForm input {
   font-family: "Montserrat", sans-serif;
+  padding: 0.5rem;
 }
 
-.Form label {
+.Signupform input:focus {
+  background-color: #f5edeb;
+}
+
+.SignupForm label {
   font-weight: bold;
 }
 
-.Form label,
-.Form input {
+.SignupForm label,
+.SignupForm input {
   margin: 0.1rem;
 }
 
-.Form h1 {
+.SignupForm h1 {
   color: #505061;
 }
 
-.Form_buttonPalette {
+.SignupForm_buttonPalette {
   display: flex;
   flex-direction: row;
 }
 
-.Form button {
+.SignupForm button {
   margin-top: 1.5rem;
   padding: 1rem;
   width: 50%;
@@ -48,35 +53,27 @@ main {
   color: white;
 }
 
-input {
-  padding: 0.5rem;
-}
-
-input:focus {
-  background-color: #f5edeb;
-}
-
-.Form button:hover,
-.Form button:active {
+.SignupForm button:hover,
+.SignupForm button:active {
   border: 2px solid #2f4392;
   background-color: #9199cb;
   transition: background-color 400ms;
 }
 
-.Form button:disabled {
+.SignupForm button:disabled {
   background-color: rgb(177, 177, 177);
   color: #cce0ff;
 }
 
-.Form button:focus {
+.SignupForm button:focus {
   outline: unset;
 }
 
-.Form button:first-of-type {
+.SignupForm button:first-of-type {
   margin-right: 0.5rem;
 }
 
-.Form_signupProgress {
+.SignupForm_signupProgress {
   list-style: none;
   margin: 3rem auto;
   padding-left: 0;
@@ -87,13 +84,13 @@ input:focus {
   animation-iteration-count: infinite;
 }
 
-.Form_error {
+.SignupForm_error {
   color: red;
   margin-top: 1.5rem;
   text-align: center;
 }
 
-.Form_successMessage {
+.SignupForm_successMessage {
   margin-top: 2rem;
   color: #086d64;
   font-size: large;
@@ -101,7 +98,7 @@ input:focus {
   justify-content: center;
 }
 
-.Form_successMessage__tick {
+.SignupForm_successMessage__tick {
   width: 20px;
   margin-left: 0.5rem;
 }
@@ -143,7 +140,7 @@ input:focus {
 }
 
 @media (min-width: 40rem) {
-  .Form {
+  .SignupForm {
     top: 7rem;
     padding: 3rem;
     margin: auto;
