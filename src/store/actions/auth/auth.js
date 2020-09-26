@@ -35,8 +35,12 @@ export const authSuccess = (expiresOn, userId, secretKey, encryptionKey, keyId) 
 
     localStorage.setItem('expiresOn', expiresOn);
     localStorage.setItem('userId', userId);
-    localStorage.setItem('encryptionKey', encryptionKey);
-    localStorage.setItem('keyId', keyId);
+    if (encryptionKey) {
+        localStorage.setItem('encryptionKey', encryptionKey);
+    }
+    if (keyId) {
+        localStorage.setItem('keyId', keyId);
+    }
 
     return {
         type: actions.AUTH_USER_SUCCESS,
@@ -60,6 +64,7 @@ export const logout = () => {
     localStorage.removeItem('userId');
     localStorage.removeItem('encryptionKey');
     localStorage.removeItem('keyId');
+    sessionStorage.removeItem('secretKey');
 
     return {
         type: actions.AUTH_USER_LOGOUT
@@ -118,10 +123,25 @@ export const clearError = () => {
  * @returns {function}
  */
 export const tryAutoLogin = () => {
+
     const expiryTime = localStorage.getItem('expiresOn');
     const userId = localStorage.getItem('userId');
     const encryptionKey = localStorage.getItem('encryptionKey');
     const keyId = localStorage.getItem('keyId');
+
+    if (sessionStorage.getItem('secretKey')) {
+        const secretKey = sessionStorage.getItem('secretKey');
+        return dispatch => {
+            if (!expiryTime || !userId) {
+                dispatch(logout());
+            } else {
+                const expiresOn = new Date(expiryTime)
+                dispatch(authSuccess(expiresOn, userId, secretKey));
+                const timeInSeconds = (expiresOn.getTime() - new Date().getTime());
+                dispatch(checkAuthTimeOut(timeInSeconds));
+            }
+        }
+    }
 
     return async (dispatch) => {
         if (!expiryTime || !userId || !encryptionKey || !keyId) {
@@ -178,7 +198,7 @@ export const tryAutoLogin = () => {
  * @param {string} credential.password
  * @returns {function}
  */
-export const authUser = (credential) => {
+export const authUser = (credential, rememberMe) => {
     return async (dispatch) => {
         dispatch(authStart());
         let expiresOn, userId, secretKey;
@@ -197,8 +217,8 @@ export const authUser = (credential) => {
                 } else {
                     secretKey = CryptoJS.AES.decrypt(encryptedKey, credential.password).toString(CryptoJS.enc.Utf8);
                     if (!expiresOn || !userId || !secretKey) {
-                        dispatch(authFailed("Missing credentials in storage"));
-                    } else {
+                        dispatch(authFailed("Something went wrong"));
+                    } else if (rememberMe) {
                         const salt = CryptoJS.lib.WordArray.random(128 / 8);
                         const key = CryptoJS.PBKDF2(credential.username + credential.password + new Date().getTime(), salt, {
                             keySize: 256 / 32,
@@ -228,6 +248,10 @@ export const authUser = (credential) => {
                                 dispatch(authFailed('Something went wrong'));
                             }
                         }
+                    } else {
+                        sessionStorage.setItem('secretKey', secretKey);
+                        dispatch(authSuccess(expiresOn, userId, secretKey));
+                        dispatch(checkAuthTimeOut(expiresOn - new Date().getTime()));
                     }
                 }
             }

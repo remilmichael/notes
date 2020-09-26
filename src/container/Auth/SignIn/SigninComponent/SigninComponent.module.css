@@ -26,6 +26,17 @@
   flex-direction: row;
 }
 
+.LoginForm_Remember {
+  display: flex;
+  align-items: center;
+}
+
+.LoginForm_Remember label {
+  margin-left: 0.5rem;
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+
 .LoginForm button {
   margin-top: 1.5rem;
   padding: 1rem;

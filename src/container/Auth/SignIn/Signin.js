@@ -12,6 +12,7 @@ class Auth extends Component {
     errorTimeout = null;
 
     state = {
+        rememberMe: false,
         username: null,
         password: null,
         error: null,
@@ -63,7 +64,7 @@ class Auth extends Component {
                 username: this.state.username,
                 password: this.state.password
             };
-            this.props.onLogin(credential);
+            this.props.onLogin(credential, this.state.rememberMe);
         }
     }
 
@@ -74,6 +75,19 @@ class Auth extends Component {
      */
     goBackHandler = () => {
         this.props.history.push('/');
+    }
+
+    /**
+     * Function to update the 'Remember me' checkbox
+     *      checked status
+     * 
+     * @function rememberMeHandler
+     * @param {Event} event 
+     */
+    rememberMeHandler = (event) => {
+        this.setState({
+            rememberMe: event.target.checked
+        });
     }
 
     render() {
@@ -95,6 +109,7 @@ class Auth extends Component {
                     passwordChanged={this.passwordChangeHandler}
                     loginClicked={(event) => this.loginHandler(event)}
                     cancelClicked={this.goBackHandler}
+                    rememberMe={(event) => this.rememberMeHandler(event)}
                 />
             );
         }
@@ -139,7 +154,7 @@ export const mapStateToProps = state => {
 
 export const mapDispatchToProps = dispatch => {
     return {
-        onLogin: (credential) => dispatch(actions.authUser(credential)),
+        onLogin: (credential, rememberMe) => dispatch(actions.authUser(credential, rememberMe)),
         onClearError: () => dispatch(actions.clearError()),
         onClearMessage: () => dispatch(actions.unsetMessage())
     };

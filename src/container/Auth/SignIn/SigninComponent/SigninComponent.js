@@ -20,6 +20,12 @@ function Signin(props) {
                 placeholder="Password"
                 onChange={props.passwordChanged}
             />
+            <div className={classes.LoginForm_Remember}>
+                <input type="checkbox"
+                    id="remember"
+                    onClick={props.rememberMe} />
+                <label htmlFor="remember">Remember me</label>
+            </div>
             <div className={classes.LoginForm_buttonPalette}>
                 <button id="loginBtn" onClick={props.loginClicked}>
                     Login
