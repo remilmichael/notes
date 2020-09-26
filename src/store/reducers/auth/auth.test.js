@@ -1,5 +1,6 @@
 import * as actionTypes from '../../actions/actionTypes';
 import { reducer, initialState } from './auth';
+import { goodKey } from '../../../testUtils'
 
 describe('auth Reducer', () => {
 
@@ -16,7 +17,7 @@ describe('auth Reducer', () => {
     test('should return the state upon receiving the action type `AUTH_USER_SUCCESS`', () => {
         const date = new Date();
         date.setDate(date.getDate() + 1);
-        const payload = { expiresOn: date, userId: 'user1' };
+        const payload = { expiresOn: date, userId: 'user1', secretKey: goodKey };
         const newState = reducer(initialState, { type: actionTypes.AUTH_USER_SUCCESS, payload: payload });
         expect(newState).toEqual({ ...initialState, ...payload, logging: false, error: null, authCheckComplete: true });
     });

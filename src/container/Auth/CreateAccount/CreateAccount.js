@@ -105,7 +105,11 @@ function CreateAccount() {
         } catch (error) {
             if (!axios.isCancel(error)) {
                 setCurrentEventIndex(-1);
-                setError(error);
+                if (error.response && error.response.data && error.response.data.message) {
+                    setError(error.response.data.message)
+                } else {
+                    setError('Something went wrong');
+                }
             }
         }
 

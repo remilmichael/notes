@@ -3,7 +3,14 @@ import { shallow } from 'enzyme';
 import moxios from 'moxios';
 
 import Signin from '../container/Auth/SignIn/Signin';
-import { storeFactory, findByTestAttr, findByIdSelector, addDays } from '../testUtils';
+import {
+    storeFactory,
+    findByTestAttr,
+    findByIdSelector,
+    addDays,
+    goodKey,
+    validDecryptedKey
+} from '../testUtils';
 
 
 /**
@@ -20,7 +27,8 @@ const setup = (initialState = {}, props = {}) => {
 
 const sampleResponse = {
     expiresOn: Math.round(addDays(new Date(), 1).getTime() / 1000),
-    userId: '123'
+    userId: 'user123',
+    secretKey: goodKey
 }
 
 describe('User authenticates', () => {
@@ -28,7 +36,7 @@ describe('User authenticates', () => {
     beforeEach(() => {
         moxios.install();
         wrapper = setup({});
-        wrapper.setState({ username: 'user', password: 'pass' });
+        wrapper.setState({ username: 'user123', password: 'password' });
         const component = findByTestAttr(wrapper, 'component-loginform').dive();
         const loginBtn = findByIdSelector(component, 'loginBtn');
         loginBtn.simulate('click', { preventDefault: () => { } });
@@ -39,20 +47,28 @@ describe('User authenticates', () => {
     })
 
     it('should update the auth reducer state with the login credentials without errors', (done) => {
+        const expectedState = {
+            userId: sampleResponse.userId,
+            secretKey: validDecryptedKey,
+            expiresOn: new Date(sampleResponse.expiresOn * 1000),
+            authCheckComplete: true,
+            error: null,
+            logging: false,
+        }
         moxios.wait(() => {
             const request = moxios.requests.mostRecent();
             request.respondWith({
                 status: 200,
                 response: sampleResponse
+            })
+        })
+
+        moxios.wait(() => {
+            const request = moxios.requests.mostRecent();
+            request.respondWith({
+                status: 200
             }).then(() => {
                 const authReceivedState = wrapper.instance().props.store.getState().auth;
-                const expectedState = {
-                    userId: sampleResponse.userId,
-                    expiresOn: new Date(sampleResponse.expiresOn * 1000),
-                    authCheckComplete: true,
-                    error: null,
-                    logging: false,
-                }
                 expect(authReceivedState).toEqual(expectedState);
                 done();
             })
@@ -69,6 +85,7 @@ describe('User authenticates', () => {
             }).then(() => {
                 const expectedState = {
                     userId: null,
+                    secretKey: null,
                     expiresOn: null,
                     logging: false,
                     authCheckComplete: true,

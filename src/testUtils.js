@@ -125,3 +125,6 @@ export const sampleNotes = [
     { noteId: '467', noteHeading: 'Heading 4' },
 ]
 
+export const goodKey = '3b57dafd3e982d351542a5f551864852e10e2815b18af7539bebfabcc30bf053U2FsdGVkX19JxSghJH1iQZhoyHtSWMHqYPQM8gbkgnrhaKUWcSknGPAlxoxA2jSuF7SPMdN40wUvN+lBapQlTDIHtnsCuH8Kn0bLWlOxZWDpHZzyw8TT1yYMpTeMaXx2';
+export const tamperedKey = 'd350a1409e9814339e52e0fecfb10141f15b5754dea98811c942900b3ef3719dU2FsdGVkX1+RTgr7umdGwvZR6BetBeyWOAJKjLztPcILsJ0eNh4Cf6O9venzjWEf8gofUV9lDX9uH8slp6PYliuOU2xbnM/UZqk3gJS/XGKz+PzkunRIsM4coV4u/i6U';
+export const validDecryptedKey = 'c1d5aecca0d635eda02069d6fe5d7b00c3f6d4691cfcec12db18997539739f1b';

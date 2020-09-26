@@ -4,7 +4,13 @@ import thunk from 'redux-thunk'
 
 import * as actionTypes from '../actionTypes';
 import * as actions from './auth';
-import { addDays, mockLocalStorage } from '../../../testUtils';
+import {
+    addDays,
+    mockLocalStorage,
+    tamperedKey,
+    goodKey,
+    validDecryptedKey
+} from '../../../testUtils';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
@@ -27,7 +33,7 @@ describe('auth actions', () => {
             type: actionTypes.AUTH_USER_SUCCESS,
             payload: { expiresOn, userId }
         };
-        expect(spy.mock.calls.length).toBe(2);
+        expect(spy.mock.calls.length).toBe(3);
         expect(receivedAction).toEqual(expectedAction);
     });
 
@@ -70,16 +76,53 @@ describe('auth actions', () => {
         })
 
         it('should return actions { AUTH_USER_START, AUTH_USER_SUCCESS } ', (done) => {
+            const username = 'user123';
+            const password = 'password';
+            const decryptedKey = validDecryptedKey;
             const response = {
                 expiresOn: addDays(new Date(), 1) / 1000,
-                userId: '1234'
+                userId: username,
+                secretKey: goodKey
             }
             const expectedActions = [
                 actions.authStart(),
-                actions.authSuccess(new Date(response.expiresOn * 1000), response.userId)
+                actions.authSuccess(new Date(response.expiresOn * 1000), response.userId, decryptedKey)
             ];
             const store = mockStore({});
-            store.dispatch(actions.authUser({ username: 'user', password: 'password' }));
+            store.dispatch(actions.authUser({ username: username, password: password }));
+            moxios.wait(() => {
+                const request = moxios.requests.mostRecent();
+                request.respondWith({
+                    status: 200,
+                    response: response
+                })
+            })
+
+            moxios.wait(() => {
+                const request = moxios.requests.mostRecent();
+                request.respondWith({
+                    status: 200
+                }).then(() => {
+                    expect(store.getActions()).toEqual(expectedActions);
+                    done();
+                })
+            })
+        });
+
+        it('should return action { AUTH_USER_START, AUTH_USER_FAILED } - tampered keys', (done) => {
+            const username = 'user123';
+            const password = 'password';
+            const response = {
+                expiresOn: addDays(new Date(), 1) / 1000,
+                userId: username,
+                secretKey: tamperedKey
+            }
+            const expectedActions = [
+                actions.authStart(),
+                actions.authFailed('WARNING: Secret tampered!')
+            ];
+            const store = mockStore({});
+            store.dispatch(actions.authUser({ username: username, password: password }));
             moxios.wait(() => {
                 const request = moxios.requests.mostRecent();
                 request.respondWith({
@@ -90,7 +133,8 @@ describe('auth actions', () => {
                     done();
                 })
             })
-        });
+
+        })
 
         it('should return actions { AUTH_USER_START, AUTH_USER_FAILED } ', (done) => {
 
