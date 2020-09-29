@@ -1,5 +1,6 @@
 import * as actions from '../actionTypes';
 import axios from '../../../axios-notes';
+import { encrypt } from '../../../utility';
 
 export const defaultErrorMessage = "CHECK NETWORK CONNECTIVITY";
 
@@ -110,13 +111,23 @@ export const resetToDefault = () => {
  * 
  * @function saveNote
  * @param {Object} note - Note to be saved
+ * @param {string} encryptionKey - Key for encrypting data
+ * @param {string} note.noteId - Note identifier
+ * @param {string} note.noteHeading - Title for the note
+ * @param {string} note.noteBody - Note body/content
+ * @param {string} note.userId - User identifier to which the note belongs to
+ * @param {string} note.lastUpdated - Last updated timestamp in milliseconds
  * @returns {Function} - Redux Thunk function
  */
-export const saveNote = (note) => {
+export const saveNote = (note, encryptionKey) => {
     return dispatch => {
-
+        const encryptedNote = {
+            ...note,
+            noteHeading: encrypt(note.noteHeading, encryptionKey),
+            noteBody: encrypt(note.noteBody, encryptionKey)
+        }
         dispatch(dbActionStart());
-        axios.post('/notes', note, {
+        axios.post('/notes', encryptedNote, {
             withCredentials: true
         })
             .then(() => {
@@ -139,14 +150,23 @@ export const saveNote = (note) => {
  * 
  * @function updateNote
  * @param {Object} note - Note to be updated
- * @param {String} idToken - JWT token for authentication
+ * @param {string} encryptionKey - Key for encrypting data
+ * @param {string} note.noteId - Note identifier
+ * @param {string} note.noteHeading - Title for the note
+ * @param {string} note.noteBody - Note body/content
+ * @param {string} note.userId - User identifier to which the note belongs to
+ * @param {string} note.lastUpdated - Last updated timestamp in milliseconds
  * @returns {Function} - Redux Thunk function
  */
-export const updateNote = (note) => {
+export const updateNote = (note, encryptionKey) => {
     return dispatch => {
-
+        const encryptedNote = {
+            ...note,
+            noteHeading: encrypt(note.noteHeading, encryptionKey),
+            noteBody: encrypt(note.noteBody, encryptionKey)
+        }
         dispatch(dbActionStart());
-        axios.put('/notes', note, {
+        axios.put('/notes', encryptedNote, {
             withCredentials: true
         })
             .then(() => {
@@ -168,9 +188,8 @@ export const updateNote = (note) => {
  * 
  * @function deleteNote
  * @param {String} noteId - Note id to delete
- * @param {String} idToken - JWT authentication token
  */
-export const deleteNote = (noteId, idToken) => {
+export const deleteNote = (noteId) => {
     return dispatch => {
 
         dispatch(dbActionStart());

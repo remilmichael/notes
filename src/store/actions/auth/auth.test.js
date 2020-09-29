@@ -9,7 +9,8 @@ import {
     mockLocalStorage,
     tamperedKey,
     goodKey,
-    validDecryptedKey
+    validDecryptedKey,
+    newKey, keyId
 } from '../../../testUtils';
 
 const middlewares = [thunk];
@@ -19,6 +20,10 @@ describe('auth actions', () => {
     const expiresOn = addDays(new Date(), 1);
     const userId = 'abcd';
 
+    afterEach(() => {
+        jest.clearAllMocks();
+    })
+
     it('should create an action to start spinner while user authenticates', () => {
         const expectAction = {
             type: actionTypes.AUTH_USER_START
@@ -26,24 +31,35 @@ describe('auth actions', () => {
         expect(actions.authStart()).toEqual(expectAction);
     });
 
-    it('should create an action to stop spinner and set authentication to success', () => {
+    it('should return { AUTH_USER_SUCCESS } action creator - Key NOT generated', () => {
         const spy = jest.spyOn(Storage.prototype, 'setItem');
         const receivedAction = actions.authSuccess(expiresOn, userId);
         const expectedAction = {
             type: actionTypes.AUTH_USER_SUCCESS,
             payload: { expiresOn, userId }
         };
-        expect(spy.mock.calls.length).toBe(3);
+        expect(spy.mock.calls.length).toBe(2);
         expect(receivedAction).toEqual(expectedAction);
     });
 
-    it('should clear credentials from `localStorage`', () => {
+    it('should return { AUTH_USER_SUCCESS } action creator - Key generated', () => {
+        const spy = jest.spyOn(Storage.prototype, 'setItem');
+        const receivedAction = actions.authSuccess(expiresOn, userId, validDecryptedKey, newKey, keyId);
+        const expectedAction = {
+            type: actionTypes.AUTH_USER_SUCCESS,
+            payload: { expiresOn, userId, secretKey: validDecryptedKey }
+        };
+        expect(spy.mock.calls.length).toBe(4);
+        expect(receivedAction).toEqual(expectedAction);
+    });
+
+    it('should return { AUTH_USER_LOGOUT } action creator', () => {
         const spy = jest.spyOn(Storage.prototype, 'removeItem');
         const receivedAction = actions.logout();
         const expectedAction = {
             type: actionTypes.AUTH_USER_LOGOUT
         };
-        expect(spy.mock.calls.length).toBe(2);
+        expect(spy.mock.calls.length).toBe(5);
         expect(receivedAction).toEqual(expectedAction);
     });
 
@@ -174,6 +190,7 @@ describe('Testing `tryAutoLogin` action creator', () => {
     })
     afterEach(() => {
         store.clearActions();
+        jest.clearAllMocks();
     })
 
 
@@ -189,7 +206,8 @@ describe('Testing `tryAutoLogin` action creator', () => {
                 type: actionTypes.AUTH_USER_SUCCESS,
                 payload: {
                     expiresOn: expiresOn_valid,
-                    userId: userId
+                    userId: userId,
+                    secretKey: validDecryptedKey
                 }
             }
         ];

@@ -1,10 +1,12 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import moxios from 'moxios';
+import CryptoJS from 'crypto-js'
 
 import AxiosInstance from '../axios-notes';
 import NoteEditor from '../container/NoteEditor/NoteEditor';
-import { storeFactory, authInitialState, findByTestAttr, findByIdSelector } from '../testUtils';
+import { storeFactory, findByTestAttr, findByIdSelector, validDecryptedKey } from '../testUtils';
+import { initialState as authInitialState } from '../store/reducers/auth/auth';
 import { initialState as allNotesInitialState } from '../store/reducers/notelist/notelist';
 
 
@@ -15,19 +17,19 @@ import { initialState as allNotesInitialState } from '../store/reducers/notelist
  * @param {Object} props - Component props specific to this setup.
  * @returns {ShallowWrapper}
  */
-const setup = (initialState={}, props={}) => {
+const setup = (initialState = {}, props = {}) => {
     const store = storeFactory(initialState);
-    return shallow(<NoteEditor store={store} { ...props } />).dive().dive();
+    return shallow(<NoteEditor store={store} {...props} />).dive().dive();
 }
 
 
 describe('Saving note', () => {
-    
+
     let wrapper;
 
     const updatedAuth = {
         ...authInitialState,
-        idToken: 'sampleToken123',
+        secretKey: validDecryptedKey,
         userId: 'id123',
         expiresOn: new Date(),
     };
@@ -38,16 +40,25 @@ describe('Saving note', () => {
         note: 'Sample note body',
     };
 
+    const encryptedHeading = 'U2FsdGVkX1/GIkmverfkVeFF+D/8ehF0TKmK66M9ppnvQg7JaEi6uX1JMKWx2tc5';
+    const encryptedBody = 'U2FsdGVkX1+nBm/CtgR7t2GgRWtg5SnL7+0LRLVNCjnXuieIi2Ss+8ve7/pJbQ8l';
+
     beforeEach(() => {
         moxios.install(AxiosInstance);
-        
+
     });
 
     afterEach(() => {
         moxios.uninstall(AxiosInstance);
     });
 
-    it('should receive the request sent from redux thunk', (done) => {
+    it('should encrypt the note before sending it to the server', (done) => {
+
+        CryptoJS.AES.encrypt = jest.fn().mockImplementationOnce((data, key) => {
+            return encryptedHeading;
+        }).mockImplementationOnce((data, key) => {
+            return encryptedBody;
+        })
         moxios.wait(() => {
             const request = moxios.requests.mostRecent();
             request.respondWith({
@@ -56,13 +67,14 @@ describe('Saving note', () => {
                 const receivedData = JSON.parse(request.config.data);
                 const expectedData = {
                     noteId: receivedData.noteId,
-                    noteHeading: sampleNote.heading,
-                    noteBody: sampleNote.note,
+                    noteHeading: encryptedHeading,
+                    noteBody: encryptedBody,
                     userId: updatedAuth.userId,
                     lastUpdated: receivedData.lastUpdated
                 };
                 expect(receivedData).toEqual(expectedData);
                 done();
+                jest.clearAllMocks();
             })
         })
         wrapper = setup({ auth: updatedAuth });
@@ -71,7 +83,12 @@ describe('Saving note', () => {
         saveBtn.simulate('click');
     });
 
-    it('should add the newly created note in the `allNotes` reducer', (done) => {
+    it('should add the newly created note in the `notelist` reducer', (done) => {
+        CryptoJS.AES.encrypt = jest.fn().mockImplementationOnce((data, key) => {
+            return encryptedHeading;
+        }).mockImplementationOnce((data, key) => {
+            return encryptedBody;
+        })
         moxios.wait(() => {
             const request = moxios.requests.mostRecent();
             request.respondWith({
@@ -85,6 +102,7 @@ describe('Saving note', () => {
                 }
                 expect(recievedNote).toEqual(expectedNote)
                 done();
+                jest.clearAllMocks();
             })
         })
         wrapper = setup({ auth: updatedAuth });
@@ -94,6 +112,11 @@ describe('Saving note', () => {
     });
 
     it('should update the note in redux and position it first on array', (done) => {
+        CryptoJS.AES.encrypt = jest.fn().mockImplementationOnce((data, key) => {
+            return encryptedHeading;
+        }).mockImplementationOnce((data, key) => {
+            return encryptedBody;
+        })
         const sampleNotes = [
             { noteId: '123', noteHeading: 'Heading 1' },
             { noteId: '456', noteHeading: 'Heading 2' },
@@ -110,11 +133,11 @@ describe('Saving note', () => {
             request.respondWith({
                 status: 200
             }).then(() => {
-                expect(wrapper.instance().props.store.getState().notelist.notes[0]).toEqual({...sampleNotes[4], noteHeading: sampleNote.heading});
+                expect(wrapper.instance().props.store.getState().notelist.notes[0]).toEqual({ ...sampleNotes[4], noteHeading: sampleNote.heading });
                 done();
             })
         })
-        wrapper = setup({ auth: updatedAuth, notelist: {...allNotesInitialState, notes: [...sampleNotes]} });
+        wrapper = setup({ auth: updatedAuth, notelist: { ...allNotesInitialState, notes: [...sampleNotes] } });
         wrapper.setState(newNote);
         const saveBtn = findByIdSelector(findByTestAttr(wrapper, 'component-action').dive(), 'saveBtn');
         saveBtn.simulate('click');

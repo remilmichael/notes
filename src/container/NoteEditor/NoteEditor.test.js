@@ -1,7 +1,8 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import { storeFactory, findByTestAttr, findByIdSelector, authInitialState } from '../../testUtils';
+import { storeFactory, findByTestAttr, findByIdSelector, validDecryptedKey } from '../../testUtils';
+import { initialState as authInitialState } from '../../store/reducers/auth/auth';
 import NoteEditor from './NoteEditor';
 import moxios from 'moxios';
 
@@ -12,10 +13,17 @@ const randomNoteId = 'randomId757';
  */
 const sampleResponse = {
     noteId: randomNoteId,
-    noteHeading: 'This is a sample note heading',
-    noteBody: 'I\'m the note body',
+    noteHeading: 'U2FsdGVkX18P7ezuTeD+R9BMucJTxur+R5YE5SEhgti+LohNv/SYEsQPZklVkc6r',
+    noteBody: 'U2FsdGVkX1/GIkmverfkVeFF+D/8ehF0TKmK66M9ppnvQg7JaEi6uX1JMKWx2tc5',
     lastUpdated: new Date(),
 };
+
+const sampleResponseDecrypted = {
+    noteId: randomNoteId,
+    noteHeading: 'This is a sample note heading',
+    noteBody: 'Sample note body',
+    lastUpdated: sampleResponse.lastUpdated
+}
 
 /**
  * Initial state of the `NoteEditor` component
@@ -37,9 +45,9 @@ const noteEditorInitialState = {
  * @param {Object} props - Component props specific to this setup.
  * @returns {ShallowWrapper}
  */
-const setup = (initialState={}, props={}) => {
+const setup = (initialState = {}, props = {}) => {
     const store = storeFactory(initialState);
-    return shallow(<NoteEditor store={store} { ...props } />).dive().dive();
+    return shallow(<NoteEditor store={store} {...props} />).dive().dive();
 };
 
 describe('Accessing `NoteEditor` without signing in', () => {
@@ -50,7 +58,7 @@ describe('Accessing `NoteEditor` without signing in', () => {
         beforeEach(() => {
             wrapper = setup();
         })
-        
+
         it('should NOT render any form components', () => {
             const component = findByTestAttr(wrapper, 'component-inputform');
             expect(component.length).toBe(0);
@@ -65,7 +73,7 @@ describe('Accessing `NoteEditor` without signing in', () => {
         const randomNoteId = 'randomId757';
         let wrapper;
         beforeEach(() => {
-            wrapper = setup({}, { location: { search: { id: randomNoteId }} });
+            wrapper = setup({}, { location: { search: { id: randomNoteId } } });
         });
 
         it('should render `Redirect` component with `noteId` as url parameter', () => {
@@ -81,10 +89,10 @@ describe('Accessing `NoteEditor` without signing in', () => {
 
 
 describe('Accessing `NoteEditor` with valid login credentials', () => {
-    
+
     const authUpdatedState = {
         ...authInitialState,
-        idToken: 'sampleToken123',
+        secretKey: validDecryptedKey,
         userId: 'id123',
         expiresOn: new Date()
     }
@@ -118,13 +126,13 @@ describe('Accessing `NoteEditor` with valid login credentials', () => {
     });
 
     describe('`NoteEditor` with url params', () => {
-        
+
         const expectedState = {
             ...noteEditorInitialState,
-            noteId: sampleResponse.noteId,
-            heading: sampleResponse.noteHeading,
-            note: sampleResponse.noteBody,
-            lastUpdated: sampleResponse.lastUpdated,
+            noteId: sampleResponseDecrypted.noteId,
+            heading: sampleResponseDecrypted.noteHeading,
+            note: sampleResponseDecrypted.noteBody,
+            lastUpdated: sampleResponseDecrypted.lastUpdated,
             fetchingNow: false
         };
 
@@ -137,11 +145,11 @@ describe('Accessing `NoteEditor` with valid login credentials', () => {
         });
 
         it('should render the spinner component', () => {
-            const wrapper = setup({ auth: authUpdatedState }, { location: { search: { id: randomNoteId }}});
+            const wrapper = setup({ auth: authUpdatedState }, { location: { search: { id: randomNoteId } } });
             const spinner = findByTestAttr(wrapper, 'component-spinner');
             expect(spinner.length).toBe(1);
         })
-        
+
         it('should updated the state with mocked data from server', (done) => {
             moxios.wait(() => {
                 const request = moxios.requests.mostRecent();
@@ -149,12 +157,12 @@ describe('Accessing `NoteEditor` with valid login credentials', () => {
                     status: 200,
                     response: sampleResponse
                 }).then(() => {
-                    const updatedState =  wrapper.instance().state;
-                    expect(expectedState).toStrictEqual(updatedState);
+                    const receivedState = wrapper.instance().state;
+                    expect(receivedState).toStrictEqual(expectedState);
                     done();
                 });
             })
-            const wrapper = setup({ auth: authUpdatedState }, { location: { search: { id: randomNoteId }}});
+            const wrapper = setup({ auth: authUpdatedState }, { location: { search: { id: randomNoteId } } });
         });
 
         it('should display an error message on click event of `save` button when both heading and body are empty', (done) => {
@@ -177,7 +185,7 @@ describe('Accessing `NoteEditor` with valid login credentials', () => {
                     done();
                 });
             });
-            const wrapper = setup({ auth: authUpdatedState }, { location: { search: { id: randomNoteId }}}); 
+            const wrapper = setup({ auth: authUpdatedState }, { location: { search: { id: randomNoteId } } });
         });
     });
 });

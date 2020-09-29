@@ -10,7 +10,7 @@ import Spinner from '../../component/UI/Spinner/Spinner';
 import Alert from '../../component/UI/Alert/Alert';
 import Actions from './Action/Action';
 import Input from './Input/Input';
-import { ROOT_URL } from '../../utility';
+import { ROOT_URL, decrypt } from '../../utility';
 
 class NoteEditor extends Component {
 
@@ -35,7 +35,7 @@ class NoteEditor extends Component {
         note: '',
         lastUpdated: null,
         error: null,
-        errorAck: false, // Set to true, when error has been acknowledged properly, since errors are faded after few seconds, to avoid re-rendering due to that.
+        errorAck: false, // Set to true, when error has been acknowledged properly, since errors will be fade after few seconds, to avoid re-rendering due to that.
         fetchingNow: false
     };
 
@@ -115,13 +115,27 @@ class NoteEditor extends Component {
         }
 
         if (data) {
-            this.setState({
-                noteId: response.data["noteId"],
-                heading: response.data["noteHeading"],
-                note: response.data["noteBody"],
-                lastUpdated: response.data["lastUpdated"],
-                fetchingNow: false
-            });
+            let noteId = response.data["noteId"];
+            let heading = response.data["noteHeading"];
+            let noteBody = response.data["noteBody"];
+            let lastUpdated = response.data["lastUpdated"];
+
+            if (noteId && heading && noteBody && lastUpdated) {
+                heading = decrypt(heading, this.props.encryptionKey);
+                noteBody = decrypt(noteBody, this.props.encryptionKey);
+                this.setState({
+                    noteId: noteId,
+                    heading: heading,
+                    note: noteBody,
+                    lastUpdated: lastUpdated,
+                    fetchingNow: false
+                })
+            } else {
+                this.setState({
+                    fetchingNow: false,
+                    error: 'Something went wrong'
+                })
+            }
         }
     }
 
@@ -132,11 +146,16 @@ class NoteEditor extends Component {
      * @function checkNoteValidity
      */
     checkNoteValidity = () => {
-        if (this.state.note === null || this.state.note.trim() === '') {
+        if (!this.state.note || this.state.note.trim() === '') {
             this.setState({
                 error: "Note can't be empty"
             })
-        } else if (this.state.heading === null || this.state.heading.trim() === '') {
+        } else if (this.state.note.length > 48000) {
+            // Max. length is set to 48,000 characters.
+            this.setState({
+                error: `Maximum characters allowed in a single note is 48000. Current count: ${this.state.note.length}`
+            })
+        } else if (!this.state.heading || this.state.heading.trim() === '') {
             let heading = "";
             if (this.state.note.length <= 10) {
                 heading = this.state.note;
@@ -144,8 +163,12 @@ class NoteEditor extends Component {
                 heading = this.state.note.slice(0, 10);
             }
             this.setState({ heading: heading }, () => {
-                // call this function only after the state gets updated.
                 this.saveNoteHandler();
+            });
+        } else if (this.state.heading.length > 150) {
+            // Max. length is set to 150 characters.
+            this.setState({
+                error: `Maximum characters for heading is 150. Current count ${this.state.heading.length}`
             });
         } else {
             this.saveNoteHandler();
@@ -168,9 +191,9 @@ class NoteEditor extends Component {
         };
         if (this.state.noteId === null) {
             note.noteId = uuidv4();
-            this.props.onSaveNote(note);
+            this.props.onSaveNote(note, this.props.encryptionKey);
         } else {
-            this.props.onUpdateNote(note);
+            this.props.onUpdateNote(note, this.props.encryptionKey);
         }
     }
 
@@ -263,6 +286,7 @@ class NoteEditor extends Component {
 
 const mapStateToProps = state => {
     return {
+        encryptionKey: state.auth.secretKey,
         isStoringNow: state.note.loadingNow,
         error: state.note.error,
         dbActionSuccessful: state.note.saveSuccessful,
@@ -272,8 +296,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        onSaveNote: (note) => dispatch(actions.saveNote(note)),
-        onUpdateNote: (note) => dispatch(actions.updateNote(note)),
+        onSaveNote: (note, encryptionKey) => dispatch(actions.saveNote(note, encryptionKey)),
+        onUpdateNote: (note, encryptionKey) => dispatch(actions.updateNote(note, encryptionKey)),
         onDeleteNote: (noteId) => dispatch(actions.deleteNote(noteId)),
         onResetToDefault: () => dispatch(actions.resetToDefault()),
         onRaiseWarning: (message, type) => dispatch(actions.setMessage(message, type)),
