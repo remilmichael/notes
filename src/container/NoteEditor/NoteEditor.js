@@ -203,7 +203,7 @@ class NoteEditor extends Component {
      * @function cancelNoteHandler
      */
     cancelNoteHandler = () => {
-        this.props.history.push('/');
+        this.props.history.push('/noteviewer');
     }
 
     /**
@@ -222,7 +222,7 @@ class NoteEditor extends Component {
         let dispComponent = null;
 
         if (this.props.dbActionSuccessful) {
-            dispComponent = <Redirect data-test="component-redirect-plain" to="/" />;
+            dispComponent = <Redirect data-test="component-redirect-plain" to="/noteviewer" />;
         }
         else if (!this.props.userId) {
             if (this.urlParam_Id) {

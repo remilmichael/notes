@@ -12,7 +12,8 @@ import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 
 import TodoEditor from './TodoEditor'
-import { storeFactory, authInitialState } from '../../../testUtils';
+import { storeFactory, validDecryptedKey } from '../../../testUtils';
+import { initialState as authInitialState } from '../../../store/reducers/auth/auth'
 import { ROOT_URL } from '../../../utility';
 
 const sampleTodos = [
@@ -25,23 +26,55 @@ const sampleTodos = [
 
 const sampleFetchResponse = {
     todoId: 'ce28159b-e2cf-43d8-892c-ac15af89cf43',
+    // todoTitle: 'Sample title',
+    todoTitle: 'U2FsdGVkX18fjurwK7BnIXY4KfVAnPtNO7nJaI8WeY0=',
+    username: 'foo',
+    lastUpdated: '1597731817123',
+    todoItems: [
+        {
+            todoIndex: 0,
+            // todoItem: 'Item 1',
+            todoItem: 'U2FsdGVkX1+etZJ23HzTkLrfeQLTUbOwhdgJlwrZ+Qc=',
+            strike: false
+        },
+        {
+            todoIndex: 1,
+            // todoItem: 'Item 2',
+            todoItem: 'U2FsdGVkX19s3fW3BviJks2JALlnLVL/sQWKHo9dPGg=',
+            strike: false
+        },
+        {
+            todoIndex: 2,
+            // todoItem: 'Item 3',
+            todoItem: 'U2FsdGVkX18IaXwjnJwDs0Tr8fCY2SfJnCK9Z5fVKsM=',
+            strike: false
+        },
+    ]
+}
+
+const sampleFetchResponseDecrypted = {
+    todoId: 'ce28159b-e2cf-43d8-892c-ac15af89cf43',
     todoTitle: 'Sample title',
+    // todoTitle: 'U2FsdGVkX18fjurwK7BnIXY4KfVAnPtNO7nJaI8WeY0=',
     username: 'foo',
     lastUpdated: '1597731817123',
     todoItems: [
         {
             todoIndex: 0,
             todoItem: 'Item 1',
+            // todoItem: 'U2FsdGVkX1+etZJ23HzTkLrfeQLTUbOwhdgJlwrZ+Qc=',
             strike: false
         },
         {
             todoIndex: 1,
             todoItem: 'Item 2',
+            // todoItem: 'U2FsdGVkX19s3fW3BviJks2JALlnLVL/sQWKHo9dPGg=',
             strike: false
         },
         {
             todoIndex: 2,
             todoItem: 'Item 3',
+            // todoItem: 'U2FsdGVkX18IaXwjnJwDs0Tr8fCY2SfJnCK9Z5fVKsM=',
             strike: false
         },
     ]
@@ -49,7 +82,7 @@ const sampleFetchResponse = {
 
 const authUpdatedState = {
     ...authInitialState,
-    idToken: 'sampleToken123',
+    secretKey: validDecryptedKey,
     userId: 'id123',
     expiresOn: new Date()
 }
@@ -439,6 +472,7 @@ describe('Saving and fetching to/from database', () => {
             expect(history.location.pathname).toEqual('/todoviewer')
         })
         expect(history.action).toEqual('REPLACE')
+
     });
 
     it('should display `Alert` when response failed', async () => {
@@ -491,7 +525,7 @@ describe('Saving and fetching to/from database', () => {
         setupWithHistoryProps();
         const todos = await screen.findAllByText(/Item/);
         expect(todos.length).toBe(sampleFetchResponse.todoItems.length);
-        expect(screen.queryByDisplayValue(sampleFetchResponse.todoTitle)).toBeTruthy();
+        expect(screen.queryByDisplayValue(sampleFetchResponseDecrypted.todoTitle)).toBeTruthy();
 
         const addButton = screen.queryByText('Add')
         fireEvent.change(screen.queryByRole('textbox', { name: 'todo-new' }),
@@ -550,7 +584,7 @@ describe('Saving and fetching to/from database', () => {
         expect(history.action).toEqual('PUSH')
     });
 
-    it('should throw an error while trying to delete todo', async () => {
+    it('should throw error while trying to delete todo', async () => {
         let errorReceived;
         window.alert = (error) => { errorReceived = error }
 

@@ -21,6 +21,7 @@ import TextField from '../../../component/UI/TextField/TextField'
 import classes from './TodoEditor.module.css'
 import Spinner from '../../../component/UI/Spinner/Spinner'
 import Alert from '../../../component/UI/Alert/Alert'
+import { encrypt, decrypt } from '../../../utility';
 import * as reduxActionTypes from '../../../store/actions/actionTypes'
 
 function TodoEditor() {
@@ -44,6 +45,8 @@ function TodoEditor() {
     source.current = axios.CancelToken.source()
   }
 
+
+
   useEffect(() => {
     if (urlParamsId && authReduxReducer.userId) {
       dispatch({ type: actions.INIT_SPINNER })
@@ -62,7 +65,7 @@ function TodoEditor() {
             const todos = []
             todoItems.forEach((item) => {
               todos.push({
-                item: item.todoItem,
+                item: decrypt(item.todoItem, authReduxReducer.secretKey),
                 index: item.todoIndex,
                 strike: item.strike
               })
@@ -70,7 +73,7 @@ function TodoEditor() {
             const fetchedTodo = {
               todos: todos,
               todoId: todoId,
-              todoTitle: todoTitle
+              todoTitle: decrypt(todoTitle, authReduxReducer.secretKey)
             }
             dispatch({ type: actions.FETCH_FROM_DB_SUCCESS, payload: fetchedTodo })
           }
@@ -87,7 +90,7 @@ function TodoEditor() {
         }
       })
     }
-  }, [urlParamsId, authReduxReducer.userId, dispatch, history])
+  }, [urlParamsId, authReduxReducer.userId, authReduxReducer.secretKey, dispatch, history])
 
   useEffect(() => {
     document.title = 'ToDo Editor'
@@ -105,6 +108,10 @@ function TodoEditor() {
       }
     }
   }, [dispatch, state.error])
+
+
+
+
 
   /**
    * Function to add a new item in to the todo list
@@ -134,6 +141,9 @@ function TodoEditor() {
     }
   }
 
+
+
+
   /**
    * Checks whether the key pressed was 'Enter' key,
    *      if yes adds the item to the todo list
@@ -146,6 +156,9 @@ function TodoEditor() {
       addItem()
     }
   }
+
+
+
 
   /**
    * Function to handle checkbox state changes, if a
@@ -172,6 +185,8 @@ function TodoEditor() {
     }
   }
 
+
+
   /**
    * Function to delete multiple todo items whose index in
    *      the `selectedCbSet` state
@@ -187,6 +202,8 @@ function TodoEditor() {
     setSelectedCbSet(new Set())
   }
 
+
+
   /**
    * Function to delete the item when clicked on Trash icon
    *      against the label
@@ -199,6 +216,9 @@ function TodoEditor() {
     setSelectedCbSet(new Set())
   }
 
+
+
+
   /**
    * Function to replace the todo item with a textfield
    *      to edit an already existing item.
@@ -209,6 +229,9 @@ function TodoEditor() {
   const itemEditHandler = (index) => {
     setEditItemIndex(index)
   }
+
+
+
 
   /**
    * Function to save changes made to an existing todo item
@@ -233,6 +256,9 @@ function TodoEditor() {
     }
   }
 
+
+
+
   /**
    * Function discard changes made to an existing todo item
    * Calls setEditItemIndex(-1);
@@ -242,6 +268,9 @@ function TodoEditor() {
   const clearEditablesHandler = () => {
     setEditItemIndex(-1)
   }
+
+
+
 
   /**
    * Function either creates a new todo with new
@@ -272,7 +301,7 @@ function TodoEditor() {
       state.todos.forEach((item) => {
         todoItems.push({
           todoIndex: item.index,
-          todoItem: item.item,
+          todoItem: encrypt(item.item, authReduxReducer.secretKey),
           strike: item.strike
         })
       })
@@ -284,14 +313,19 @@ function TodoEditor() {
         todoItems: todoItems
       }
 
+      const encrypted = {
+        ...newTodo,
+        todoTitle: encrypt(newTodo.todoTitle, authReduxReducer.secretKey)
+      }
+
       dispatch({ type: actions.SAVE_TO_DB_START })
 
       try {
         let response
         if (state.fetchTodoId) {
-          response = await Axios.put('/todos', newTodo, { withCredentials: true, cancelToken: source.current.token })
+          response = await Axios.put('/todos', encrypted, { withCredentials: true, cancelToken: source.current.token })
         } else {
-          response = await Axios.post('/todos', newTodo, { withCredentials: true, cancelToken: source.current.token })
+          response = await Axios.post('/todos', encrypted, { withCredentials: true, cancelToken: source.current.token })
         }
         if (response) {
           dispatch({ type: actions.SAVE_TO_DB_SUCCESS })
@@ -326,6 +360,9 @@ function TodoEditor() {
     }
   }
 
+
+
+
   /**
    * Function to delete the todo from redux and database
    *
@@ -349,6 +386,9 @@ function TodoEditor() {
     }
   }
 
+
+
+
   /**
    * Delete button to delete multiple todos
    *    when checkboxes are selected
@@ -366,6 +406,9 @@ function TodoEditor() {
       </button>
     )
   }
+
+
+
 
   /**
    * Actual todo contents including the icons

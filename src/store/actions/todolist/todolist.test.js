@@ -2,11 +2,18 @@ import moxios from 'moxios';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 
+import { validDecryptedKey } from '../../../testUtils';
 import Axios from '../../../axios-notes';
 import * as actionTypes from '../actionTypes';
 import * as actions from './todolist';
 
 const mockStore = configureMockStore([thunk]);
+
+const titlesEncrypted = [
+    { todoId: '123', todoTitle: 'U2FsdGVkX18iPTBkwyx5KGC15QI8Iby035qFP3WOeyk=' },
+    { todoId: '456', todoTitle: 'U2FsdGVkX19rP0R+xtgpYgwqB7kzKxvipp4vfNLeLOA=' },
+    { todoId: '789', todoTitle: 'U2FsdGVkX1/xybot56EHdHjF6YrSb1a2bsncJDWDoO4=' },
+];
 
 const titles = [
     { todoId: '123', todoTitle: 'Title 1' },
@@ -40,7 +47,7 @@ it('should return action type `FETCH_TODOS_TITLES_SUCCESS`', () => {
 });
 
 describe('Testing `fetchAllTodos` action creator', () => {
-    const idToken = 'id8756';
+    const secretKey = validDecryptedKey
     const recordNumber = 15;
     let store;
     beforeEach(() => {
@@ -52,7 +59,7 @@ describe('Testing `fetchAllTodos` action creator', () => {
         moxios.uninstall(Axios);
     })
     it('should return action types { FETCH_MORE_TODOS_START, FETCH_TODOS_TITLES_SUCCESS }', (done) => {
-        store.dispatch(actions.fetchAllTodos(idToken, recordNumber));
+        store.dispatch(actions.fetchAllTodos(recordNumber, secretKey));
         const expectedActions = [
             { type: actionTypes.FETCH_MORE_TODOS_START },
             {
@@ -64,7 +71,7 @@ describe('Testing `fetchAllTodos` action creator', () => {
             const request = moxios.requests.mostRecent();
             request.respondWith({
                 status: 200,
-                response: titles
+                response: titlesEncrypted
             }).then(() => {
                 expect(store.getActions()).toEqual(expectedActions);
                 done();
@@ -73,7 +80,7 @@ describe('Testing `fetchAllTodos` action creator', () => {
     });
 
     it('should return action types { FETCH_MORE_TODOS_START, FETCH_TODOS_TITLES_FAILED }', (done) => {
-        store.dispatch(actions.fetchAllTodos(idToken, recordNumber));
+        store.dispatch(actions.fetchAllTodos(recordNumber, validDecryptedKey));
         const expectedActions = [
             { type: actionTypes.FETCH_MORE_TODOS_START },
             { type: actionTypes.FETCH_TODOS_TITLES_FAILED }

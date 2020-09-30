@@ -26,7 +26,8 @@ class NoteViewer extends Component {
     if (this.props.notelist.length === 0 && !this.props.loading) {
       if (this.props.userId !== null && !this.props.fetchFailed) {
         this.props.onFetchNotes(
-          this.props.nextRecordNumber
+          this.props.nextRecordNumber,
+          this.props.secretKey
         );
       }
     } else if (
@@ -44,7 +45,7 @@ class NoteViewer extends Component {
    * @function loadMoreNotesHandler
    */
   loadMoreNotesHandler = () => {
-    this.props.onFetchNotes(this.props.nextRecordNumber);
+    this.props.onFetchNotes(this.props.nextRecordNumber, this.props.secretKey);
   };
 
   render() {
@@ -132,6 +133,7 @@ class NoteViewer extends Component {
 
 export const mapStateToProps = (state) => {
   return {
+    secretKey: state.auth.secretKey,
     userId: state.auth.userId,
     notelist: state.notelist.notes,
     nextRecordNumber: state.notelist.nextRecordNumber,
@@ -143,8 +145,8 @@ export const mapStateToProps = (state) => {
 
 export const mapDispatchToProps = (dispatch) => {
   return {
-    onFetchNotes: (nextRecordNumber) =>
-      dispatch(actions.fetchAllNotes(nextRecordNumber)),
+    onFetchNotes: (nextRecordNumber, secretKey) =>
+      dispatch(actions.fetchAllNotes(nextRecordNumber, secretKey)),
     onClearNotes: () => dispatch(actions.clearTitles()),
   };
 };

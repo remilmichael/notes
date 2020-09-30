@@ -1,5 +1,6 @@
 import * as actions from '../actionTypes';
 import axios from '../../../axios-notes';
+import { decrypt } from '../../../utility';
 import { RECORD_COUNT } from '../../reducers/todolist/todolist';
 
 
@@ -47,11 +48,11 @@ export const fetchTitlesSuccess = (titles) => {
  * Function to fetch todo titles from server
  * 
  * @function fetchAllTodos
- * @param {String} idToken - JWT authentication token
- * @param {Number} page - Next record to fetch
+ * @param {number} page - Next record to fetch
+ * @param {string} secretKey - Secret key for decryption
  * @returns {Function}
  */
-export const fetchAllTodos = (page) => {
+export const fetchAllTodos = (page, secretKey) => {
     return dispatch => {
         dispatch(fetchMoreTitleStart());
         axios.get(`/todos/page/${page}/${RECORD_COUNT}`, {
@@ -59,7 +60,13 @@ export const fetchAllTodos = (page) => {
         })
             .then((response) => {
                 if (response.data) {
-                    dispatch(fetchTitlesSuccess(response.data))
+                    const data = response.data.map((item) => {
+                        return {
+                            todoId: item.todoId,
+                            todoTitle: decrypt(item.todoTitle, secretKey)
+                        }
+                    })
+                    dispatch(fetchTitlesSuccess(data))
                 } else {
                     dispatch(fetchTitlesFailed());
                 }

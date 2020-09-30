@@ -1,5 +1,6 @@
 import * as actions from '../actionTypes';
 import axios from '../../../axios-notes';
+import { decrypt } from '../../../utility';
 import { RECORD_COUNT } from '../../reducers/notelist/notelist';
 
 /**
@@ -61,10 +62,11 @@ export const clearTitles = () => {
  * Function to fetch note titles from server
  * 
  * @function fetchAllNotes
- * @param {Number} page - Next record to fetch
+ * @param {number} page - Next record to fetch
+ * @param {string} secretKey - Secret key for decryption
  * @returns {Function}
  */
-export const fetchAllNotes = (page) => {
+export const fetchAllNotes = (page, secretKey) => {
     return dispatch => {
         dispatch(fetchMoreTitleStart());
         axios.get(`/notes/page/${page}/${RECORD_COUNT}`, {
@@ -72,7 +74,13 @@ export const fetchAllNotes = (page) => {
         })
             .then((response) => {
                 if (response.data) {
-                    dispatch(fetchTitlesSuccess(response.data))
+                    const data = response.data.map((item) => {
+                        return {
+                            noteHeading: decrypt(item.noteHeading, secretKey),
+                            noteId: item.noteId
+                        }
+                    })
+                    dispatch(fetchTitlesSuccess(data))
                 } else {
                     dispatch(fetchTitlesFailed());
                 }

@@ -4,7 +4,14 @@ import moxios from 'moxios';
 
 import Axios from '../axios-notes';
 import NoteViewer from '../container/NoteViewer/NoteViewer';
-import { storeFactory, authInitialState, sampleNotes, findByTestAttr, findByIdSelector } from '../testUtils';
+import {
+    storeFactory,
+    authInitialState,
+    sampleNotes,
+    findByTestAttr,
+    findByIdSelector,
+    validDecryptedKey
+} from '../testUtils';
 import { initialState as notelistInitialState } from '../store/reducers/notelist/notelist';
 
 /**
@@ -24,7 +31,7 @@ describe('Accessing `NoteViewer` after logged-in', () => {
 
     const authWithCredentials = {
         ...authInitialState,
-        idToken: 'sampleToken123',
+        secretKey: validDecryptedKey,
         userId: 'id123',
         expiresOn: new Date()
     }
@@ -63,6 +70,12 @@ describe('Accessing `NoteViewer` after logged-in', () => {
             nextRecordNumber: sampleNotes.length
         };
 
+        const moreNotesEncrypted = [
+            { noteId: 'abcd', noteHeading: 'U2FsdGVkX18cA7mihsGChmvGEWVbkzVjyJxf4+HONfE=' },
+            { noteId: '131', noteHeading: 'U2FsdGVkX19NQkdyUcLAoikEUD6Pc5fxdsyeQ5hogWU=' },
+            { noteId: '454', noteHeading: 'U2FsdGVkX19xZvKrX6zyvhxM8WtKA5eSysEdmReJO5E=' },
+        ];
+
         const moreNotes = [
             { noteId: 'abcd', noteHeading: 'Heading 5' },
             { noteId: '131', noteHeading: 'Heading 6' },
@@ -73,7 +86,7 @@ describe('Accessing `NoteViewer` after logged-in', () => {
             const request = moxios.requests.mostRecent()
             request.respondWith({
                 status: 200,
-                response: moreNotes
+                response: moreNotesEncrypted
             }).then(() => {
                 const receivedState = wrapper.instance().props.store.getState().notelist;
                 const expectedState = {

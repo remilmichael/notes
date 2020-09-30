@@ -28,9 +28,9 @@ function TodoViewer() {
             auth.userId &&
             !todolist.loading &&
             todolist.hasMoreTodos) {
-            dispatch(actions.fetchAllTodos(todolist.nextRecordNumber));
+            dispatch(actions.fetchAllTodos(todolist.nextRecordNumber, auth.secretKey));
         }
-    }, [todolist, dispatch, auth.userId]);
+    }, [todolist, dispatch, auth.userId, auth.secretKey]);
 
 
     /**
