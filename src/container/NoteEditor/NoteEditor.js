@@ -165,10 +165,10 @@ class NoteEditor extends Component {
             this.setState({ heading: heading }, () => {
                 this.saveNoteHandler();
             });
-        } else if (this.state.heading.length > 150) {
+        } else if (this.state.heading.length > 130) {
             // Max. length is set to 150 characters.
             this.setState({
-                error: `Maximum characters for heading is 150. Current count ${this.state.heading.length}`
+                error: `Maximum characters for heading is 130. Current count ${this.state.heading.length}`
             });
         } else {
             this.saveNoteHandler();

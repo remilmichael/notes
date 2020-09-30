@@ -124,6 +124,8 @@ function TodoEditor() {
       const item = inputRef.current.value
       if (item.trim().length === 0) {
         alert('Nothing to add')
+      } else if (item.length > 500) {
+        alert('Maximum characters is set to 500')
       } else {
         const nextIndex = state.todos.length
         const newTodo = {
@@ -293,6 +295,14 @@ function TodoEditor() {
         type: actions.SET_ERROR,
         payload: {
           error: 'Give a title for todo',
+          errorType: 'warning'
+        }
+      })
+    } else if (title.length > 130) {
+      dispatch({
+        type: actions.SET_ERROR,
+        payload: {
+          error: 'Maximum characters for title is set to 130',
           errorType: 'warning'
         }
       })
